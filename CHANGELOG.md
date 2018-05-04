@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
-
 <!--
   MIT License
 
-  Copyright 2018 Sabre GLBL Inc.
+  Copyright 2017-2018 Sabre GLBL Inc.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +20,11 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  -->
+ -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+# YARE Change Log
+The change log adheres [Keep a CHANGELOG](http://keepachangelog.com/) methodology.
 
-    <parent>
-        <groupId>com.sabre.oss.yare</groupId>
-        <artifactId>yare</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>yare-model</artifactId>
-</project>
+## [Unreleased]
+### Added
+- YARE source code donation to open source community.

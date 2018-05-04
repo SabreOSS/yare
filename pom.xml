@@ -30,11 +30,11 @@
 
     <groupId>com.sabre.oss.yare</groupId>
     <artifactId>yare</artifactId>
-    <version>1.0.2.RC1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>YARE</name>
-    <description>YARE is a rules engine that simplifies processing rules</description>
+    <description>YARE is a rules engine for Java that simplifies processing rules</description>
     <inceptionYear>2018</inceptionYear>
     <organization>
         <name>Sabre GLBL Inc.</name>
