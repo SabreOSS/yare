@@ -22,24 +22,14 @@
   SOFTWARE.
   -->
 
-<!-- tag::part-of-validation-example-xml[] -->
 <Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
-    <Fact name="flight" type="com.sabre.oss.yare.documentation.userguide.Flight"/>
+    <Attribute name="ruleName" value="Should match flight with given class of service" type="java.lang.String"/>
+    <Fact name="flight" type="com.sabre.oss.yare.examples.facts.Flight"/>
     <Predicate>
-        <And>
-            <Operator type="less-or-equal">
-                <Field path="price" ref="flight"/>
-                <Value type="java.math.BigDecimal">100</Value>
-            </Operator>
-            <Operator type="less">
-                <Function name="getDiffInHours">
-                    <Parameter name="date">
-                        <Field path="dateOfDeparture" ref="flight"/>
-                    </Parameter>
-                </Function>
-                <Value type="java.lang.Long">24</Value>
-            </Operator>
-        </And>
+        <Operator type="equal">
+            <Field path="classOfService" type="java.lang.String" ref="flight"/>
+            <Value type="java.lang.String">First Class</Value>
+        </Operator>
     </Predicate>
     <Action name="collect">
         <Parameter name="context">
@@ -50,4 +40,3 @@
         </Parameter>
     </Action>
 </Rule>
-<!-- end::part-of-validation-example-xml[] -->

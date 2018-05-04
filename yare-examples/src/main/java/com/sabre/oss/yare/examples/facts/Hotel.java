@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Hotel {
-
     private String hotelName;
     private String chainCode;
     private boolean isPreferred;

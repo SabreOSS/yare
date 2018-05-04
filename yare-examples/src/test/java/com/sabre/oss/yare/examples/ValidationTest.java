@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.documentation.userguide;
+package com.sabre.oss.yare.examples;
 
 import com.google.common.io.Resources;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
+import com.sabre.oss.yare.examples.facts.Flight;
 import com.sabre.oss.yare.model.validator.DefaultRuleValidator;
 import com.sabre.oss.yare.model.validator.ValidationResult;
 import com.sabre.oss.yare.model.validator.ValidationResults;
@@ -46,7 +47,6 @@ class ValidationTest {
     @Test
     void shouldNotThrowExceptionWithMalformedRuleAndDisabledValidation() {
         // given / when /then
-        // tag::part-of-validation-example-disabled[]
         Rule rule = RuleDsl.ruleBuilder()
                 .fact("flight", Flight.class)
                 .predicate(
@@ -66,7 +66,6 @@ class ValidationTest {
                         param("context", reference("ctx")),
                         param("fact", reference("flight")))
                 .build(false);
-        // end::part-of-validation-example-disabled[]
     }
 
     @Test
@@ -102,20 +101,14 @@ class ValidationTest {
                 Resources.getResource("exampleRules/invalidRule.xml"),
                 Charset.defaultCharset());
 
-        // tag::part-of-validation-example-unmarshalling[]
         Rule unmarshalledRule = RuleToXmlConverter.getInstance().unmarshal(invalidRuleInXmlString);
-        // end::part-of-validation-example-unmarshalling[]
 
         // when
-        // tag::part-of-validation-example-rule-from-xml-validation[]
         ValidationResults validationResults = DefaultRuleValidator.getRuleValidator().validate(unmarshalledRule);
-        // end::part-of-validation-example-rule-from-xml-validation[]
 
         // then
-        assertThat(validationResults.getResults()).hasSize(1);
-        ValidationResult validationResult = validationResults.getResults().get(0);
-        assertThat(validationResult.getLevel()).isEqualTo(ValidationResult.Level.ERROR);
-        assertThat(validationResult.getCode()).isEqualTo("rule.attribute.rule-name-attribute-not-set");
-        assertThat(validationResult.getMessage()).isEqualTo("Attribute Error: \"ruleName\" was not specified");
+        assertThat(validationResults.getResults()).containsExactly(
+                ValidationResult.error("rule.attribute.rule-name-attribute-not-set", "Attribute Error: \"ruleName\" was not specified")
+        );
     }
 }

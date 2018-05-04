@@ -22,13 +22,14 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.documentation.userguide;
+package com.sabre.oss.yare.examples;
 
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
+import com.sabre.oss.yare.examples.facts.Hotel;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -46,14 +47,29 @@ class JavaScriptFunctionTest {
     void shouldMatchFactsWhenUsingJavaScriptFunction() {
         // given
         List<Hotel> facts = Arrays.asList(
-                new Hotel("HH"),
-                new Hotel("BV"),
-                new Hotel("SE"),
-                new Hotel("BW"),
-                new Hotel("HH")
+                new Hotel().withChainCode("HH"),
+                new Hotel().withChainCode("BV"),
+                new Hotel().withChainCode("SE"),
+                new Hotel().withChainCode("BW"),
+                new Hotel().withChainCode("HH")
         );
-        // tag::part-of-javascript-functions-example-rule[]
-        List<Rule> rules = Collections.singletonList(
+        List<Rule> rules = createRules();
+
+        RulesEngine rulesEngine = createRulesEngine(rules);
+        RuleSession ruleSession = rulesEngine.createSession("test");
+
+        // when
+        List<Hotel> result = ruleSession.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(result).containsExactly(
+                new Hotel().withChainCode("HH"),
+                new Hotel().withChainCode("HH")
+        );
+    }
+
+    private List<Rule> createRules() {
+        return Collections.singletonList(
                 RuleDsl.ruleBuilder()
                         .name("Rule matching when hotel has specified chain code")
                         .fact("hotel", Hotel.class)
@@ -70,23 +86,9 @@ class JavaScriptFunctionTest {
                                 param("fact", reference("hotel")))
                         .build()
         );
-        // end::part-of-javascript-functions-example-rule[]
-
-        RulesEngine rulesEngine = getRulesEngine(rules);
-        RuleSession ruleSession = rulesEngine.createSession("test");
-
-        // when
-        List<Hotel> result = ruleSession.execute(new ArrayList<>(), facts);
-
-        // then
-        assertThat(result).containsExactly(
-                new Hotel("HH"),
-                new Hotel("HH")
-        );
     }
 
-    private RulesEngine getRulesEngine(List<Rule> rules) {
-        // tag::part-of-javascript-functions-example-engine[]
+    private RulesEngine createRulesEngine(List<Rule> rules) {
         String script = "" +
                 "function concat(str1, str2) { " +
                 "   return str1 + str2; " +
@@ -94,12 +96,10 @@ class JavaScriptFunctionTest {
                 "function collect(ctx, fact) {" +
                 "   ctx.add(fact);" +
                 "}";
-        RulesEngine rulesEngine = new RulesEngineBuilder()
+        return new RulesEngineBuilder()
                 .withRulesRepository(i -> rules)
                 .withActionMapping("collect", js("collect", script))
                 .withFunctionMapping("concat", js("concat", script))
                 .build();
-        // end::part-of-javascript-functions-example-engine[]
-        return rulesEngine;
     }
 }

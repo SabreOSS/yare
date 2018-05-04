@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.documentation.userguide;
+package com.sabre.oss.yare.examples;
 
 import com.google.common.io.Resources;
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
+import com.sabre.oss.yare.examples.facts.Flight;
 import com.sabre.oss.yare.serializer.xml.RuleToXmlConverter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
@@ -43,39 +43,29 @@ class DifferentRuleFormatsTest {
     void shouldMatchRuleWithXmlFormat() throws IOException {
         // given
         Rule exampleRule = createExampleRule();
-        String exampleRuleInJson = getResourceFileContent("exampleRule.xml");
+        String marshalledRule = getResourceFileContent("exampleRule.xml");
 
         // when
-        Rule unmarshalledRule = RuleToXmlConverter.getInstance().unmarshal(exampleRuleInJson);
+        Rule unmarshalledRule = RuleToXmlConverter.getInstance().unmarshal(marshalledRule);
 
         // then
         assertThat(unmarshalledRule).isEqualTo(exampleRule);
     }
 
     private Rule createExampleRule() {
-        // tag::example-rule-java-dsl[]
-        Rule rule = RuleDsl.ruleBuilder()
-                .name("Rule matching when flight departs in 24h and it's price is less or equal 100$")
+        return RuleDsl.ruleBuilder()
+                .name("Should match flight with given class of service")
                 .fact("flight", Flight.class)
                 .predicate(
-                        and(
-                                lessOrEqual(
-                                        field("flight.price"),
-                                        value(new BigDecimal(100))
-                                ),
-                                less(
-                                        function("getDiffInHours", Long.class,
-                                                param("date", field("flight", "dateOfDeparture"))),
-                                        value(24L)
-                                )
+                        equal(
+                                field("flight.classOfService", String.class),
+                                value("First Class")
                         )
                 )
                 .action("collect",
                         param("context", reference("ctx")),
                         param("fact", reference("flight")))
                 .build();
-        // end::example-rule-java-dsl[]
-        return rule;
     }
 
     private String getResourceFileContent(String resourceFile) throws IOException {

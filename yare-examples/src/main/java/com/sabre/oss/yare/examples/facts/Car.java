@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Car {
-
     private BigDecimal totalRate;
 
     public BigDecimal getTotalRate() {

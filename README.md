@@ -34,7 +34,7 @@ It is an approach to implement an Expert System which is reliable, fast and full
 
 Beyond the advantages of business rules engines YARE makes its own contribution to user experience:
 
-* YARE is significantly faster than other rules engines for single-type collection input (e.q. List<Flight>).
+* YARE is significantly faster than other rules engines for single-type collection input (e.q. List\<Flight\>).
 * YARE allows for sequential evaluation, which is useful when it comes to modifying facts during execution.
 * YARE allows for function evaluation in condition segment of rule.
 * YARE is using three-valued logic (true/false/null).
