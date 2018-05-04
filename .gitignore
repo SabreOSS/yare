@@ -1,0 +1,10 @@
+# Recursive ignores
+.idea
+*.iml
+.project
+.classpath
+.settings
+target
+
+# Global ignores
+/.mvn/timing.properties

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+
+<!--
+  MIT License
+
+  Copyright 2018 Sabre GLBL Inc.
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  -->
+
+<!--suppress XmlUnusedNamespaceDeclaration -->
+<jaxb:bindings xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
+               xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1"
+               version="2.1"
+               xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_1.xsd
+                      http://jaxb2-commons.dev.java.net/namespace-prefix http://java.net/projects/jaxb2-commons/sources/svn/content/namespace-prefix/trunk/src/main/resources/prefix-namespace-schema.xsd">
+
+    <jaxb:bindings schemaLocation="yare-rules.xsd">
+        <jaxb:schemaBindings>
+            <jaxb:package name="com.sabre.oss.yare.serializer.model"/>
+        </jaxb:schemaBindings>
+
+        <jaxb:bindings>
+            <namespace:prefix name="yare"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Action">
+            <jaxb:class name="ActionSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Attribute">
+            <jaxb:class name="AttributeSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:CustomValue">
+            <jaxb:class name="CustomValueSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Fact">
+            <jaxb:class name="FactSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Field">
+            <jaxb:class name="FieldSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Function">
+            <jaxb:class name="FunctionSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Parameter">
+            <jaxb:class name="ParameterSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Predicate">
+            <jaxb:class name="PredicateSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Reference">
+            <jaxb:class name="ReferenceSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Rule">
+            <jaxb:class name="RuleSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Value">
+            <jaxb:class name="ValueSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:Values">
+            <jaxb:class name="ValuesSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:RelationOperator">
+            <jaxb:class name="OperatorSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:LogicalOperatorAnd">
+            <jaxb:class name="AndSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:LogicalOperatorOr">
+            <jaxb:class name="OrSer"/>
+        </jaxb:bindings>
+
+        <jaxb:bindings scd="~yare:LogicalOperatorNot">
+            <jaxb:class name="NotSer"/>
+        </jaxb:bindings>
+
+    </jaxb:bindings>
+</jaxb:bindings>

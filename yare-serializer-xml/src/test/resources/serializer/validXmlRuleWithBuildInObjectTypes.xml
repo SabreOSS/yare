@@ -1,0 +1,99 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright 2018 Sabre GLBL Inc.
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  ~
+  -->
+
+<!--suppress XmlUnusedNamespaceDeclaration -->
+<yare:Rule xmlns:custom="http://example.sabre.com/custom/schema"
+           xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1">
+    <yare:Attribute name="ruleName" type="java.lang.String" value="RuleName"/>
+    <yare:Attribute name="ruleType" type="java.lang.String" value="RuleType"/>
+    <yare:Attribute name="startDate" type="java.time.ZonedDateTime" value="2016-06-30T00:00+01:00[Europe/London]"/>
+    <yare:Attribute name="expireDate" type="java.time.ZonedDateTime" value="2017-01-02T00:00Z"/>
+    <yare:Fact name="fact1" type="java.lang.Object"/>
+    <yare:Predicate>
+        <yare:And>
+            <yare:And>
+                <yare:Value type="java.lang.Boolean">false</yare:Value>
+                <yare:Operator type="EQUALS">
+                    <yare:Reference ref="someVariable"/>
+                    <yare:Value type="java.lang.Boolean">false</yare:Value>
+                </yare:Operator>
+                <yare:Operator type="EQUALS">
+                    <yare:Field ref="fact" path="field" type="java.lang.Boolean"/>
+                    <yare:Field ref="otherFact" path="otherField" type="java.lang.Object"/>
+                </yare:Operator>
+            </yare:And>
+            <yare:Or>
+                <yare:Value type="java.lang.Boolean">false</yare:Value>
+                <yare:Operator type="EQUALS">
+                    <yare:Reference ref="someVariable"/>
+                    <yare:Value type="java.lang.Boolean">false</yare:Value>
+                </yare:Operator>
+            </yare:Or>
+            <yare:Not>
+                <yare:Value type="java.lang.Boolean">false</yare:Value>
+            </yare:Not>
+            <yare:Operator type="EQUALS">
+                <yare:Reference ref="someVariable"/>
+                <yare:Value type="java.lang.Boolean">false</yare:Value>
+            </yare:Operator>
+            <yare:Function name="someFunction" returnType="java.lang.Boolean">
+                <yare:Parameter name="funcArg1">
+                    <yare:Value type="java.lang.String">value</yare:Value>
+                </yare:Parameter>
+                <yare:Parameter name="funcArg1">
+                    <yare:Reference ref="property"/>
+                </yare:Parameter>
+                <yare:Parameter name="funcArg3">
+                    <yare:Function name="otherFunction" returnType="java.lang.Long">
+                        <yare:Parameter name="param">
+                            <yare:Field ref="fact" path="field" type="java.lang.String"/>
+                        </yare:Parameter>
+                    </yare:Function>
+                </yare:Parameter>
+            </yare:Function>
+            <yare:Value type="java.lang.Boolean">false</yare:Value>
+        </yare:And>
+    </yare:Predicate>
+    <yare:Action name="ActionName1">
+        <yare:Parameter name="ParameterName1">
+            <yare:Values type="java.lang.String">
+                <yare:Value>anyValueA</yare:Value>
+            </yare:Values>
+        </yare:Parameter>
+        <yare:Parameter name="ParameterName2">
+            <yare:Values type="java.lang.String">
+                <yare:Value>anyValueB</yare:Value>
+            </yare:Values>
+        </yare:Parameter>
+    </yare:Action>
+    <yare:Action name="ActionName1">
+        <yare:Parameter name="ParameterName1">
+            <yare:Value type="java.lang.String">anyValueA</yare:Value>
+        </yare:Parameter>
+        <yare:Parameter name="ParameterName2">
+            <yare:Value type="java.lang.String">anyValueB</yare:Value>
+        </yare:Parameter>
+    </yare:Action>
+</yare:Rule>

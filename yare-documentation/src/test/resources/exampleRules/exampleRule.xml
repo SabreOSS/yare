@@ -1,0 +1,55 @@
+<!--
+  MIT License
+
+  Copyright 2018 Sabre GLBL Inc.
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  -->
+
+<!-- tag::example-rule-xml[] -->
+<Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
+    <Attribute name="ruleName" value="Rule matching when flight departs in 24h and it's price is less or equal 100$"
+               type="java.lang.String"/>
+    <Fact name="flight" type="com.sabre.oss.yare.documentation.userguide.Flight"/>
+    <Predicate>
+        <And>
+            <Operator type="less-or-equal">
+                <Field path="price" ref="flight"/>
+                <Value type="java.math.BigDecimal">100</Value>
+            </Operator>
+            <Operator type="less">
+                <Function name="getDiffInHours" returnType="java.lang.Long">
+                    <Parameter name="date">
+                        <Field path="dateOfDeparture" ref="flight"/>
+                    </Parameter>
+                </Function>
+                <Value type="java.lang.Long">24</Value>
+            </Operator>
+        </And>
+    </Predicate>
+    <Action name="collect">
+        <Parameter name="context">
+            <Reference ref="ctx"/>
+        </Parameter>
+        <Parameter name="fact">
+            <Reference ref="flight"/>
+        </Parameter>
+    </Action>
+</Rule>
+<!-- end::example-rule-xml[] -->

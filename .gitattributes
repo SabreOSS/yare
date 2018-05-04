@@ -1,0 +1,4 @@
+* text=auto
+
+.mvn/jvm.config eol=lf
+.mvn/maven.config eol=lf

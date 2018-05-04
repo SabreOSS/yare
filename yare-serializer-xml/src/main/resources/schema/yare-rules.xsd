@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!--
+  MIT License
+
+  Copyright 2018 Sabre GLBL Inc.
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  -->
+
+<xsd:schema xmlns:rul="http://www.sabre.com/schema/oss/yare/rules/v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            targetNamespace="http://www.sabre.com/schema/oss/yare/rules/v1" version="1.0">
+
+    <xsd:element name="Rule" type="rul:Rule"/>
+
+    <xsd:complexType name="Rule">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="rul:Attribute"/>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="rul:Fact"/>
+            <xsd:element ref="rul:Predicate"/>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="rul:Action"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="Attribute" type="rul:Attribute"/>
+
+    <xsd:complexType name="Attribute">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string"/>
+        <xsd:attribute name="type" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:element name="Fact" type="rul:Fact"/>
+
+    <xsd:complexType name="Fact">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="type" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:element name="Action" type="rul:Action"/>
+
+    <xsd:complexType name="Action">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="Parameter" type="rul:Parameter"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="Predicate" type="rul:Predicate"/>
+
+    <xsd:complexType name="Predicate">
+        <xsd:sequence>
+            <xsd:group ref="rul:BooleanExpression"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:group name="BooleanExpression">
+        <xsd:choice>
+            <xsd:element minOccurs="0" name="Operator" type="rul:RelationOperator"/>
+            <xsd:element minOccurs="0" name="Or" type="rul:LogicalOperatorOr"/>
+            <xsd:element minOccurs="0" name="And" type="rul:LogicalOperatorAnd"/>
+            <xsd:element minOccurs="0" name="Not" type="rul:LogicalOperatorNot"/>
+            <xsd:element minOccurs="0" ref="rul:Function"/>
+            <xsd:element minOccurs="0" ref="rul:Value"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:element name="RelationOperator" type="rul:RelationOperator"/>
+
+    <xsd:complexType name="RelationOperator">
+        <xsd:sequence>
+            <xsd:group maxOccurs="unbounded" ref="rul:Operand"/>
+        </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="Function" type="rul:Function"/>
+
+    <xsd:complexType name="Function">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" name="Parameter" type="rul:Parameter"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="returnType" type="xsd:string" default="java.lang.Object"/>
+    </xsd:complexType>
+
+    <xsd:group name="Operand">
+        <xsd:choice>
+            <xsd:group minOccurs="0" ref="rul:ConstantValue"/>
+            <xsd:element minOccurs="0" ref="rul:Reference"/>
+            <xsd:element minOccurs="0" ref="rul:Field"/>
+            <xsd:element minOccurs="0" ref="rul:Function"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:element name="Parameter" type="rul:Parameter"/>
+
+    <xsd:complexType name="Parameter">
+        <xsd:sequence>
+            <xsd:group ref="rul:Operand"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="LogicalOperatorOr" type="rul:LogicalOperatorOr"/>
+
+    <xsd:complexType name="LogicalOperatorOr">
+        <xsd:sequence>
+            <xsd:group maxOccurs="unbounded" ref="rul:BooleanExpression"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="LogicalOperatorAnd" type="rul:LogicalOperatorAnd"/>
+
+    <xsd:complexType name="LogicalOperatorAnd">
+        <xsd:sequence>
+            <xsd:group maxOccurs="unbounded" ref="rul:BooleanExpression"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="LogicalOperatorNot" type="rul:LogicalOperatorNot"/>
+
+    <xsd:complexType name="LogicalOperatorNot">
+        <xsd:sequence>
+            <xsd:group ref="rul:BooleanExpression"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="Reference" type="rul:Reference"/>
+
+    <xsd:complexType name="Reference">
+        <xsd:attribute name="ref" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="Field" type="rul:Field"/>
+
+    <xsd:complexType name="Field">
+        <xsd:complexContent>
+            <xsd:extension base="rul:Reference">
+                <xsd:attribute name="path" type="xsd:string" use="required"/>
+                <xsd:attribute name="type" type="xsd:string" default="java.lang.Object"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:group name="ConstantValue">
+        <xsd:choice>
+            <xsd:element minOccurs="0" ref="rul:Value"/>
+            <xsd:element minOccurs="0" ref="rul:Values"/>
+            <xsd:element minOccurs="0" ref="rul:CustomValue"/>
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:element name="Value" type="rul:Value"/>
+
+    <xsd:complexType name="Value">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="type" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:element name="Values" type="rul:Values"/>
+
+    <xsd:complexType name="Values">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="rul:Value"/>
+        </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation source="Description">List element type</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="CustomValue" type="rul:CustomValue">
+        <xsd:annotation>
+            <xsd:documentation source="Description">
+                This element should be used carefully due to the fact that it prevents converting rule from
+                one format to another (e.g. JSON into XML).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="CustomValue">
+        <xsd:annotation>
+            <xsd:documentation source="Description">
+                This element should be used carefully due to the fact that it prevents converting rule from
+                one format to another (e.g. JSON into XML).
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:any minOccurs="0" processContents="lax"/>
+        </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string"/>
+    </xsd:complexType>
+
+</xsd:schema>
