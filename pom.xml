@@ -85,7 +85,6 @@
         <module>yare-dsl</module>
         <module>yare-serializer-xml</module>
         <module>yare-examples</module>
-        <module>yare-documentation</module>
         <module>yare-performance</module>
         <module>yare-invoker-js</module>
         <module>yare-model</module>

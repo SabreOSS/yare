@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class Airline {
-
     private String name;
     private List<String> airlineCodes;
     private boolean isRejected = false;
