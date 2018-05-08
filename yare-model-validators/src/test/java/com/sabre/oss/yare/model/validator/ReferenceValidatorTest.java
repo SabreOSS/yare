@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.model.validator;
 
+import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
@@ -43,7 +44,7 @@ class ReferenceValidatorTest {
 
     @BeforeEach
     void setUp() {
-        validator = new ReferenceValidator(false);
+        validator = new ReferenceValidator(false, new ChainedTypeExtractor());
     }
 
     @Test

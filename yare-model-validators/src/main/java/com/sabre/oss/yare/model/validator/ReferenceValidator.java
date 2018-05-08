@@ -24,26 +24,26 @@
 
 package com.sabre.oss.yare.model.validator;
 
+import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
-    private final ConcurrentMap<Type, ConcurrentMap<String, Type>> typeProperties = new ConcurrentHashMap<>();
+    private final ChainedTypeExtractor chainedTypeExtractor;
 
-    public ReferenceValidator(boolean failFast) {
+    public ReferenceValidator(boolean failFast, ChainedTypeExtractor chainedTypeExtractor) {
         super(failFast);
+        this.chainedTypeExtractor = chainedTypeExtractor;
     }
 
     @Override
@@ -104,92 +104,40 @@ public class ReferenceValidator extends BaseValidator {
         } else if (!localReferences.keySet().contains(reference.getReference())) {
             append(results, ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> " + reference.getReference()));
         } else if (!StringUtils.isEmpty(reference.getPath())) {
-            String[] path = reference.getPath().split("\\.", -1);
-
-            if (hasEmptyPathSegment(path)) {
+            if (hasEmptyPathSegment(reference.getPath())) {
                 append(results, ValidationResult.error("rule.ref.empty-field", "Reference Error: field cannot have empty segments"));
-            } else if (findPathType(reference.getReferenceType(), results, path) == null) {
-                append(results, ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> " + reference.getReference() + "." + reference.getPath()));
+            } else {
+                checkPath(reference, results);
             }
         }
     }
 
-    private boolean hasEmptyPathSegment(String[] path) {
-        return Stream.of(path).anyMatch(StringUtils::isEmpty);
+    private boolean hasEmptyPathSegment(String path) {
+        String[] pathParts = path.split("\\.", -1);
+        return Stream.of(pathParts).anyMatch(StringUtils::isEmpty);
     }
 
-    private Type findPathType(Type type, ValidationResults results, String[] path) {
-        Type currentType = type;
-        for (String pathPart : path) {
-            Type finalCurrentType = currentType;
-            currentType = typeProperties.computeIfAbsent(currentType, k -> new ConcurrentHashMap<>())
-                    .computeIfAbsent(pathPart, s -> computeTypeProperties(finalCurrentType, s));
-            if (currentType == null) {
-                break;
-            }
+    private void checkPath(Expression.Reference reference, ValidationResults results) {
+        try {
+            checkCollectionOperator(reference, results);
+        } catch (ChainedTypeExtractor.InvalidPathException e) {
+            append(results, ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> " + reference.getReference() + "." + reference.getPath()));
+        }
+    }
+
+    private void checkCollectionOperator(Expression.Reference reference, ValidationResults results) {
+        String[] pathParts = reference.getPath().split("\\.", -1);
+        Type currentType = reference.getReferenceType();
+        for (String pathPart : pathParts) {
+            currentType = chainedTypeExtractor.findPathType(currentType, pathPart);
             if (!isCollection(currentType) && pathPart.contains("[*]")) {
                 append(results, ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type"));
             }
         }
-        return currentType;
-    }
-
-    private Type computeTypeProperties(Type type, String pathPart) {
-        return computeTypeOfReference(unwrapCollectionType(type), pathPart.replace("[*]", ""));
-    }
-
-    private Type unwrapCollectionType(Type type) {
-        return isCollection(type) ? getTypeOfElementInList(type) : type;
     }
 
     private boolean isCollection(Type type) {
         return type instanceof ParameterizedType &&
                 Collection.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType());
-    }
-
-    private Type getTypeOfElementInList(Type listType) {
-        return ((ParameterizedType) listType).getActualTypeArguments()[0];
-    }
-
-    private Type computeTypeOfReference(Type type, String pathPart) {
-        if (isTypeImplementingMap(type)) {
-            return getTypeOfValueInMap(type);
-        }
-        Optional<java.lang.reflect.Field> fieldOptional = getFieldOptional((Class<?>) type, pathPart);
-        if (fieldOptional.isPresent()) {
-            return fieldOptional.get().getGenericType();
-        }
-        Optional<Method> methodOptional = getMethodOptional((Class<?>) type, pathPart);
-        if (methodOptional.isPresent()) {
-            return methodOptional.get().getGenericReturnType();
-        }
-        return null;
-    }
-
-    private boolean isTypeImplementingMap(Type type) {
-        return Map.class.isAssignableFrom((Class<?>) type);
-    }
-
-    private Type getTypeOfValueInMap(Type type) {
-        return ((ParameterizedType) ((Class<?>) type).getGenericSuperclass()).getActualTypeArguments()[1];
-    }
-
-    private Optional<java.lang.reflect.Field> getFieldOptional(Class<?> type, String fieldName) {
-        return Arrays.stream(type.getFields())
-                .filter(f -> Modifier.isPublic(f.getModifiers()))
-                .filter(f -> f.getName().equals(fieldName))
-                .findFirst();
-    }
-
-    private Optional<Method> getMethodOptional(Class<?> type, String fieldName) {
-        return Arrays.stream(type.getMethods())
-                .filter(m -> m.getParameterCount() == 0)
-                .filter(m -> (m.getName().equals("get" + capitalize(fieldName)) ||
-                        m.getName().equals("is" + capitalize(fieldName))))
-                .findFirst();
-    }
-
-    private String capitalize(String fieldName) {
-        return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 }
