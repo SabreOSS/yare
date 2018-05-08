@@ -28,15 +28,16 @@ import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
 class CallConverterTest {
     private CallConverter callConverter;
@@ -46,64 +47,67 @@ class CallConverterTest {
         callConverter = new CallConverter();
     }
 
-    @Test
-    void shouldProperlyConvertAction() {
-        // given
-        Expression.Action action = getAction();
+    @ParameterizedTest
+    @MethodSource("mappings")
+    void shouldConvertExpressionToArgument(Expression expression, Argument argument) {
+        Argument.Invocation invocation = callConverter.apply(ExpressionFactory.functionOf("name", Object.class, "call", expression));
 
-        // when
-        Argument.Invocation invocation = callConverter.apply(action);
-
-        // then
-        assertThat(invocation).isNotNull();
-        assertThat(invocation.getName()).isEqualTo(action.getName());
-        assertThat(invocation.getCall()).isEqualTo(action.getName());
-        assertThat(invocation.getArguments().stream()
-                .map(Argument::getName)
-                .collect(Collectors.toSet()))
-                .isEqualTo(action.getArguments().stream()
-                        .map(Expression::getName)
-                        .collect(Collectors.toSet()));
+        assertThat(invocation).isEqualTo(ArgumentFactory.invocationOf("name", Argument.UNKNOWN, "call", argument));
     }
 
-    @Test
-    void shouldProperlyConvertActionParametersToArguments() {
-        // given
-        List<? extends Expression> actionParameters = getActionParameters();
-
-        // when
-        Map<String, Argument> arguments = actionParameters.stream()
-                .map(parameter -> new Object[]{parameter.getName(), callConverter.convert(parameter)})
-                .collect(Collectors.toMap((Object[] k) -> k[0].toString(), (Object[] v) -> (Argument) v[1]));
-
-        // then
-        assertThat(arguments).containsOnly(
-                entry("booleanFalse", Argument.valueOf("booleanFalse", Boolean.FALSE)),
-                entry("booleanTrue", Argument.valueOf("booleanTrue", Boolean.TRUE)),
-                entry("number", Argument.valueOf("number", Long.parseLong("1234"))),
-                entry("decimalNumber", Argument.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456))),
-                entry("ordinaryString", Argument.valueOf("ordinaryString", "Just a string")),
-                entry("listOfNumbers", Argument.valueOf("listOfNumbers", new CallConverter.InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))),
-                entry("listOfStrings", Argument.valueOf("listOfStrings", new CallConverter.InternalParameterizedType(null, List.class, String.class), asList("one", "two"))),
-                entry("simpleReference", Argument.referenceOf("simpleReference", Object.class, Argument.UNKNOWN, "person")),
-                entry("propertyReference", Argument.referenceOf("propertyReference", Object.class, Argument.UNKNOWN, "person.name"))
+    private static Stream<Arguments> mappings() {
+        return Stream.of(
+                Arguments.of(
+                        ExpressionFactory.valueOf("booleanFalse", false),
+                        Argument.valueOf("booleanFalse", Boolean.FALSE)
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("booleanTrue", true),
+                        Argument.valueOf("booleanTrue", Boolean.TRUE)
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("number", 1234L),
+                        Argument.valueOf("number", Long.parseLong("1234"))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456)),
+                        Argument.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("ordinaryString", "Just a string"),
+                        Argument.valueOf("ordinaryString", "Just a string")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
+                        Argument.valueOf("listOfNumbers", new InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("listOfStrings", asList("one", "two")),
+                        Argument.valueOf("listOfStrings", new InternalParameterizedType(null, List.class, String.class), asList("one", "two"))
+                ),
+                Arguments.of(
+                        ExpressionFactory.referenceOf("simpleReference", Object.class, "person"),
+                        Argument.referenceOf("simpleReference", Object.class, Argument.UNKNOWN, "person")
+                ),
+                Arguments.of(
+                        ExpressionFactory.referenceOf("propertyReference", Object.class, "person", String.class, "name"),
+                        Argument.referenceOf("propertyReference", Object.class, Argument.UNKNOWN, "person.name")
+                )
         );
     }
 
-    Expression.Action getAction() {
-        return ExpressionFactory.actionOf("actionOne", "actionOne", getActionParameters());
-    }
+    @Test
+    void shouldConvertMultipleExpressions() {
+        Argument.Invocation invocation = callConverter.apply(
+                ExpressionFactory.functionOf("functionName", Object.class, "functionCall",
+                        ExpressionFactory.valueOf("string", "value"),
+                        ExpressionFactory.valueOf("boolean", false)
+                ));
 
-    List<Expression> getActionParameters() {
-        return asList(
-                ExpressionFactory.valueOf("booleanFalse", false),
-                ExpressionFactory.valueOf("booleanTrue", true),
-                ExpressionFactory.valueOf("number", 1234L),
-                ExpressionFactory.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456)),
-                ExpressionFactory.valueOf("ordinaryString", "Just a string"),
-                ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
-                ExpressionFactory.valueOf("listOfStrings", asList("one", "two")),
-                ExpressionFactory.referenceOf("simpleReference", Object.class, "person"),
-                ExpressionFactory.referenceOf("propertyReference", Object.class, "person", String.class, "name"));
+        assertThat(invocation).isEqualTo(
+                ArgumentFactory.invocationOf("functionName", Argument.UNKNOWN, "functionCall",
+                        Argument.valueOf("string", "value"),
+                        Argument.valueOf("boolean", Boolean.FALSE)
+                ));
     }
 }

@@ -77,8 +77,8 @@ class ConsequenceFactoryTest {
                 Argument.valueOf("arg3", 1234L),
                 Argument.valueOf("arg4", BigDecimal.valueOf(-123, 456)),
                 Argument.valueOf("arg5", "Just a string"),
-                Argument.valueOf("arg6", new CallConverter.InternalParameterizedType(null, List.class, Long.class), asList(1L, 2L)),
-                Argument.valueOf("arg7", new CallConverter.InternalParameterizedType(null, List.class, String.class), asList("one", "two")),
+                Argument.valueOf("arg6", new InternalParameterizedType(null, List.class, Long.class), asList(1L, 2L)),
+                Argument.valueOf("arg7", new InternalParameterizedType(null, List.class, String.class), asList("one", "two")),
                 Argument.referenceOf("arg8", Object.class, Argument.UNKNOWN, "person"),
                 Argument.referenceOf("arg9", Object.class, Argument.UNKNOWN, "person.name"));
         assertThat(invocations).containsKey("actionTwo");

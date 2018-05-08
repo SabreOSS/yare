@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -43,7 +42,7 @@ public final class ConsequenceFactory {
     private static final Logger log = LoggerFactory.getLogger(ConsequenceFactory.class);
 
     private final ProcessingInvocationFactory<Void> invocationFactory;
-    private final Function<Expression.Invocation, Argument.Invocation> callConverter;
+    private final CallConverter callConverter;
     private final ErrorHandler errorHandler;
 
     public ConsequenceFactory(ProcessingInvocationFactory<Void> invocationFactory) {
@@ -54,7 +53,7 @@ public final class ConsequenceFactory {
         this(invocationFactory, errorHandler, new CallConverter());
     }
 
-    public ConsequenceFactory(ProcessingInvocationFactory<Void> invocationFactory, ErrorHandler errorHandler, Function<Expression.Invocation, Argument.Invocation> actionConverter) {
+    public ConsequenceFactory(ProcessingInvocationFactory<Void> invocationFactory, ErrorHandler errorHandler, CallConverter actionConverter) {
         this.invocationFactory = Objects.requireNonNull(invocationFactory);
         this.errorHandler = errorHandler;
         this.callConverter = Objects.requireNonNull(actionConverter);

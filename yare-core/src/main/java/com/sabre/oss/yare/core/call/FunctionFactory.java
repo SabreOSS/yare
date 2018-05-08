@@ -32,20 +32,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public class FunctionFactory {
     private static final Logger log = LoggerFactory.getLogger(FunctionFactory.class);
 
     private final ProcessingInvocationFactory<Object> invocationFactory;
-    private final Function<Expression.Invocation, Argument.Invocation> callConverter;
+    private final CallConverter callConverter;
     private final ErrorHandler errorHandler;
 
     public FunctionFactory(ProcessingInvocationFactory<Object> invocationFactory) {
         this(invocationFactory, null, new CallConverter());
     }
 
-    public FunctionFactory(ProcessingInvocationFactory<Object> invocationFactory, ErrorHandler errorHandler, Function<Expression.Invocation, Argument.Invocation> callConverter) {
+    public FunctionFactory(ProcessingInvocationFactory<Object> invocationFactory, ErrorHandler errorHandler, CallConverter callConverter) {
         this.invocationFactory = Objects.requireNonNull(invocationFactory);
         this.errorHandler = errorHandler;
         this.callConverter = Objects.requireNonNull(callConverter);
