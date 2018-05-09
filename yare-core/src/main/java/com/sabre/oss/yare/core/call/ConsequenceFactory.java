@@ -28,6 +28,7 @@ import com.sabre.oss.yare.core.ErrorHandler;
 import com.sabre.oss.yare.core.error.ConsequenceCreationError;
 import com.sabre.oss.yare.core.invocation.Invocation;
 import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.core.model.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,17 +60,18 @@ public final class ConsequenceFactory {
         this.callConverter = Objects.requireNonNull(actionConverter);
     }
 
-    public Invocation<ProcessingContext, Void> createConsequence(String ruleId, List<? extends Expression.Invocation> actions) {
+    public Invocation<ProcessingContext, Void> createConsequence(Rule rule, List<? extends Expression.Invocation> actions) {
         List<Invocation<ProcessingContext, Void>> invocations = actions.stream()
-                .map(action -> createInvocation(ruleId, action))
+                .map(action -> createInvocation(rule, action))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
         return new Consequence(invocations, errorHandler);
     }
 
-    private Invocation<ProcessingContext, Void> createInvocation(String ruleId, Expression.Invocation action) {
+    private Invocation<ProcessingContext, Void> createInvocation(Rule rule, Expression.Invocation action) {
+        String ruleId = (String) rule.getAttribute("ruleName").getValue();
         try {
-            return invocationFactory.create(callConverter.apply(action));
+            return invocationFactory.create(callConverter.convert(rule, action));
         } catch (Exception e) {
             if (Objects.isNull(errorHandler) || !errorHandler.handleError(new ConsequenceCreationError(ruleId, action, e))) {
                 throw e;

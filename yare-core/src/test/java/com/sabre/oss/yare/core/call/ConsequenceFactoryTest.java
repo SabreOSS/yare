@@ -25,15 +25,14 @@
 package com.sabre.oss.yare.core.call;
 
 import com.sabre.oss.yare.core.invocation.Invocation;
+import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
+import com.sabre.oss.yare.core.model.Rule;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -59,7 +58,7 @@ class ConsequenceFactoryTest {
         bindings.put(ProcessingContext.CURRENT_RULE_NAME, "ruleOne");
 
         // when
-        Invocation<ProcessingContext, Void> consequence = consequenceFactory.createConsequence("ruleOne", getActions());
+        Invocation<ProcessingContext, Void> consequence = consequenceFactory.createConsequence(ruleWithName("ruleOne"), getActions());
         consequence.proceed(new StaticProcessingContext(bindings, new Object[0]));
 
         // then
@@ -89,6 +88,14 @@ class ConsequenceFactoryTest {
         assertThat(arguments.size()).isEqualTo(0);
 
         assertThat(proceedInvocations).containsKeys("actionOne", "actionTwo");
+    }
+
+    private Rule ruleWithName(String ruleName) {
+        return new Rule(
+                Collections.singleton(new Attribute("ruleName", String.class, ruleName)),
+                Collections.emptyList(),
+                null,
+                Collections.emptyList());
     }
 
     private List<Expression.Invocation> getActions() {

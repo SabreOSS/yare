@@ -50,7 +50,7 @@ class CallConverterTest {
     @ParameterizedTest
     @MethodSource("mappings")
     void shouldConvertExpressionToArgument(Expression expression, Argument argument) {
-        Argument.Invocation invocation = callConverter.apply(ExpressionFactory.functionOf("name", Object.class, "call", expression));
+        Argument.Invocation invocation = callConverter.convert(null, ExpressionFactory.functionOf("name", Object.class, "call", expression));
 
         assertThat(invocation).isEqualTo(ArgumentFactory.invocationOf("name", Argument.UNKNOWN, "call", argument));
     }
@@ -98,8 +98,8 @@ class CallConverterTest {
 
     @Test
     void shouldConvertMultipleExpressions() {
-        Argument.Invocation invocation = callConverter.apply(
-                ExpressionFactory.functionOf("functionName", Object.class, "functionCall",
+        Argument.Invocation invocation = callConverter.convert(
+                null, ExpressionFactory.functionOf("functionName", Object.class, "functionCall",
                         ExpressionFactory.valueOf("string", "value"),
                         ExpressionFactory.valueOf("boolean", false)
                 ));

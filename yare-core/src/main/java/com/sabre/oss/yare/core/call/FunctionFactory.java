@@ -28,6 +28,7 @@ import com.sabre.oss.yare.core.ErrorHandler;
 import com.sabre.oss.yare.core.error.ConsequenceCreationError;
 import com.sabre.oss.yare.core.invocation.Invocation;
 import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.core.model.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +51,10 @@ public class FunctionFactory {
         this.callConverter = Objects.requireNonNull(callConverter);
     }
 
-    public Invocation<ProcessingContext, Object> create(String ruleId, Expression.Invocation function) {
+    public Invocation<ProcessingContext, Object> create(Rule rule, Expression.Invocation function) {
+        String ruleId = (String) rule.getAttribute("ruleName").getValue();
         try {
-            return invocationFactory.create(callConverter.apply(function));
+            return invocationFactory.create(callConverter.convert(rule, function));
         } catch (Exception e) {
             if (Objects.isNull(errorHandler) || !errorHandler.handleError(new ConsequenceCreationError(ruleId, function, e))) {
                 throw e;

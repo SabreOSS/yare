@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.core.call;
 
 import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.core.model.Rule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +33,16 @@ import java.util.stream.Collectors;
 
 class CallConverter {
 
-    Argument.Invocation apply(Expression.Invocation invocation) {
+    Argument.Invocation convert(Rule rule, Expression.Invocation invocation) {
         List<Argument> arguments = new ArrayList<>(invocation.getArguments().size() + 1);
 
         return Argument.invocationOf(invocation.getName(), Argument.UNKNOWN, invocation.getCall(),
                 invocation.getArguments().stream()
-                        .map(this::convert)
+                        .map(param -> convertExpression(rule, param))
                         .collect(Collectors.toCollection(() -> arguments)));
     }
 
-    private Argument convert(Expression param) throws IllegalArgumentException {
+    private Argument convertExpression(Rule rule, Expression param) throws IllegalArgumentException {
         if (param instanceof Expression.Reference) {
             Expression.Reference reference = (Expression.Reference) param;
             return Argument.referenceOf(param.getName(), reference.getReferenceType(), Argument.UNKNOWN, prepareReference(reference.getReference(), reference.getPath()));
@@ -52,7 +53,7 @@ class CallConverter {
         }
         if (param instanceof Expression.Invocation) {
             Expression.Invocation invocation = (Expression.Invocation) param;
-            return apply(invocation);
+            return convert(rule, invocation);
         }
         throw new IllegalArgumentException(String.format("Parameter of type %s not supported in invocations (functions)", param));
     }

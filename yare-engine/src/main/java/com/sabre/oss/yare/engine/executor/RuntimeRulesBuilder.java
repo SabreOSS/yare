@@ -116,7 +116,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
         }
         if (expression instanceof Expression.Function) {
             Expression.Function function = (Expression.Function) expression;
-            Invocation<ProcessingContext, Object> invocation = functionFactory.create((String) context.getRule().getAttribute("ruleName").getValue(), function);
+            Invocation<ProcessingContext, Object> invocation = functionFactory.create(context.getRule(), function);
             return ValueProviderFactory.createFromInvocation(invocation);
         }
         if (expression instanceof Expression.Reference) {
@@ -144,7 +144,6 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     }
 
     private Invocation<ProcessingContext, Void> prepareConsequence(Rule rule) {
-        String ruleName = (String) rule.getAttribute("ruleName").getValue();
-        return consequenceFactory.createConsequence(ruleName, rule.getActions());
+        return consequenceFactory.createConsequence(rule, rule.getActions());
     }
 }
