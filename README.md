@@ -25,6 +25,7 @@
 ## _YARE_ - Rules Engine in Plain Java
 
 [![Build Status](https://travis-ci.org/SabreOSS/yare.svg?branch=master)](https://travis-ci.org/SabreOSS/yare)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.sabre.oss.yare/yare/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.sabre.oss.yare/yare)
 
 **YARE** (**Y**et **A**nother **R**ules **E**ngine) is a rule engine written in Java.
 It is an approach to implement an Expert System which is reliable, fast and full of capabilities.
@@ -38,7 +39,7 @@ Beyond the advantages of business rules engines YARE makes its own contribution 
 * YARE allows for sequential evaluation, which is useful when it comes to modifying facts during execution.
 * YARE allows for function evaluation in condition segment of rule.
 * YARE is using three-valued logic (true/false/null).
-* YARE provides a rule converter for XML
+* YARE provides a rule converter for XML.
 
 ## Getting Started
 
@@ -137,7 +138,8 @@ RuleSession ruleSession = rulesEngine.createSession("ruleSet");
 List<Flight> result = ruleSession.execute(new ArrayList(), flights);
 ```
 
-For more information about how to use YARE please read YARE User's Guide and check yare-examples module.
+For more information about how to use YARE please read [YARE User's Guide](https://github.com/SabreOSS/yare/wiki)
+and check yare-examples module.
 
 ## Contributing
 
