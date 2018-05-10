@@ -32,6 +32,8 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.reference.ReferenceFactory;
+import com.sabre.oss.yare.core.reference.ValuePlaceholderConverter;
 import com.sabre.oss.yare.engine.executor.runtime.operator.logical.False;
 import com.sabre.oss.yare.engine.executor.runtime.operator.logical.True;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.Predicate;
@@ -56,11 +58,13 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     private final PredicateFactory predicateFactory;
     private final FunctionFactory functionFactory;
     private final ConsequenceFactory consequenceFactory;
+    private final ValuePlaceholderConverter<ValueProvider> converter;
 
     public RuntimeRulesBuilder(PredicateFactory predicateFactory, FunctionFactory functionFactory, ConsequenceFactory consequenceFactory) {
         this.predicateFactory = predicateFactory;
         this.functionFactory = requireNonNull(functionFactory);
         this.consequenceFactory = requireNonNull(consequenceFactory);
+        this.converter = new ValuePlaceholderConverter<>(new ValueProviderReferenceFactory());
     }
 
     public RuntimeRules build(Collection<Rule> rules) {
@@ -112,7 +116,8 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     public ValueProvider createValueProvider(PredicateFactoryContext context, Expression expression) {
         if (expression instanceof Expression.Value) {
             Expression.Value value = (Expression.Value) expression;
-            return ValueProviderFactory.createFromConstant(value.getValue());
+            ValueProvider reference = converter.tryCreateReference(context.getRule(), value);
+            return reference != null ? reference : ValueProviderFactory.createFromConstant(value.getValue());
         }
         if (expression instanceof Expression.Function) {
             Expression.Function function = (Expression.Function) expression;
@@ -145,5 +150,26 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
 
     private Invocation<ProcessingContext, Void> prepareConsequence(Rule rule) {
         return consequenceFactory.createConsequence(rule, rule.getActions());
+    }
+
+    private static class ValueProviderReferenceFactory implements ReferenceFactory<ValueProvider> {
+
+        @Override
+        public ValueProvider create(String name, Type baseReferenceType, Type argumentType, String reference) {
+            String referenceName = reference;
+            String path = null;
+
+            int dotIndex = reference.indexOf('.');
+            if (dotIndex > -1) {
+                referenceName = reference.substring(0, dotIndex);
+                path = reference.substring(dotIndex + 1);
+            }
+
+            return ValueProviderFactory.createFromPath(
+                    TypeUtils.getRawType(baseReferenceType, null),
+                    referenceName,
+                    TypeUtils.getRawType(argumentType, null),
+                    path);
+        }
     }
 }

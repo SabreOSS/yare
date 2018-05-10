@@ -99,7 +99,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when outerChainingFact.instance.instance.string is test",
                 equal(
-                        field("outerChainingFact.instance.instance.string", String.class),
+                        value("${outerChainingFact.instance.instance.string}"),
                         value("test")
                 )
         );
