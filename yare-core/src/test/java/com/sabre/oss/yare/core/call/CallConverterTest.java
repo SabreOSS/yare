@@ -24,8 +24,7 @@
 
 package com.sabre.oss.yare.core.call;
 
-import com.sabre.oss.yare.core.model.Expression;
-import com.sabre.oss.yare.core.model.ExpressionFactory;
+import com.sabre.oss.yare.core.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +32,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -50,7 +50,7 @@ class CallConverterTest {
     @ParameterizedTest
     @MethodSource("mappings")
     void shouldConvertExpressionToArgument(Expression expression, Argument argument) {
-        Argument.Invocation invocation = callConverter.convert(null, ExpressionFactory.functionOf("name", Object.class, "call", expression));
+        Argument.Invocation invocation = callConverter.convert(createRule(), ExpressionFactory.functionOf("name", Object.class, "call", expression));
 
         assertThat(invocation).isEqualTo(ArgumentFactory.invocationOf("name", Argument.UNKNOWN, "call", argument));
     }
@@ -78,12 +78,44 @@ class CallConverterTest {
                         Argument.valueOf("ordinaryString", "Just a string")
                 ),
                 Arguments.of(
+                        ExpressionFactory.valueOf("nullValue", String.class, null),
+                        Argument.valueOf("nullValue", String.class, null)
+                ),
+                Arguments.of(
                         ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
                         Argument.valueOf("listOfNumbers", new InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))
                 ),
                 Arguments.of(
                         ExpressionFactory.valueOf("listOfStrings", asList("one", "two")),
                         Argument.valueOf("listOfStrings", new InternalParameterizedType(null, List.class, String.class), asList("one", "two"))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${ruleName}"),
+                        Argument.referenceOf("factFieldReference", String.class, String.class, "ruleName")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${ctx}"),
+                        Argument.referenceOf("factFieldReference", Object.class, Object.class, "ctx")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, UserFact.class, "fact")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact.field}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, String.class, "fact.field")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldListReference", "${fact.list}"),
+                        Argument.referenceOf("factFieldListReference", UserFact.class, new InternalParameterizedType(null, List.class, String.class), "fact.list")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("nonExistingReference", "${nonExisting}"),
+                        Argument.valueOf("nonExistingReference", String.class, "${nonExisting}")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("nonExistingField", "${fact.nonExisting}"),
+                        Argument.valueOf("nonExistingField", String.class, "${fact.nonExisting}")
                 ),
                 Arguments.of(
                         ExpressionFactory.referenceOf("simpleReference", Object.class, "person"),
@@ -99,15 +131,31 @@ class CallConverterTest {
     @Test
     void shouldConvertMultipleExpressions() {
         Argument.Invocation invocation = callConverter.convert(
-                null, ExpressionFactory.functionOf("functionName", Object.class, "functionCall",
+                createRule(),
+                ExpressionFactory.functionOf("functionName", Object.class, "functionCall",
                         ExpressionFactory.valueOf("string", "value"),
+                        ExpressionFactory.valueOf("reference", "${fact.field}"),
                         ExpressionFactory.valueOf("boolean", false)
                 ));
 
         assertThat(invocation).isEqualTo(
                 ArgumentFactory.invocationOf("functionName", Argument.UNKNOWN, "functionCall",
                         Argument.valueOf("string", "value"),
+                        Argument.referenceOf("reference", UserFact.class, String.class, "fact.field"),
                         Argument.valueOf("boolean", Boolean.FALSE)
                 ));
+    }
+
+    private Rule createRule() {
+        return new Rule(
+                Collections.singleton(new Attribute("ruleName", String.class, "nameOfRule")),
+                Collections.singletonList(new Fact("fact", UserFact.class)),
+                null,
+                Collections.emptyList());
+    }
+
+    private static class UserFact {
+        public String field;
+        public List<String> list;
     }
 }
