@@ -38,18 +38,18 @@
             <yare:And>
                 <yare:Value type="java.lang.Boolean">false</yare:Value>
                 <yare:Operator type="EQUALS">
-                    <yare:Reference ref="someVariable"/>
+                    <yare:Value>${someVariable}</yare:Value>
                     <yare:Value type="java.lang.Boolean">false</yare:Value>
                 </yare:Operator>
                 <yare:Operator type="EQUALS">
-                    <yare:Field ref="fact" path="boolField" type="java.lang.Boolean"/>
-                    <yare:Field ref="otherFact" path="otherField" type="java.lang.Object"/>
+                    <yare:Value>${fact.boolField}</yare:Value>
+                    <yare:Value>${otherFact.otherField}</yare:Value>
                 </yare:Operator>
             </yare:And>
             <yare:Or>
                 <yare:Value type="java.lang.Boolean">false</yare:Value>
                 <yare:Operator type="EQUALS">
-                    <yare:Reference ref="someVariable"/>
+                    <yare:Value>${someVariable}</yare:Value>
                     <yare:Value type="java.lang.Boolean">false</yare:Value>
                 </yare:Operator>
             </yare:Or>
@@ -57,20 +57,20 @@
                 <yare:Value type="java.lang.Boolean">false</yare:Value>
             </yare:Not>
             <yare:Operator type="EQUALS">
-                <yare:Reference ref="someVariable"/>
+                <yare:Value>${someVariable}</yare:Value>
                 <yare:Value type="java.lang.Boolean">false</yare:Value>
             </yare:Operator>
             <yare:Function name="someFunction" returnType="java.lang.Boolean">
                 <yare:Parameter name="funcArg1">
-                    <yare:Value type="java.lang.String">value</yare:Value>
+                    <yare:Value>value</yare:Value>
                 </yare:Parameter>
                 <yare:Parameter name="funcArg1">
-                    <yare:Reference ref="fact"/>
+                    <yare:Value>${fact}</yare:Value>
                 </yare:Parameter>
                 <yare:Parameter name="funcArg3">
                     <yare:Function name="otherFunction" returnType="java.lang.Long">
                         <yare:Parameter name="param">
-                            <yare:Field ref="fact" path="stringField" type="java.lang.String"/>
+                            <yare:Value>${fact.stringField}</yare:Value>
                         </yare:Parameter>
                     </yare:Function>
                 </yare:Parameter>
@@ -92,10 +92,10 @@
     </yare:Action>
     <yare:Action name="ActionName1">
         <yare:Parameter name="ParameterName1">
-            <yare:Value type="java.lang.String">anyValueA</yare:Value>
+            <yare:Value>anyValueA</yare:Value>
         </yare:Parameter>
         <yare:Parameter name="ParameterName2">
-            <yare:Value type="java.lang.String">anyValueB</yare:Value>
+            <yare:Value>anyValueB</yare:Value>
         </yare:Parameter>
     </yare:Action>
 </yare:Rule>

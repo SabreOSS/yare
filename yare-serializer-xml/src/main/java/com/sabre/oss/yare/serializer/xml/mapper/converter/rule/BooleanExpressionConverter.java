@@ -105,8 +105,14 @@ class BooleanExpressionConverter implements ContextualConverter<Object, Expressi
     private class ValueConverter implements ContextualConverter<ValueSer, Expression.Value> {
         @Override
         public Expression.Value convert(Context ctx, ValueSer input) {
-            Type type = typeConverter.fromString(Type.class, input.getType());
-            return valueOf(null, type, typeConverter.fromString(type, input.getValue()));
+            String typeName = input.getType();
+            String value = input.getValue();
+            if (typeName != null) {
+                Type type = typeConverter.fromString(Type.class, typeName);
+                return valueOf(null, type, typeConverter.fromString(type, value));
+            } else {
+                return valueOf(null, value != null ? value.getClass() : String.class, value);
+            }
         }
     }
 

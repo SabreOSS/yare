@@ -84,7 +84,7 @@ public class ExpressionConverter {
                 }
                 if (typeConverter.isApplicable(value.getType())) {
                     return new ValueSer()
-                            .withType(type)
+                            .withType(String.class.equals(value.getType()) ? null : type)
                             .withValue(typeConverter.toString(value.getType(), value.getValue()));
                 }
             }

@@ -115,9 +115,14 @@ class ParameterConverter implements ContextualConverter<ParameterSer, Expression
     private class ValueParameterConverter implements ContextualConverter<ParameterSer, Expression.Value> {
         @Override
         public Expression.Value convert(Context ctx, ParameterSer input) {
-            ValueSer value = input.getValue();
-            Type type = typeConverter.fromString(Type.class, value.getType());
-            return valueOf(input.getName(), type, typeConverter.fromString(type, value.getValue()));
+            ValueSer valueContainer = input.getValue();
+            String typeName = valueContainer.getType();
+            String value = valueContainer.getValue();
+            if (typeName != null) {
+                Type type = typeConverter.fromString(Type.class, typeName);
+                return valueOf(input.getName(), type, typeConverter.fromString(type, value));
+            }
+            return valueOf(input.getName(), value != null ? value.getClass() : String.class, value);
         }
     }
 
