@@ -291,6 +291,17 @@ public final class RuleDsl {
     }
 
     /**
+     * Creates a String-based value operand.
+     *
+     * @param value string representation of the value
+     * @param <T>   value type
+     * @return value operand
+     */
+    public static <T> ExpressionOperand<T> value(String value) {
+        return (name, builder) -> ExpressionFactory.valueOf(name, value != null ? value.getClass() : Object.class, value);
+    }
+
+    /**
      * Creates an operand representing a collection of constant values.
      *
      * @param type   class describing collection item type

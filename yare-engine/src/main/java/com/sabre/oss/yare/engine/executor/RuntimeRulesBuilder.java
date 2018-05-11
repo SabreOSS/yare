@@ -86,18 +86,18 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
             if (value.getValue() == null) {
                 return ValueProviderFactory.constantNull();
             }
+            ValueProvider referenceValueProvider = converter.tryCreateReference(context.getRule(), value);
+            if (referenceValueProvider != null) {
+                Type type = referenceValueProvider.getType();
+                if (!type.equals(Boolean.class) && !type.equals(Boolean.TYPE)) {
+                    throw new IllegalArgumentException("Only references of boolean type can be translated directly to predicate");
+                }
+                return referenceValueProvider;
+            }
             if (!(value.getValue() instanceof Boolean)) {
                 throw new IllegalArgumentException("Only boolean values can be translated directly to predicate");
             }
             return (Boolean) value.getValue() ? new True() : new False();
-        }
-        if (expression instanceof Expression.Reference) {
-            ValueProvider valueProvider = createValueProvider(context, expression);
-            Type type = valueProvider.getType();
-            if (!type.equals(Boolean.class) && !type.equals(Boolean.TYPE) && !type.equals(Object.class)) {
-                throw new IllegalArgumentException("Only references of boolean type can be translated directly to predicate");
-            }
-            return valueProvider;
         }
         if (expression instanceof Expression.Operator) {
             Expression.Operator operator = (Expression.Operator) expression;
