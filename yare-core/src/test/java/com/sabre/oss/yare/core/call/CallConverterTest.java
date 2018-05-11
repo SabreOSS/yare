@@ -95,7 +95,7 @@ class CallConverterTest {
                 ),
                 Arguments.of(
                         ExpressionFactory.valueOf("factFieldReference", "${ctx}"),
-                        Argument.referenceOf("factFieldReference", Object.class, Object.class, "ctx")
+                        Argument.referenceOf("factFieldReference", Argument.UNKNOWN, Argument.UNKNOWN, "ctx")
                 ),
                 Arguments.of(
                         ExpressionFactory.valueOf("factFieldReference", "${fact}"),

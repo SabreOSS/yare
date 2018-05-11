@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.core.reference;
 
+import com.sabre.oss.yare.core.call.Argument;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
@@ -72,7 +73,7 @@ public class ValuePlaceholderConverter<R> {
             }
         }
         if (CONTEXT_PATH.equals(path)) {
-            return referenceFactory.create(expressionName, Object.class, Object.class, path);
+            return referenceFactory.create(expressionName, Argument.UNKNOWN, Argument.UNKNOWN, path);
         }
 
         return null;
