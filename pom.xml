@@ -218,6 +218,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.everit.json</groupId>
+                <artifactId>org.everit.json.schema</artifactId>
+                <version>1.5.1</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>

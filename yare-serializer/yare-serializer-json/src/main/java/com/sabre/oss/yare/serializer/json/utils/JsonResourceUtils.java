@@ -29,37 +29,37 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class ResourceUtils {
-    private static final Pattern YAML_COMMENT_REGEX = Pattern.compile("(?m)^#.*");
+public final class JsonResourceUtils {
+    private static final Pattern jsonCommentPattern = Pattern.compile("/\\*+[^*]*\\*+(?:[^/*][^*]*\\*+)*/");
+    private static final Pattern yamlCommentPattern = Pattern.compile("(?m)^#.*");
 
-    private ResourceUtils() {
+    private JsonResourceUtils() {
     }
 
     public static String getJsonResourceAsString(String resource) {
-        try (InputStream is = getResourceAsStream(resource)) {
-            String content = IOUtils.toString(is, UTF_8);
-            return content.substring(content.indexOf("*/") + 2);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(format("Cannot read %s", resource), e);
-        }
+        return getResourceWithoutComments(jsonCommentPattern, resource);
     }
 
     public static String getYamlResourceAsString(String resource) {
+        return getResourceWithoutComments(yamlCommentPattern, resource);
+    }
+
+    private static String getResourceWithoutComments(Pattern commentPattern, String resource) {
         try (InputStream is = getResourceAsStream(resource)) {
-            String content = IOUtils.toString(is, UTF_8);
-            return YAML_COMMENT_REGEX.matcher(content).replaceAll("");
+            String content = IOUtils.toString(is, StandardCharsets.UTF_8);
+            return commentPattern.matcher(content).replaceAll("");
         } catch (IOException e) {
             throw new IllegalArgumentException(format("Cannot read %s", resource), e);
         }
     }
 
     private static InputStream getResourceAsStream(String resource) {
-        InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(resource);
+        InputStream resourceAsStream = JsonResourceUtils.class.getResourceAsStream(resource);
         if (resourceAsStream == null) {
             throw new IllegalArgumentException(format("Cannot find %s", resource));
         }

@@ -27,7 +27,7 @@ package com.sabre.oss.yare.serializer.json.model.yaml;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
 import com.sabre.oss.yare.serializer.json.model.ParameterSerializationTestCase;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class YamlParameterSerializationTest extends ParameterSerializationTestCase {
     @Override
@@ -37,6 +37,6 @@ class YamlParameterSerializationTest extends ParameterSerializationTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/model/parameter/%s.yml", fileName));
+        return JsonResourceUtils.getYamlResourceAsString(String.format("/yaml/model/parameter/%s.yml", fileName));
     }
 }

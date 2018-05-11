@@ -39,6 +39,7 @@
     <modules>
         <module>yare-serializer-xml</module>
         <module>yare-serializer-json</module>
+        <module>yare-serializer-validation</module>
     </modules>
 
 </project>

@@ -27,7 +27,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.converter.deserializer.ParameterDeserializerTestCase;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class JsonParameterDeserializerTest extends ParameterDeserializerTestCase {
     @Override
@@ -37,6 +37,6 @@ class JsonParameterDeserializerTest extends ParameterDeserializerTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/converter/deserializer/parameter/%s.json", fileName));
+        return JsonResourceUtils.getJsonResourceAsString(String.format("/json/converter/deserializer/parameter/%s.json", fileName));
     }
 }

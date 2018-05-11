@@ -1,0 +1,286 @@
+/*
+ * MIT License
+ *
+ * Copyright 2018 Sabre GLBL Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+{
+  "title": "YARE Rules model 0.1",
+  "description": "JSON Schema for YARE rule",
+  "cmm": {
+    "projectName": "SabreOSS/yare 0.1",
+    "modelUnits": [
+      {
+        "modelName": "YARE Rules model 0.1"
+      }
+    ]
+  },
+  "$ref": "#/definitions/rule",
+  "definitions": {
+    "rule": {
+      "description": "JSON Schema for YARE rule model",
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/attributes"
+        },
+        "facts": {
+          "$ref": "#/definitions/facts"
+        },
+        "predicate": {
+          "$ref": "#/definitions/predicate"
+        },
+        "actions": {
+          "$ref": "#/definitions/actions"
+        }
+      },
+      "required": [
+        "attributes",
+        "facts",
+        "predicate",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "attributes": {
+      "description": "Set of rule attributes",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/attribute"
+      }
+    },
+    "facts": {
+      "description": "Set of rule facts",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/fact"
+      }
+    },
+    "predicate": {
+      "$ref": "#/definitions/operand"
+    },
+    "actions": {
+      "description": "Set of rule actions",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/action"
+      }
+    },
+    "attribute": {
+      "description": "Rule attribute",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "null",
+            "object",
+            "boolean",
+            "number",
+            "string"
+          ]
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "fact": {
+      "description": "Rule fact",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "action": {
+      "description": "Rule action",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/parameter"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "additionalProperties": false
+    },
+    "parameter": {
+      "description": "Rule parameter",
+      "allOf": [
+        {
+          "$ref": "#/definitions/expression"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ]
+    },
+    "operand": {
+      "description": "Rule predicate operand",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/operator"
+        },
+        {
+          "$ref": "#/definitions/expression"
+        }
+      ]
+    },
+    "expression": {
+      "description": "Rule predicate expression",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/value"
+        },
+        {
+          "$ref": "#/definitions/values"
+        },
+        {
+          "$ref": "#/definitions/function"
+        }
+      ]
+    },
+    "value": {
+      "description": "Rule predicate value",
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": [
+            "null",
+            "object",
+            "boolean",
+            "number",
+            "string"
+          ]
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "values": {
+      "description": "Rule predicate values",
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/expression"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "values",
+        "type"
+      ]
+    },
+    "function": {
+      "description": "Rule predicate function",
+      "type": "object",
+      "properties": {
+        "function": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "returnType": {
+              "type": "string"
+            },
+            "parameters": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/parameter"
+              },
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "name",
+            "returnType",
+            "parameters"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "function"
+      ]
+    },
+    "operator": {
+      "description": "Rule predicate operator",
+      "type": "object",
+      "patternProperties": {
+        "^(?!value\\s|values\\s|function\\s).*$": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/operand"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
