@@ -103,9 +103,9 @@
 
     <xsd:group name="Operand">
         <xsd:choice>
-            <xsd:group minOccurs="0" ref="rul:ConstantValue"/>
-            <xsd:element minOccurs="0" ref="rul:Reference"/>
-            <xsd:element minOccurs="0" ref="rul:Field"/>
+            <xsd:element minOccurs="0" ref="rul:Value"/>
+            <xsd:element minOccurs="0" ref="rul:Values"/>
+            <xsd:element minOccurs="0" ref="rul:CustomValue"/>
             <xsd:element minOccurs="0" ref="rul:Function"/>
         </xsd:choice>
     </xsd:group>
@@ -142,31 +142,6 @@
             <xsd:group ref="rul:BooleanExpression"/>
         </xsd:sequence>
     </xsd:complexType>
-
-    <xsd:element name="Reference" type="rul:Reference"/>
-
-    <xsd:complexType name="Reference">
-        <xsd:attribute name="ref" type="xsd:string" use="required"/>
-    </xsd:complexType>
-
-    <xsd:element name="Field" type="rul:Field"/>
-
-    <xsd:complexType name="Field">
-        <xsd:complexContent>
-            <xsd:extension base="rul:Reference">
-                <xsd:attribute name="path" type="xsd:string" use="required"/>
-                <xsd:attribute name="type" type="xsd:string" default="java.lang.Object"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:group name="ConstantValue">
-        <xsd:choice>
-            <xsd:element minOccurs="0" ref="rul:Value"/>
-            <xsd:element minOccurs="0" ref="rul:Values"/>
-            <xsd:element minOccurs="0" ref="rul:CustomValue"/>
-        </xsd:choice>
-    </xsd:group>
 
     <xsd:element name="Value" type="rul:Value"/>
 

@@ -33,8 +33,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 public class ExpressionConverter {
     private final TypeConverter typeConverter;
 
@@ -124,18 +122,6 @@ public class ExpressionConverter {
             }
         }
 
-        Expression.Reference reference = expression.as(Expression.Reference.class);
-        if (reference != null) {
-            if (isEmpty(reference.getPath())) {
-                return new ReferenceSer()
-                        .withRef(reference.getReference());
-            }
-            return new FieldSer()
-                    .withRef(reference.getReference())
-                    .withPath(reference.getPath())
-                    .withType(typeConverter.toString(Type.class, reference.getType()));
-        }
-
         return null;
     }
 
@@ -157,10 +143,6 @@ public class ExpressionConverter {
             parameterSer.withValues((ValuesSer) o);
         } else if (o instanceof CustomValueSer) {
             parameterSer.withCustomValue((CustomValueSer) o);
-        } else if (o instanceof FieldSer) {
-            parameterSer.withField((FieldSer) o);
-        } else if (o instanceof ReferenceSer) {
-            parameterSer.withReference((ReferenceSer) o);
         } else if (o instanceof FunctionSer) {
             parameterSer.withFunction((FunctionSer) o);
         }
@@ -207,5 +189,4 @@ public class ExpressionConverter {
 
         return notSer;
     }
-
 }
