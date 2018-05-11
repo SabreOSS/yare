@@ -83,7 +83,7 @@
         <module>yare-engine</module>
         <module>yare-model-converters</module>
         <module>yare-dsl</module>
-        <module>yare-serializer-xml</module>
+        <module>yare-serializer</module>
         <module>yare-examples</module>
         <module>yare-performance</module>
         <module>yare-invoker-js</module>
@@ -199,9 +199,33 @@
             </dependency>
 
             <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson2.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.javacrumbs.json-unit</groupId>
+                <artifactId>json-unit-fluent</artifactId>
+                <version>1.29.0</version>
             </dependency>
 
             <dependency>

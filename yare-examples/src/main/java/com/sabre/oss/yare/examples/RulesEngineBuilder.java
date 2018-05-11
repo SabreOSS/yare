@@ -42,9 +42,6 @@ import static java.time.temporal.ChronoUnit.HOURS;
 
 public final class RulesEngineBuilder {
 
-    private static final String FUNCTIONS_PROVIDER = "testFunction";
-    private static final String ACTIONS_PROVIDER = "testAction";
-
     private RulesEngineBuilder() {
     }
 
@@ -70,7 +67,6 @@ public final class RulesEngineBuilder {
     }
 
     public static class TestFunction {
-
         private final Clock clock;
 
         public TestFunction() {
