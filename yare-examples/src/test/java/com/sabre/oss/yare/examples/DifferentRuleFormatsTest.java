@@ -58,13 +58,13 @@ class DifferentRuleFormatsTest {
                 .fact("flight", Flight.class)
                 .predicate(
                         equal(
-                                field("flight.classOfService", String.class),
+                                value("${flight.classOfService}"),
                                 value("First Class")
                         )
                 )
                 .action("collect",
-                        param("context", reference("ctx")),
-                        param("fact", reference("flight")))
+                        param("context", value("${ctx}")),
+                        param("fact", value("${flight}")))
                 .build();
     }
 

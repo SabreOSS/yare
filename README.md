@@ -72,13 +72,13 @@ Rule rule = RuleDsl.ruleBuilder()
                 .fact("flightFact", Flight.class)
                 .predicate(
                         equal(
-                                field("flightFact.classOfService", String.class),
+                                value("${flightFact.classOfService}"),
                                 value(classOfService)
                         )
                 )
                 .action("collect",
-                        param("context", reference("ctx")),
-                        param("fact", reference("flightFact")))
+                        param("context", value("${ctx}")),
+                        param("fact", value("${flightFact}")))
                 .build();
 ```
 
@@ -89,16 +89,16 @@ or using XML:
     <Fact name="flightFact" type="com.sabre.oss.yare.example.Flight"/>
     <Predicate>
         <Operator type="equal">
-            <Field path="classOfService" ref="flightFact"/>
+            <Value>${flight.classOfService}</Value>
             <Value type="java.lang.String">First Class</Value>
         </Operator>
     </Predicate>
     <Action name="collect">
         <Parameter name="context">
-            <Reference ref="ctx"/>
+            <Value>${ctx}</Value>
         </Parameter>
         <Parameter name="fact">
-            <Reference ref="flightFact"/>
+            <Value>${flightFact"</Value>
         </Parameter>
     </Action>
 </Rule>

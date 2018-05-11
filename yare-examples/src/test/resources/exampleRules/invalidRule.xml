@@ -26,16 +26,16 @@
     <Fact name="flight" type="com.sabre.oss.yare.examples.facts.Flight"/>
     <Predicate>
         <Operator type="equal">
-            <Field path="classOfService" type="java.lang.String" ref="flight"/>
-            <Value type="java.lang.String">First Class</Value>
+            <Value>${flight.classOfService}</Value>
+            <Value>First Class</Value>
         </Operator>
     </Predicate>
     <Action name="collect">
         <Parameter name="context">
-            <Reference ref="ctx"/>
+            <Value>${ctx}</Value>
         </Parameter>
         <Parameter name="fact">
-            <Reference ref="flight"/>
+            <Value>${flight}</Value>
         </Parameter>
     </Action>
 </Rule>
