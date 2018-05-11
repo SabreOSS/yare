@@ -30,7 +30,9 @@
     <yare:Attribute name="ruleType" type="java.lang.String" value="RuleType"/>
     <yare:Attribute name="startDate" type="java.time.ZonedDateTime" value="2016-06-30T00:00+01:00[Europe/London]"/>
     <yare:Attribute name="expireDate" type="java.time.ZonedDateTime" value="2017-01-02T00:00Z"/>
-    <yare:Fact name="fact1" type="java.lang.Object"/>
+    <yare:Attribute name="someVariable" type="java.lang.Boolean" value="true"/>
+    <yare:Fact name="fact" type="com.sabre.oss.yare.serializer.SimpleFact"/>
+    <yare:Fact name="otherFact" type="com.sabre.oss.yare.serializer.OtherFact"/>
     <yare:Predicate>
         <yare:And>
             <yare:And>
@@ -40,7 +42,7 @@
                     <yare:Value type="java.lang.Boolean">false</yare:Value>
                 </yare:Operator>
                 <yare:Operator type="EQUALS">
-                    <yare:Field ref="fact" path="field" type="java.lang.Boolean"/>
+                    <yare:Field ref="fact" path="boolField" type="java.lang.Boolean"/>
                     <yare:Field ref="otherFact" path="otherField" type="java.lang.Object"/>
                 </yare:Operator>
             </yare:And>
@@ -63,12 +65,12 @@
                     <yare:Value type="java.lang.String">value</yare:Value>
                 </yare:Parameter>
                 <yare:Parameter name="funcArg1">
-                    <yare:Reference ref="property"/>
+                    <yare:Reference ref="fact"/>
                 </yare:Parameter>
                 <yare:Parameter name="funcArg3">
                     <yare:Function name="otherFunction" returnType="java.lang.Long">
                         <yare:Parameter name="param">
-                            <yare:Field ref="fact" path="field" type="java.lang.String"/>
+                            <yare:Field ref="fact" path="stringField" type="java.lang.String"/>
                         </yare:Parameter>
                     </yare:Function>
                 </yare:Parameter>
