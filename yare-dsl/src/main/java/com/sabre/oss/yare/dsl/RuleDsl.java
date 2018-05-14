@@ -51,22 +51,21 @@ import java.util.stream.Stream;
  *      .name("example.Rule001")
  *      .fact("fact1", FactOne.class)
  *      .fact("fact2", FactTwo.class)
- *      .active(true)
- *      .attribute("my.custom.property", "my value", Message.class)
+ *      .attribute("my.custom.property", "my value")
  *      .predicate(
  *              or(
  *                      lessOrEqual(
  *                              function("math.add", Long.class,
- *                                      param("arg1", field("fact1", "counter", Long.class)),
- *                                      param("arg2", field("fact2.counter", Long.class))),
+ *                                      param("arg1", value("${fact1.counter}")),
+ *                                      param("arg2", value("${fact2.counter}"))),
  *                              value(190L)),
  *                      match(
- *                              field("fact1.mode", String.class),
+ *                              value("{fact1.mode}"),
  *                              value("my string value"))
  *                 ))
  *      .action("example.ActionOne",
- *              param("ctx", reference("ctx")),
- *              param("ruleName", reference("ruleName")),
+ *              param("ctx", value("${ctx}")),
+ *              param("ruleName", value("${ruleName}")),
  *              param("value", value("String value")))
  *      .action("example.ActionTwo")
  *      .build();
@@ -97,7 +96,9 @@ public final class RuleDsl {
      * @param type class describing the field type
      * @param <T>  type of the field
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${ref.path}"
      */
+    @Deprecated
     public static <T> Operand<T> field(String ref, String path, Class<T> type) {
         return value(String.format("${%s.%s}", ref, path));
     }
@@ -121,7 +122,9 @@ public final class RuleDsl {
      * @param type  class describing the field type
      * @param <T>   type of the field
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${field}"
      */
+    @Deprecated
     public static <T> Operand<T> field(String field, Class<T> type) {
         return value(String.format("${%s}", field));
     }
@@ -132,7 +135,9 @@ public final class RuleDsl {
      * @param ref  instance identifier
      * @param path field (property) path
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${ref.path}"
      */
+    @Deprecated
     public static Operand<Object> field(String ref, String path) {
         return field(ref, path, Object.class);
     }
@@ -142,7 +147,9 @@ public final class RuleDsl {
      *
      * @param field combined (with dot) instance identifier and the path of field
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${field}"
      */
+    @Deprecated
     public static Operand<Object> field(String field) {
         return field(field, Object.class);
     }
@@ -154,7 +161,9 @@ public final class RuleDsl {
      * @param type      class describing referenced instance
      * @param <T>       type of the instance
      * @return reference operand
+     * @deprecated Please create reference directly by passing placeholder in {@link #value(String)} with format: "${reference}"
      */
+    @Deprecated
     public static <T> Operand<T> reference(String reference, Class<T> type) {
         return field(reference, type);
     }
@@ -164,7 +173,9 @@ public final class RuleDsl {
      *
      * @param reference instance identifier
      * @return reference operand
+     * @deprecated Please create reference directly by passing placeholder in {@link #value(String)} with format: "${reference}"
      */
+    @Deprecated
     public static Operand<Object> reference(String reference) {
         return field(reference);
     }
@@ -266,7 +277,8 @@ public final class RuleDsl {
     }
 
     /**
-     * Creates a String-based value operand.
+     * Creates a String-based value operand. References to attributes/facts or fact fields can be accessed using
+     * placeholders, e.g. "${factName.field}".
      *
      * @param value string representation of the value
      * @param <T>   value type

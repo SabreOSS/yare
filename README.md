@@ -90,7 +90,7 @@ or using XML:
     <Predicate>
         <Operator type="equal">
             <Value>${flight.classOfService}</Value>
-            <Value type="java.lang.String">First Class</Value>
+            <Value>First Class</Value>
         </Operator>
     </Predicate>
     <Action name="collect">
