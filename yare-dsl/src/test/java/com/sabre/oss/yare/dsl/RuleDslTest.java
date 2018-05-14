@@ -172,6 +172,27 @@ class RuleDslTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("deprecatedReferenceMethods")
+    void shouldSupportDeprecatedMethods(Operand<Object> operand, String value) {
+        Expression expression = operand.getExpression(null, null);
+
+        assertThat(expression)
+                .isInstanceOfSatisfying(Expression.Value.class,
+                        e -> assertThat(e.getValue()).isEqualTo(value));
+    }
+
+    private static Stream<Arguments> deprecatedReferenceMethods() {
+        return Stream.of(
+                Arguments.of(field("field"), "${field}"),
+                Arguments.of(field("stringField", String.class), "${stringField}"),
+                Arguments.of(field("reference", "path"), "${reference.path}"),
+                Arguments.of(field("reference", "path.longValue", Long.class), "${reference.path.longValue}"),
+                Arguments.of(reference("reference"), "${reference}"),
+                Arguments.of(reference("integerReference", Integer.class), "${integerReference}")
+        );
+    }
+
     private Expression.Operator expectedValidPredicateModel() {
         return operatorOf(null, Boolean.class, "and",
                 operatorOf(null, Boolean.class, "or",
