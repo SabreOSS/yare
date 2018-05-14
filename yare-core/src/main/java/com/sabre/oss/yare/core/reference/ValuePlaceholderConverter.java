@@ -35,8 +35,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ValuePlaceholderConverter<R> {
+    public static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("^\\$\\{(.*)}$");
     private static final ChainedTypeExtractor CHAINED_TYPE_EXTRACTOR = new ChainedTypeExtractor();
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("^\\$\\{(.*)}$");
     private static final String CONTEXT_PATH = "ctx";
 
     private final ReferenceFactory<R> referenceFactory;
@@ -56,7 +56,7 @@ public class ValuePlaceholderConverter<R> {
         return null;
     }
 
-    private boolean isReferenceCandidate(Expression.Value value) {
+    public static boolean isReferenceCandidate(Expression.Value value) {
         return String.class.equals(value.getType()) && value.getValue() != null;
     }
 

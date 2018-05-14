@@ -48,6 +48,7 @@ public final class DefaultRuleValidator {
                         new AttributeValidator(fastFail),
                         new FactValidator(fastFail),
                         new ReferenceValidator(fastFail, new ChainedTypeExtractor()),
+                        new PlaceholderReferenceValidator(fastFail, new ChainedTypeExtractor()),
                         new ActionValidator(fastFail)));
     }
 }
