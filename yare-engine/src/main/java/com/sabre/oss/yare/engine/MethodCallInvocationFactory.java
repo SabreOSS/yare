@@ -26,6 +26,7 @@ package com.sabre.oss.yare.engine;
 
 import com.sabre.oss.yare.core.call.*;
 import com.sabre.oss.yare.core.invocation.Invocation;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -73,7 +74,7 @@ public class MethodCallInvocationFactory implements InvocationFactory {
         for (int i = 0, len = parameterTypes.length; i < len; i++) {
             Class<?> type = parameterTypes[i];
             Argument argument = arguments.get(i);
-            if (!type.isAssignableFrom(extractClass(argument.getType()))
+            if (!ClassUtils.isAssignable(extractClass(argument.getType()), type)
                     && (strictCheck || !UNKNOWN.equals(argument.getType()))) {
                 throw new IllegalStateException(String.format(INCOMPATIBLE_ARGUMENTS, call, toString(parameterTypes), toString(arguments)));
             }

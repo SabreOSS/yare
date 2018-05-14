@@ -40,8 +40,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 /**
  * {@link RuleDsl} is a class providing simple DSL for {@link Rule}s creation.
  * <p>
@@ -101,14 +99,7 @@ public final class RuleDsl {
      * @return field operand
      */
     public static <T> Operand<T> field(String ref, String path, Class<T> type) {
-        return (name, builder) -> {
-            Type referenceType = builder.facts.stream()
-                    .filter(f -> Objects.equals(f.getIdentifier(), ref))
-                    .map(Fact::getType)
-                    .findFirst()
-                    .orElse(Object.class);
-            return ExpressionFactory.referenceOf(name, referenceType, ref, type, path);
-        };
+        return value(String.format("${%s.%s}", ref, path));
     }
 
     /**
@@ -132,16 +123,7 @@ public final class RuleDsl {
      * @return field operand
      */
     public static <T> Operand<T> field(String field, Class<T> type) {
-        if (isEmpty(field)) {
-            return field(field, field, type);
-        }
-        int dotIdx = field.indexOf('.');
-        if (dotIdx == -1) {
-            return field(field, null, type);
-        }
-        String ref = field.substring(0, dotIdx);
-        String path = field.substring(dotIdx + 1);
-        return field(ref, path, type);
+        return value(String.format("${%s}", field));
     }
 
     /**
@@ -174,7 +156,7 @@ public final class RuleDsl {
      * @return reference operand
      */
     public static <T> Operand<T> reference(String reference, Class<T> type) {
-        return (name, builder) -> ExpressionFactory.referenceOf(name, type, reference);
+        return field(reference, type);
     }
 
     /**
@@ -184,14 +166,7 @@ public final class RuleDsl {
      * @return reference operand
      */
     public static Operand<Object> reference(String reference) {
-        return (name, builder) -> {
-            Type referenceType = builder.facts.stream()
-                    .filter(f -> Objects.equals(f.getIdentifier(), reference))
-                    .map(Fact::getType)
-                    .findFirst()
-                    .orElse(Object.class);
-            return ExpressionFactory.referenceOf(name, referenceType, reference);
-        };
+        return field(reference);
     }
 
     /**

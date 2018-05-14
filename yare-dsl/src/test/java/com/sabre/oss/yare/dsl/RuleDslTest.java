@@ -109,7 +109,7 @@ class RuleDslTest {
         assertThat(rule.getPredicate()).isEqualTo(expectedValidPredicateModel());
         assertThat(rule.getActions()).containsExactly(
                 actionOf("exampleAction", "exampleAction",
-                        referenceOf("param1", Object.class, "ctx")
+                        valueOf("param1", String.class, "${ctx}")
                 )
         );
     }
@@ -177,19 +177,19 @@ class RuleDslTest {
                 operatorOf(null, Boolean.class, "or",
                         operatorOf(null, Boolean.class, "less-or-equal",
                                 valueOf(null, Long.class, 123L),
-                                referenceOf(null, OtherFact.class, "otherFact", Long.class, "number")
+                                valueOf(null, String.class, "${otherFact.number}")
                         ),
                         operatorOf(null, Boolean.class, "match",
-                                referenceOf(null, String.class, "stringValue"),
+                                valueOf(null, String.class, "${stringValue}"),
                                 valueOf(null, String.class, "10")
                         ),
                         operatorOf(null, Boolean.class, "asd",
-                                referenceOf(null, OtherFact.class, "otherFact", String.class, "enabled"),
+                                valueOf(null, String.class, "${otherFact.enabled}"),
                                 valueOf(null, Boolean.class, true)
                         ),
                         operatorOf(null, Boolean.class, "and",
                                 operatorOf(null, Boolean.class, "equal",
-                                        referenceOf(null, OtherFact.class, "otherFact", Boolean.class, "enabled"),
+                                        valueOf(null, String.class, "${otherFact.enabled}"),
                                         valueOf(null, Boolean.class, true)
                                 ),
                                 operatorOf(null, Boolean.class, "not",
@@ -198,15 +198,15 @@ class RuleDslTest {
                         )
                 ),
                 operatorOf(null, Boolean.class, "less",
-                        referenceOf(null, ExampleFact.class, "exampleFact", Object.class, "startDate"),
-                        referenceOf(null, ExampleFact.class, "exampleFact", Object.class, "stopDate")
+                        valueOf(null, String.class, "${exampleFact.startDate}"),
+                        valueOf(null, String.class, "${exampleFact.stopDate}")
                 ),
                 operatorOf(null, Boolean.class, "contains",
                         valueOf(null, converter.fromString(Type.class, "java.util.List<java.lang.String>"), Arrays.asList("a", "b", "c")),
                         valueOf(null, String.class, "c")
                 ),
                 functionOf("function", Boolean.class, "function",
-                        referenceOf("param1", Object.class, "ruleName"),
+                        valueOf("param1", String.class, "${ruleName}"),
                         valueOf("param2", String.class, "my value")
                 )
         );
