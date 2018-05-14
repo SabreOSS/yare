@@ -24,11 +24,12 @@
 
 package com.sabre.oss.yare.model.validator;
 
-import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
+import com.sabre.oss.yare.core.reference.ValuePlaceholderConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -36,6 +37,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
@@ -63,7 +65,6 @@ public class ReferenceValidator extends BaseValidator {
         for (Attribute attribute : rule.getAttributes()) {
             localReferences.put(attribute.getName(), attribute.getType());
         }
-        localReferences.put("ruleName", String.class);
         localReferences.put("ctx", Object.class);
         return localReferences;
     }
@@ -92,22 +93,36 @@ public class ReferenceValidator extends BaseValidator {
                 checkExpression(e, results, localReferences);
             }
         }
-        Expression.Reference reference = expression.as(Expression.Reference.class);
-        if (reference != null) {
-            checkReference(reference, results, localReferences);
+        Expression.Value value = expression.as(Expression.Value.class);
+        if (value != null) {
+            if (ValuePlaceholderConverter.isReferenceCandidate(value)) {
+                Matcher matcher = ValuePlaceholderConverter.PLACEHOLDER_PATTERN.matcher(value.getValue().toString());
+                if (matcher.find()) {
+                    String ref = matcher.group(1);
+                    int dotIndex = ref.indexOf('.');
+                    String reference = ref;
+                    String path = null;
+                    if (dotIndex > -1) {
+                        reference = ref.substring(0, dotIndex);
+                        path = ref.substring(dotIndex + 1);
+                    }
+
+                    checkReference(reference, path, results, localReferences);
+                }
+            }
         }
     }
 
-    private void checkReference(Expression.Reference reference, ValidationResults results, Map<String, Type> localReferences) {
-        if (StringUtils.isEmpty(reference.getReference())) {
+    private void checkReference(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
+        if (StringUtils.isEmpty(reference)) {
             append(results, ValidationResult.error("rule.ref.empty-reference", "Reference Error: empty reference used"));
-        } else if (!localReferences.keySet().contains(reference.getReference())) {
-            append(results, ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> " + reference.getReference()));
-        } else if (!StringUtils.isEmpty(reference.getPath())) {
-            if (hasEmptyPathSegment(reference.getPath())) {
+        } else if (!localReferences.keySet().contains(reference)) {
+            append(results, ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> " + reference));
+        } else if (path != null) {
+            if (hasEmptyPathSegment(path)) {
                 append(results, ValidationResult.error("rule.ref.empty-field", "Reference Error: field cannot have empty segments"));
             } else {
-                checkPath(reference, results);
+                checkPath(reference, path, results, localReferences);
             }
         }
     }
@@ -117,17 +132,17 @@ public class ReferenceValidator extends BaseValidator {
         return Stream.of(pathParts).anyMatch(StringUtils::isEmpty);
     }
 
-    private void checkPath(Expression.Reference reference, ValidationResults results) {
+    private void checkPath(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
         try {
-            checkCollectionOperator(reference, results);
+            checkCollectionOperator(path, results, localReferences.get(reference));
         } catch (ChainedTypeExtractor.InvalidPathException e) {
-            append(results, ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> " + reference.getReference() + "." + reference.getPath()));
+            append(results, ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> " + reference + "." + path));
         }
     }
 
-    private void checkCollectionOperator(Expression.Reference reference, ValidationResults results) {
-        String[] pathParts = reference.getPath().split("\\.", -1);
-        Type currentType = reference.getReferenceType();
+    private void checkCollectionOperator(String path, ValidationResults results, Type referenceType) {
+        String[] pathParts = path.split("\\.", -1);
+        Type currentType = referenceType;
         for (String pathPart : pathParts) {
             currentType = chainedTypeExtractor.findPathType(currentType, pathPart);
             if (!isCollection(currentType) && pathPart.contains("[*]")) {

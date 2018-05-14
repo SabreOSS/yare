@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.operatorOf;
-import static com.sabre.oss.yare.core.model.ExpressionFactory.referenceOf;
+import static com.sabre.oss.yare.core.model.ExpressionFactory.valueOf;
 import static com.sabre.oss.yare.model.validator.ValidationResult.error;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,7 +48,7 @@ class DefaultRuleValidatorTest {
         // given
         Rule rule = new Rule(Collections.emptySet(), Collections.emptyList(),
                 operatorOf(null, Boolean.class, "is-true",
-                        referenceOf(null, Boolean.class, "missing", Object.class, "")
+                        valueOf(null, String.class, "${missing}")
                 ),
                 Collections.emptyList());
 
