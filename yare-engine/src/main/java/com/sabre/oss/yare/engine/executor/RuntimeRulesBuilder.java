@@ -124,11 +124,6 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
             Invocation<ProcessingContext, Object> invocation = functionFactory.create(context.getRule(), function);
             return ValueProviderFactory.createFromInvocation(invocation);
         }
-        if (expression instanceof Expression.Reference) {
-            Expression.Reference reference = (Expression.Reference) expression;
-            return ValueProviderFactory.createFromPath(TypeUtils.getRawType(reference.getReferenceType(), null), reference.getReference(),
-                    TypeUtils.getRawType(reference.getType(), null), reference.getPath());
-        }
         throw new IllegalArgumentException(String.format("Unsupported expression: %s", expression));
     }
 

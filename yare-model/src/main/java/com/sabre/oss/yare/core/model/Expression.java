@@ -54,16 +54,6 @@ public interface Expression {
                 : null;
     }
 
-    interface Raw extends Expression {
-
-        /**
-         * Returns string representation of value with specified type.
-         *
-         * @return string representation of specified type.
-         */
-        String getValue();
-    }
-
     interface Value extends Expression {
 
         /**
@@ -72,30 +62,6 @@ public interface Expression {
          * @return value;
          */
         Object getValue();
-    }
-
-    interface Reference extends Expression {
-
-        /**
-         * Return reference type (i.e. type of the object pointed by very first identifier)
-         *
-         * @return reference
-         */
-        Type getReferenceType();
-
-        /**
-         * Return reference (identifier)
-         *
-         * @return reference
-         */
-        String getReference();
-
-        /**
-         * Return path
-         *
-         * @return path
-         */
-        String getPath();
     }
 
     interface Invocation extends Expression {

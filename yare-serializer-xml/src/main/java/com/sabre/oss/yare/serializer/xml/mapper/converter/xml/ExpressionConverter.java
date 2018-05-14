@@ -151,17 +151,9 @@ public class ExpressionConverter {
     }
 
     private String extractName(Expression expression) {
-        Expression.Raw raw = expression.as(Expression.Raw.class);
-        if (raw != null) {
-            return raw.getName();
-        }
         Expression.Value value = expression.as(Expression.Value.class);
         if (value != null) {
             return value.getName();
-        }
-        Expression.Reference reference = expression.as(Expression.Reference.class);
-        if (reference != null) {
-            return reference.getName();
         }
         Expression.Invocation invocation = expression.as(Expression.Invocation.class);
         if (invocation != null) {
