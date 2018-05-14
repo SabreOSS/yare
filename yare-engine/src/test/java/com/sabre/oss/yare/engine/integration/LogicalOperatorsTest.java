@@ -25,9 +25,9 @@
 package com.sabre.oss.yare.engine.integration;
 
 import com.sabre.oss.yare.core.RulesEngine;
+import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.Operand;
 import com.sabre.oss.yare.dsl.RuleDsl;
-import com.sabre.oss.yare.core.model.Rule;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -192,10 +192,10 @@ class LogicalOperatorsTest extends AbstractBaseRulesTest {
                 .attribute(SHOULD_MATCH_ATTRIBUTE, match)
                 .predicate(predicate)
                 .action("collect",
-                        param("context", reference("ctx")),
-                        param("ruleName", reference("ruleName")),
-                        param("factOne", reference(FACT_ONE)),
-                        param("factTwo", reference(FACT_TWO)))
+                        param("context", value("${ctx}")),
+                        param("ruleName", value("${ruleName}")),
+                        param("factOne", value("${factOne}")),
+                        param("factTwo", value("${factTwo}")))
                 .build();
     }
 
@@ -216,9 +216,9 @@ class LogicalOperatorsTest extends AbstractBaseRulesTest {
     @Test
     void shouldProperlyEvaluateTopLevelIsXXXOperatorsForProperties() {
         // given
-        BaseRulesUtils.Expression trueExp = expr(field(FACT_ONE, PRIMITIVE_TRUE_PROPERTY, Boolean.class), "trueProperty");
-        BaseRulesUtils.Expression falseExp = expr(field(FACT_ONE, PRIMITIVE_FALSE_PROPERTY, Boolean.class), "falseProperty");
-        Expression nullExp = expr(field(FACT_ONE, NULL_PROPERTY, Boolean.class), "nullProperty");
+        BaseRulesUtils.Expression trueExp = expr(value(format("${%s.%s}", FACT_ONE, PRIMITIVE_TRUE_PROPERTY)), "trueProperty");
+        BaseRulesUtils.Expression falseExp = expr(value(format("${%s.%s}", FACT_ONE, PRIMITIVE_FALSE_PROPERTY)), "falseProperty");
+        Expression nullExp = expr(value(format("${%s.%s}", FACT_ONE, NULL_PROPERTY)), "nullProperty");
 
         List<Rule> rules = new ArrayList<>();
         topLevelIsXXXOperatorsCheckSet(rules, trueExp, falseExp, nullExp);
@@ -279,8 +279,8 @@ class LogicalOperatorsTest extends AbstractBaseRulesTest {
                 expr(function(RETURN_ARGUMENT, Boolean.class, param("result", value(false))), "function(constant)"),
                 NULL_VALUE);
         generateRulesCheckSet(rules,
-                expr(function(RETURN_ARGUMENT, Boolean.class, param("trueFromFact", field("factOne", "primitiveTrueProperty"))), "function(factOne)"),
-                expr(function(RETURN_ARGUMENT, Boolean.class, param("falseFromFact", field("factOne", "primitiveFalseProperty"))), "function(factOne)"),
+                expr(function(RETURN_ARGUMENT, Boolean.class, param("trueFromFact", value("${factOne.primitiveTrueProperty}"))), "function(factOne)"),
+                expr(function(RETURN_ARGUMENT, Boolean.class, param("falseFromFact", value("${factOne.primitiveFalseProperty}"))), "function(factOne)"),
                 NULL_VALUE);
 
         // when / then
@@ -294,13 +294,13 @@ class LogicalOperatorsTest extends AbstractBaseRulesTest {
                 TRUE_VALUE,
                 expr(function(RETURN_WRAPPED_TRUE, Boolean.class), "trueFunction()"),
                 expr(function(RETURN_ARGUMENT, Boolean.class, param("constant", value(true))), "function(true)"),
-                expr(function(RETURN_ARGUMENT, Boolean.class, param("factOne", field("factOne", "primitiveTrueProperty"))), "function(factOne.true)"));
+                expr(function(RETURN_ARGUMENT, Boolean.class, param("factOne", value("${factOne.primitiveTrueProperty}"))), "function(factOne.true)"));
 
         List<Expression> falseExps = asList(
                 FALSE_VALUE,
                 expr(function(RETURN_WRAPPED_FALSE, Boolean.class), "falseFunction()"),
                 expr(function(RETURN_ARGUMENT, Boolean.class, param("constant", value(false))), "function(false)"),
-                expr(function(RETURN_ARGUMENT, Boolean.class, param("factOne", field("factOne", "primitiveFalseProperty"))), "function(factOne.false)"));
+                expr(function(RETURN_ARGUMENT, Boolean.class, param("factOne", value("${factOne.primitiveFalseProperty}"))), "function(factOne.false)"));
 
         for (int i = 0; i < 2; i++) {
             List<Expression> trueExpressions = trueExpressionGenerator(trueExps, falseExps);

@@ -58,11 +58,11 @@ class YareRelationOperatorsTest extends AbstractBaseRulesTest {
                 currentAgainstGreater, operator(operator, function(RETURN_ARGUMENT, type, param("result", current)), gt)), current, gt);
 
         addRule(rules, () -> rule(format("Rule - operator(%s, field(current), value(current) [%s]", operator, typeName),
-                currentAgainstCurrent, operator(operator, field(FACT_ONE, CURRENT_PROPERTY, type), current)), current);
+                currentAgainstCurrent, operator(operator, value(format("${%s.%s}", FACT_ONE, CURRENT_PROPERTY)), current)), current);
         addRule(rules, () -> rule(format("Rule - operator(%s, field(current), value(lessThen) [%s]", operator, typeName),
-                currentAgainstLess, operator(operator, field(FACT_ONE, CURRENT_PROPERTY, type), lt)), current, lt);
+                currentAgainstLess, operator(operator, value(format("${%s.%s}", FACT_ONE, CURRENT_PROPERTY)), lt)), current, lt);
         addRule(rules, () -> rule(format("Rule - operator(%s, field(current), value(greaterThen) [%s]", operator, typeName),
-                currentAgainstGreater, operator(operator, field(FACT_ONE, CURRENT_PROPERTY, type), gt)), current, gt);
+                currentAgainstGreater, operator(operator, value(format("${%s.%s}", FACT_ONE, CURRENT_PROPERTY)), gt)), current, gt);
 
         rules.addAll(asList(
                 rule(format("Rule - operator(%s, function(current), value(null) [%s]", operator, typeName),
@@ -73,11 +73,11 @@ class YareRelationOperatorsTest extends AbstractBaseRulesTest {
                         false, operator(operator, function(RETURN_ARGUMENT, type, param("result", nullValue)), nullValue)),
 
                 rule(format("Rule - operator(%s, field(current), value(null) [%s]", operator, typeName),
-                        false, operator(operator, field(FACT_ONE, CURRENT_PROPERTY, type), nullValue)),
+                        false, operator(operator, value(format("${%s.%s}", FACT_ONE, CURRENT_PROPERTY)), nullValue)),
                 rule(format("Rule - operator(%s, field(null), value(current) [%s]", operator, typeName),
-                        false, operator(operator, field(FACT_ONE, NULL_PROPERTY, type), current)),
+                        false, operator(operator, value(format("${%s.%s}", FACT_ONE, NULL_PROPERTY)), current)),
                 rule(format("Rule - operator(%s, field(null), value(null) [%s]", operator, typeName),
-                        false, operator(operator, field(FACT_ONE, NULL_PROPERTY, type), nullValue))
+                        false, operator(operator, value(format("${%s.%s}", FACT_ONE, NULL_PROPERTY)), nullValue))
         ));
 
         return rules;
@@ -96,10 +96,10 @@ class YareRelationOperatorsTest extends AbstractBaseRulesTest {
                 .attribute(SHOULD_MATCH_ATTRIBUTE, match)
                 .predicate(predicate)
                 .action("collect",
-                        param("context", reference("ctx")),
-                        param("ruleName", reference("ruleName")),
-                        param("factOne", reference(FACT_ONE)),
-                        param("factTwo", reference(FACT_TWO)))
+                        param("context", value("${ctx}")),
+                        param("ruleName", value("${ruleName}")),
+                        param("factOne", value("${factOne}")),
+                        param("factTwo", value("${factTwo}")))
                 .build();
     }
 

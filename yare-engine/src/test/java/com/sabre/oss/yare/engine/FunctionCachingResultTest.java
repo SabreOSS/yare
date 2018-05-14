@@ -57,7 +57,7 @@ class FunctionCachingResultTest {
                                     value("test")
                             )
                     )
-                    .action("testAction", param("context", reference("ctx")), param("fact", reference("testFact")))
+                    .action("testAction", param("context", value("${ctx}")), param("fact", value("${testFact}")))
                     .build()
     );
 

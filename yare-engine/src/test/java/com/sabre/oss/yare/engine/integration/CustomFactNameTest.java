@@ -55,20 +55,20 @@ class CustomFactNameTest {
                         .predicate(
                                 or(
                                         equal(
-                                                field("customFactName.value", String.class),
+                                                value("${customFactName.value}"),
                                                 value("Second")
                                         ),
                                         function("matches", Boolean.class,
-                                                param("fact", reference("customFactName")),
+                                                param("fact", value("${customFactName}")),
                                                 param("value", value("Third"))),
                                         function("equals", Boolean.class,
-                                                param("actual", field("customFactName.value")),
+                                                param("actual", value("${customFactName.value}")),
                                                 param("expected", value("Fourth")))
                                 )
                         )
                         .action("collect",
-                                param("context", reference("ctx")),
-                                param("fact", reference("customFactName")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${customFactName}")))
                         .build()
         );
 

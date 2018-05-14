@@ -64,18 +64,18 @@ class RuleDslTest {
                                 or(
                                         lessOrEqual(
                                                 value(123L),
-                                                field("otherFact.number", Long.class)
+                                                value("${otherFact.number}")
                                         ),
                                         match(
-                                                reference("stringValue", String.class),
+                                                value("${stringValue}"),
                                                 value("10")
                                         ),
                                         operator("asd",
-                                                field("otherFact", "enabled", String.class),
+                                                value("${otherFact.enabled}"),
                                                 value(true)
                                         ),
                                         and(
-                                                equal(field("otherFact.enabled", Boolean.class),
+                                                equal(value("${otherFact.enabled}"),
                                                         value(true)
                                                 ),
                                                 not(
@@ -84,17 +84,17 @@ class RuleDslTest {
                                         )
                                 ),
                                 less(
-                                        field("exampleFact.startDate"),
-                                        field("exampleFact.stopDate")
+                                        value("${exampleFact.startDate}"),
+                                        value("${exampleFact.stopDate}")
                                 ),
                                 operator("contains", values(String.class, value("a"), value("b"), value("c")), value("c")),
                                 function("function", Boolean.class,
-                                        param("param1", reference("ruleName")),
+                                        param("param1", value("${ruleName}")),
                                         param("param2", value("my value"))
                                 )
                         )
                 )
-                .action("exampleAction", param("param1", reference("ctx")))
+                .action("exampleAction", param("param1", value("${ctx}")))
                 .build();
 
         assertThat(rule.getAttributes()).containsExactly(

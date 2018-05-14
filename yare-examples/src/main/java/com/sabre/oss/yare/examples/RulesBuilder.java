@@ -24,8 +24,8 @@
 
 package com.sabre.oss.yare.examples;
 
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.examples.facts.Airline;
 import com.sabre.oss.yare.examples.facts.Car;
 import com.sabre.oss.yare.examples.facts.Flight;
@@ -58,14 +58,14 @@ public final class RulesBuilder {
                         .predicate(
                                 equal(
                                         function(CONTAINS, Boolean.class,
-                                                param("outerList", field("airline", "airlineCodes")),
+                                                param("outerList", value("${airline.airlineCodes}")),
                                                 param("innerList", values(String.class, mapToArray(airlineCodes)))),
                                         value(true)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("airline")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${airline}")))
                         .build()
         );
     }
@@ -79,13 +79,13 @@ public final class RulesBuilder {
                                 equal(
                                         function(CONTAINS, Boolean.class,
                                                 param("outerList", values(String.class, mapToArray(airlineCodes))),
-                                                param("innerList", field("airline", "airlineCodes"))),
+                                                param("innerList", value("${airline.airlineCodes}"))),
                                         value(true)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("airline")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${airline}")))
                         .build()
         );
     }
@@ -98,14 +98,14 @@ public final class RulesBuilder {
                         .predicate(
                                 equal(
                                         function(CONTAINS_ANY, Boolean.class,
-                                                param("outerList", field("airline", "airlineCodes")),
+                                                param("outerList", value("${airline.airlineCodes}")),
                                                 param("innerList", values(String.class, mapToArray(airlineCodes)))),
                                         value(true)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("airline")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${airline}")))
                         .build()
         );
     }
@@ -117,12 +117,12 @@ public final class RulesBuilder {
                         .fact("airline", Airline.class)
                         .predicate(
                                 equal(
-                                        field("airline.name", String.class),
+                                        value("${airline.name}"),
                                         value(name)
                                 )
                         )
                         .action(SET_REJECTED_FLAG,
-                                param("airline", reference("airline")),
+                                param("airline", value("${airline}")),
                                 param("isRejected", value(true)))
                         .build()
         );
@@ -135,13 +135,13 @@ public final class RulesBuilder {
                         .fact("airline", Airline.class)
                         .predicate(
                                 equal(
-                                        field("airline.isRejected", Boolean.class),
+                                        value("${airline.isRejected}"),
                                         value(false)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("airline", reference("airline")))
+                                param("context", value("${ctx}")),
+                                param("airline", value("${airline}")))
                         .build()
         );
     }
@@ -154,13 +154,13 @@ public final class RulesBuilder {
                         .predicate(
                                 greater(
                                         function(PRICE_DIFFERENCE, BigDecimal.class,
-                                                param("carRate", field("car.totalRate", BigDecimal.class))),
+                                                param("carRate", value("${car.totalRate}"))),
                                         value(howMuchOverLowestPrice)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("car")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${car}")))
                         .build()
         );
     }
@@ -172,13 +172,13 @@ public final class RulesBuilder {
                         .fact("flight", Flight.class)
                         .predicate(
                                 equal(
-                                        field("flight.classOfService", String.class),
+                                        value("${flight.classOfService}"),
                                         value(classOfService)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("flight")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${flight}")))
                         .build()
         );
     }
@@ -191,13 +191,13 @@ public final class RulesBuilder {
                         .predicate(
                                 less(
                                         function(GET_DATE_DIFF_IN_HOURS, Long.class,
-                                                param("givenDate", field("flight", "dateOfDeparture"))),
+                                                param("givenDate", value("${flight.dateOfDeparture}"))),
                                         value(timeUntilUntilDeparture)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("flight")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${flight}")))
                         .build()
         );
     }
@@ -209,13 +209,13 @@ public final class RulesBuilder {
                         .fact("hotel", Hotel.class)
                         .predicate(
                                 equal(
-                                        field("hotel.chainCode", String.class),
+                                        value("${hotel.chainCode}"),
                                         value(chainCode)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("hotel")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${hotel}")))
                         .build()
         );
     }
@@ -227,17 +227,17 @@ public final class RulesBuilder {
                         .fact("hotel", Hotel.class)
                         .predicate(or(
                                 equal(
-                                        field("hotel.isPreferred", boolean.class),
+                                        value("${hotel.isPreferred}"),
                                         value(true)
                                 ),
                                 equal(
-                                        field("hotel.chainCode", String.class),
+                                        value("${hotel.chainCode}"),
                                         value(preferredChainCode)
                                 )
                         ))
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("hotel")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${hotel}")))
                         .build()
         );
     }
@@ -250,15 +250,15 @@ public final class RulesBuilder {
                         .predicate(
                                 greater(
                                         function(GET_AMOUNT_OF_MONEY, BigDecimal.class,
-                                                param("amount", field("hotel.roomRate", BigDecimal.class)),
-                                                param("inputCurrency", field("hotel.currency", String.class)),
+                                                param("amount", value("${hotel.roomRate}")),
+                                                param("inputCurrency", value("${hotel.currency}")),
                                                 param("outputCurrency", value(currency))),
                                         value(amount)
                                 )
                         )
                         .action(COLLECT,
-                                param("context", reference("ctx")),
-                                param("fact", reference("hotel")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${hotel}")))
                         .build()
         );
     }

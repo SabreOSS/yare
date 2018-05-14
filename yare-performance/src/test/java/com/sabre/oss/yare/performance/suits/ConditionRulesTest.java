@@ -25,8 +25,8 @@
 package com.sabre.oss.yare.performance.suits;
 
 import com.sabre.oss.yare.core.RulesEngineBuilder;
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -71,21 +71,21 @@ public class ConditionRulesTest extends AbstractPerformanceTest {
                     .predicate(
                             or(
                                     equal(
-                                            field("conditionsFact.field", String.class),
+                                            value("${conditionsFact.field}"),
                                             value("nonExistingValue")
                                     ),
                                     match(
-                                            field("conditionsFact.field", String.class),
+                                            value("${conditionsFact.field}"),
                                             value("value")
                                     )
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("conditionsFact")))
+                            param("fact", value("${conditionsFact}")))
                     .build()
             );
 
@@ -95,25 +95,25 @@ public class ConditionRulesTest extends AbstractPerformanceTest {
                     .predicate(
                             and(
                                     equal(
-                                            field("conditionsFact.field", String.class),
+                                            value("${conditionsFact.field}"),
                                             value("value")
                                     ),
                                     equal(
-                                            field("conditionsFact.field2", String.class),
+                                            value("${conditionsFact.field2}"),
                                             value("value2")
                                     ),
                                     not(equal(
-                                            field("conditionsFact.field2", String.class),
+                                            value("${conditionsFact.field2}"),
                                             value("nonExistingValue")
                                     ))
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("conditionsFact")))
+                            param("fact", value("${conditionsFact}")))
                     .build()
             );
 
@@ -123,17 +123,17 @@ public class ConditionRulesTest extends AbstractPerformanceTest {
                     .predicate(
                             not(
                                     equal(
-                                            field("conditionsFact.field2", String.class),
+                                            value("${conditionsFact.field2}"),
                                             value("nonExistingValue")
                                     )
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("conditionsFact")))
+                            param("fact", value("${conditionsFact}")))
                     .build()
             );
 

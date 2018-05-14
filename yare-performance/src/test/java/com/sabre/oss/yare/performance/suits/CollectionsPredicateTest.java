@@ -25,8 +25,8 @@
 package com.sabre.oss.yare.performance.suits;
 
 import com.sabre.oss.yare.core.RulesEngineBuilder;
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -68,16 +68,16 @@ public class CollectionsPredicateTest extends AbstractPerformanceTest {
                     .fact("collectionFact", CollectionFact.class)
                     .predicate(
                             contains(
-                                    castToCollection(field("collectionFact.strings", List.class), String.class),
+                                    castToCollection(value("${collectionFact.strings}"), String.class),
                                     values(String.class, value("string1"), value("string2"))
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("collectionFact")))
+                            param("fact", value("${collectionFact}")))
                     .build()
             );
             rules.add(RuleDsl.ruleBuilder()
@@ -85,16 +85,16 @@ public class CollectionsPredicateTest extends AbstractPerformanceTest {
                     .fact("collectionFact", CollectionFact.class)
                     .predicate(
                             containsAny(
-                                    castToCollection(field("collectionFact.strings", List.class), String.class),
+                                    castToCollection(value("${collectionFact.strings}"), String.class),
                                     values(String.class, value("string1500"), value("string1"))
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("collectionFact")))
+                            param("fact", value("${collectionFact}")))
                     .build()
             );
 

@@ -25,8 +25,8 @@
 package com.sabre.oss.yare.performance.suits;
 
 import com.sabre.oss.yare.core.RulesEngineBuilder;
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -70,16 +70,16 @@ public class FactWithChainOperatorTest extends AbstractPerformanceTest {
                     .fact("chainingFact", ChainingFact.class)
                     .predicate(
                             equal(
-                                    field("chainingFact.innerFact.field", String.class),
+                                    value("${chainingFact.innerFact.field}"),
                                     value("testValue")
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("chainingFact")))
+                            param("fact", value("${chainingFact}")))
                     .build()
             );
 
@@ -88,16 +88,16 @@ public class FactWithChainOperatorTest extends AbstractPerformanceTest {
                     .fact("chainingFact", ChainingFact.class)
                     .predicate(
                             equal(
-                                    field("chainingFact.innerFact.field2", String.class),
+                                    value("${chainingFact.innerFact.field2}"),
                                     value("testValue2")
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("chainingFact")))
+                            param("fact", value("${chainingFact}")))
                     .build()
             );
 

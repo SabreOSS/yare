@@ -25,8 +25,8 @@
 package com.sabre.oss.yare.performance.suits;
 
 import com.sabre.oss.yare.core.RulesEngineBuilder;
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.engine.executor.DefaultRulesExecutorBuilder;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
@@ -73,16 +73,16 @@ public class SingleFieldFactTest extends AbstractPerformanceTest {
                     .fact("stringFieldFact", StringFieldFact.class)
                     .predicate(
                             greater(
-                                    field("stringFieldFact.field", Integer.class),
+                                    value("${stringFieldFact.field}"),
                                     value(0)
                             )
                     )
                     .action("collect",
                             param("context",
-                                    reference("ctx", List.class)),
+                                    value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("stringFieldFact")))
+                            param("fact", value("${stringFieldFact}")))
                     .build()
             );
 

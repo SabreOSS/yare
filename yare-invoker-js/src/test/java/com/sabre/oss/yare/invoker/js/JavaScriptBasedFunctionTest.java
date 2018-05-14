@@ -71,11 +71,11 @@ class JavaScriptBasedFunctionTest {
                 .predicate(
                         match(
                                 function("upperCase", String.class,
-                                        param("value", field("factOne.aString"))),
+                                        param("value", value("${factOne.aString}"))),
                                 value("THE_VALUE")
                         ))
                 .action("collect",
-                        param("context", reference("ctx")),
+                        param("context", value("${ctx}")),
                         param("ruleName", value(RULE_NAME)))
                 .build();
         RuleSession ruleSession = createRuleSession(rule);
@@ -98,16 +98,16 @@ class JavaScriptBasedFunctionTest {
                 .predicate(
                         and(
                                 match(
-                                        field("factOne.aString", String.class),
+                                        value("${factOne.aString}"),
                                         value("the_value")
                                 ),
                                 match(
                                         function("upperCase", String.class,
-                                                param("value", field("factOne.aString"))),
+                                                param("value", value("${factOne.aString}"))),
                                         value("THE_VALUE")
                                 )))
                 .action("collect",
-                        param("context", reference("ctx")),
+                        param("context", value("${ctx}")),
                         param("ruleName", value(RULE_NAME)))
                 .build();
         RuleSession ruleSession = createRuleSession(rule);
@@ -131,11 +131,11 @@ class JavaScriptBasedFunctionTest {
                         and(
                                 match(
                                         function("upperCase", String.class,
-                                                param("value", field("factOne.aString"))),
+                                                param("value", value("${factOne.aString}"))),
                                         value("THE_VALUE")
                                 )))
                 .action("collect",
-                        param("context", reference("ctx")),
+                        param("context", value("${ctx}")),
                         param("ruleName", value(RULE_NAME)))
                 .build();
         RuleSession ruleSession = createRuleSession(rule);
@@ -163,7 +163,7 @@ class JavaScriptBasedFunctionTest {
                                         value("THE_VALUE")
                                 )))
                 .action("collect",
-                        param("context", reference("ctx")),
+                        param("context", value("${ctx}")),
                         param("ruleName", value(RULE_NAME)))
                 .build();
         RuleSession ruleSession = createRuleSession(rule);
@@ -187,12 +187,12 @@ class JavaScriptBasedFunctionTest {
                         and(
                                 equal(
                                         function("concat", String.class,
-                                                param("a", field("factOne.aString")),
-                                                param("b", reference("ruleName"))),
+                                                param("a", value("${factOne.aString}")),
+                                                param("b", value("${ruleName}"))),
                                         value("the_value" + RULE_NAME)
                                 )))
                 .action("collect",
-                        param("context", reference("ctx")),
+                        param("context", value("${ctx}")),
                         param("ruleName", value(RULE_NAME)))
                 .build();
         RuleSession ruleSession = createRuleSession(rule);
@@ -219,12 +219,12 @@ class JavaScriptBasedFunctionTest {
                         and(
                                 match(
                                         function("concat", String.class,
-                                                param("first", field("factOne.aString")),
-                                                param("second", field("factTwo.value"))),
+                                                param("first", value("${factOne.aString}")),
+                                                param("second", value("${factTwo.value}"))),
                                         value("abc123")
                                 )))
                 .action("collect",
-                        param("context", reference("ctx")),
+                        param("context", value("${ctx}")),
                         param("ruleName", value(RULE_NAME)))
                 .build();
         RuleSession ruleSession = createRuleSession(rule);

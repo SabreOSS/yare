@@ -59,27 +59,26 @@ class ComparatorTest {
         // given
         String theStringValue = "THE_VALUE";
         int theIntValue = 124555;
-        String factTypeName = "testClass";
         RulesExecutionConfig config = RulesExecutionConfig.builder()
                 .withFactTypes(singletonList(TestClass.class))
                 .withInputType(List.class)
                 .withRules(singletonList(
                         RuleDsl.ruleBuilder()
                                 .name(RULE_NAME)
-                                .fact(factTypeName, TestClass.class)
+                                .fact("testClass", TestClass.class)
                                 .attribute("ruleType", "anyType")
                                 .predicate(
                                         and(
                                                 match(
-                                                        field(factTypeName, "aString", String.class),
+                                                        value("${testClass.aString}"),
                                                         value(theStringValue)
                                                 ),
                                                 less(
-                                                        field(factTypeName, "aLong", Long.class),
+                                                        value("${testClass.aLong}"),
                                                         value((long) theIntValue)
                                                 )))
                                 .action(ACTION_NAME,
-                                        param("context", reference("ctx")),
+                                        param("context", value("${ctx}")),
                                         param("ruleName", value(RULE_NAME)))
                                 .build()))
                 .build();

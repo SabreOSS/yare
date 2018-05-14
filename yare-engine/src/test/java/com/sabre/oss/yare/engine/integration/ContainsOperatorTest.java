@@ -27,8 +27,8 @@ package com.sabre.oss.yare.engine.integration;
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
-import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.engine.executor.DefaultRulesExecutorBuilder;
 import org.junit.jupiter.api.Test;
 
@@ -63,13 +63,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
+                                        castToCollection(value("${testFact.strings}"), String.class),
                                         values(String.class, value("firstString"), value("secondString"))
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -97,12 +97,12 @@ class ContainsOperatorTest {
                         .predicate(
                                 contains(
                                         values(String.class, value("firstString"), value("secondString")),
-                                        field("testFact.string", String.class)
+                                        value("${testFact.string}")
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -129,13 +129,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
+                                        castToCollection(value("${testFact.strings}"), String.class),
                                         values(String.class, value("fourthString"), value("fifthString"))
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -161,12 +161,12 @@ class ContainsOperatorTest {
                         .predicate(
                                 contains(
                                         values(String.class, value("secondString"), value("thirdString")),
-                                        field("testFact.string", String.class)
+                                        value("${testFact.string}")
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -191,13 +191,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.nullList", List.class), String.class),
+                                        castToCollection(value("${testFact.nullList}"), String.class),
                                         values(String.class, value("fourthString"), value("fifthString"))
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -222,13 +222,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
-                                        castToCollection(field("testFact.nullList", List.class), String.class)
+                                        castToCollection(value("${testFact.strings}"), String.class),
+                                        castToCollection(value("${testFact.nullList}"), String.class)
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -253,13 +253,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.nullList", List.class), String.class),
-                                        castToCollection(field("testFact.nullList", List.class), String.class)
+                                        castToCollection(value("${testFact.nullList}"), String.class),
+                                        castToCollection(value("${testFact.nullList}"), String.class)
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -284,13 +284,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
-                                        field("testFact.string", String.class)
+                                        castToCollection(value("${testFact.strings}"), String.class),
+                                        value("${testFact.string}")
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -315,13 +315,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.nullList", List.class), String.class),
-                                        field("testFact.string", String.class)
+                                        castToCollection(value("${testFact.nullList}"), String.class),
+                                        value("${testFact.string}")
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -346,13 +346,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 contains(
-                                        castToCollection(field("testFact.nullList", List.class), String.class),
-                                        field("testFact.string", String.class)
+                                        castToCollection(value("${testFact.nullList}"), String.class),
+                                        value("${testFact.string}")
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -377,13 +377,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 containsAny(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
+                                        castToCollection(value("${testFact.strings}"), String.class),
                                         values(String.class, value("firstString"), value("fourthString"), value("fifthString"))
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -410,13 +410,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 containsAny(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
+                                        castToCollection(value("${testFact.strings}"), String.class),
                                         values(String.class, value("fourthString"), value("fifthString"))
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -441,13 +441,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 containsAny(
-                                        castToCollection(field("testFact.nullList", List.class), String.class),
+                                        castToCollection(value("${testFact.nullList}"), String.class),
                                         values(String.class, value("fourthString"), value("fifthString"))
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -472,13 +472,13 @@ class ContainsOperatorTest {
                         .fact("testFact", TestFact.class)
                         .predicate(
                                 containsAny(
-                                        castToCollection(field("testFact.strings", List.class), String.class),
-                                        castToCollection(field("testFact.nullList", List.class), String.class)
+                                        castToCollection(value("${testFact.strings}"), String.class),
+                                        castToCollection(value("${testFact.nullList}"), String.class)
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);
@@ -504,13 +504,13 @@ class ContainsOperatorTest {
                         .attribute("ignored", false)
                         .predicate(
                                 containsAny(
-                                        castToCollection(field("testFact.nullList", List.class), String.class),
-                                        castToCollection(field("testFact.nullList", List.class), String.class)
+                                        castToCollection(value("${testFact.nullList}"), String.class),
+                                        castToCollection(value("${testFact.nullList}"), String.class)
                                 )
                         )
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("testFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${testFact}")))
                         .build());
         RulesExecutionConfig config = createConfig(rule);
         RulesEngine rulesEngine = createRuleEngine(config);

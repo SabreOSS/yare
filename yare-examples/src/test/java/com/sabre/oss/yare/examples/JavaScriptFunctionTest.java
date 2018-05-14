@@ -77,13 +77,13 @@ class JavaScriptFunctionTest {
                                 equal(
                                         function("concat", String.class,
                                                 param("str1", value("Chain code:")),
-                                                param("str2", field("hotel.chainCode"))),
+                                                param("str2", value("${hotel.chainCode}"))),
                                         value("Chain code:HH")
                                 )
                         )
                         .action("collect",
-                                param("context", reference("ctx")),
-                                param("fact", reference("hotel")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${hotel}")))
                         .build()
         );
     }
