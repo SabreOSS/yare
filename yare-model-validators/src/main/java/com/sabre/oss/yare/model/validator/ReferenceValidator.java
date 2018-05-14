@@ -94,35 +94,30 @@ public class ReferenceValidator extends BaseValidator {
             }
         }
         Expression.Value value = expression.as(Expression.Value.class);
-        if (value != null) {
-            if (ValuePlaceholderConverter.isReferenceCandidate(value)) {
-                Matcher matcher = ValuePlaceholderConverter.PLACEHOLDER_PATTERN.matcher(value.getValue().toString());
-                if (matcher.find()) {
-                    String ref = matcher.group(1);
-                    int dotIndex = ref.indexOf('.');
-                    String reference = ref;
-                    String path = null;
-                    if (dotIndex > -1) {
-                        reference = ref.substring(0, dotIndex);
-                        path = ref.substring(dotIndex + 1);
-                    }
-
-                    checkReference(reference, path, results, localReferences);
-                }
+        if (value != null && ValuePlaceholderConverter.isReferenceCandidate(value)) {
+            Matcher matcher = ValuePlaceholderConverter.PLACEHOLDER_PATTERN.matcher(value.getValue().toString());
+            if (matcher.find()) {
+                String ref = matcher.group(1);
+                checkReference(ref, results, localReferences);
             }
         }
     }
 
-    private void checkReference(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
-        if (StringUtils.isEmpty(reference)) {
+    private void checkReference(String reference, ValidationResults results, Map<String, Type> localReferences) {
+        int dotIndex = reference.indexOf('.');
+        boolean hasPathPart = dotIndex > -1;
+        String referenceName = hasPathPart ? reference.substring(0, dotIndex) : reference;
+
+        if (StringUtils.isEmpty(referenceName)) {
             append(results, ValidationResult.error("rule.ref.empty-reference", "Reference Error: empty reference used"));
-        } else if (!localReferences.keySet().contains(reference)) {
-            append(results, ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> " + reference));
-        } else if (path != null) {
+        } else if (!localReferences.keySet().contains(referenceName)) {
+            append(results, ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> " + referenceName));
+        } else if (hasPathPart) {
+            String path = reference.substring(dotIndex + 1);
             if (hasEmptyPathSegment(path)) {
                 append(results, ValidationResult.error("rule.ref.empty-field", "Reference Error: field cannot have empty segments"));
             } else {
-                checkPath(reference, path, results, localReferences);
+                checkPath(referenceName, path, results, localReferences);
             }
         }
     }
@@ -134,13 +129,13 @@ public class ReferenceValidator extends BaseValidator {
 
     private void checkPath(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
         try {
-            checkCollectionOperator(path, results, localReferences.get(reference));
+            checkCollectionOperator(localReferences.get(reference), path, results);
         } catch (ChainedTypeExtractor.InvalidPathException e) {
             append(results, ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> " + reference + "." + path));
         }
     }
 
-    private void checkCollectionOperator(String path, ValidationResults results, Type referenceType) {
+    private void checkCollectionOperator(Type referenceType, String path, ValidationResults results) {
         String[] pathParts = path.split("\\.", -1);
         Type currentType = referenceType;
         for (String pathPart : pathParts) {
