@@ -45,10 +45,6 @@ class CallConverter {
     }
 
     private Argument convertExpression(Rule rule, Expression param) throws IllegalArgumentException {
-        if (param instanceof Expression.Reference) {
-            Expression.Reference reference = (Expression.Reference) param;
-            return Argument.referenceOf(param.getName(), reference.getReferenceType(), Argument.UNKNOWN, prepareReference(reference.getReference(), reference.getPath()));
-        }
         if (param instanceof Expression.Value) {
             Expression.Value value = (Expression.Value) param;
             Argument argument = converter.tryCreateReference(rule, value);
@@ -59,11 +55,5 @@ class CallConverter {
             return convert(rule, invocation);
         }
         throw new IllegalArgumentException(String.format("Parameter of type %s not supported in invocations (functions)", param));
-    }
-
-    private String prepareReference(String reference, String path) {
-        return path != null && !path.isEmpty()
-                ? reference + '.' + path
-                : reference;
     }
 }

@@ -116,14 +116,6 @@ class CallConverterTest {
                 Arguments.of(
                         ExpressionFactory.valueOf("nonExistingField", "${fact.nonExisting}"),
                         Argument.valueOf("nonExistingField", String.class, "${fact.nonExisting}")
-                ),
-                Arguments.of(
-                        ExpressionFactory.referenceOf("simpleReference", Object.class, "person"),
-                        Argument.referenceOf("simpleReference", Object.class, Argument.UNKNOWN, "person")
-                ),
-                Arguments.of(
-                        ExpressionFactory.referenceOf("propertyReference", Object.class, "person", String.class, "name"),
-                        Argument.referenceOf("propertyReference", Object.class, Argument.UNKNOWN, "person.name")
                 )
         );
     }

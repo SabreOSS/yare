@@ -77,9 +77,7 @@ class ConsequenceFactoryTest {
                 Argument.valueOf("arg4", BigDecimal.valueOf(-123, 456)),
                 Argument.valueOf("arg5", "Just a string"),
                 Argument.valueOf("arg6", new InternalParameterizedType(null, List.class, Long.class), asList(1L, 2L)),
-                Argument.valueOf("arg7", new InternalParameterizedType(null, List.class, String.class), asList("one", "two")),
-                Argument.referenceOf("arg8", Object.class, Argument.UNKNOWN, "person"),
-                Argument.referenceOf("arg9", Object.class, Argument.UNKNOWN, "person.name"));
+                Argument.valueOf("arg7", new InternalParameterizedType(null, List.class, String.class), asList("one", "two")));
         assertThat(invocations).containsKey("actionTwo");
         actionInvocation = invocations.get("actionTwo");
         assertThat(actionInvocation.getName()).isEqualTo("Second action");
@@ -107,9 +105,7 @@ class ConsequenceFactoryTest {
                         ExpressionFactory.valueOf("arg4", BigDecimal.valueOf(-123, 456)),
                         ExpressionFactory.valueOf("arg5", "Just a string"),
                         ExpressionFactory.valueOf("arg6", asList(1L, 2L)),
-                        ExpressionFactory.valueOf("arg7", asList("one", "two")),
-                        ExpressionFactory.referenceOf("arg8", Object.class, "person"),
-                        ExpressionFactory.referenceOf("arg9", Object.class, "person", String.class, "name"))),
+                        ExpressionFactory.valueOf("arg7", asList("one", "two")))),
 
                 ExpressionFactory.actionOf("Second action", "actionTwo", emptyList())
         );
