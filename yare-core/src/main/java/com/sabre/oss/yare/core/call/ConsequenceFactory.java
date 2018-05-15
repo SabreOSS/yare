@@ -69,7 +69,7 @@ public final class ConsequenceFactory {
     }
 
     private Invocation<ProcessingContext, Void> createInvocation(Rule rule, Expression.Invocation action) {
-        String ruleId = (String) rule.getAttribute("ruleName").getValue();
+        String ruleId = rule.getAttribute("ruleName").getValue().toString();
         try {
             return invocationFactory.create(callConverter.convert(rule, action));
         } catch (Exception e) {

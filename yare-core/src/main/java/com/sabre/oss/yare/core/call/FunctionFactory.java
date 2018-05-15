@@ -52,7 +52,7 @@ public class FunctionFactory {
     }
 
     public Invocation<ProcessingContext, Object> create(Rule rule, Expression.Invocation function) {
-        String ruleId = (String) rule.getAttribute("ruleName").getValue();
+        String ruleId = rule.getAttribute("ruleName").getValue().toString();
         try {
             return invocationFactory.create(callConverter.convert(rule, function));
         } catch (Exception e) {

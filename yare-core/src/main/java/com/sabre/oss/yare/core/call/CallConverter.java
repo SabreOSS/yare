@@ -28,24 +28,32 @@ import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.core.reference.ValueConverter;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class CallConverter {
+public class CallConverter {
     private final ValueConverter<Argument> valueConverter;
 
-    CallConverter() {
-        this.valueConverter = new ValueConverter<>(Argument::referenceOf, Argument::valueOf);
+    public CallConverter() {
+        this.valueConverter = new ValueConverter<>(
+                (name, baseReferenceType, referenceType, reference) -> Argument.referenceOf(name, convertType(baseReferenceType), convertType(referenceType), reference),
+                (name, type, value) -> Argument.valueOf(name, convertType(type), value)
+        );
     }
 
-    Argument.Invocation convert(Rule rule, Expression.Invocation invocation) {
+    public Argument.Invocation convert(Rule rule, Expression.Invocation invocation) {
         List<Argument> arguments = new ArrayList<>(invocation.getArguments().size() + 1);
 
-        return Argument.invocationOf(invocation.getName(), Argument.UNKNOWN, invocation.getCall(),
+        return Argument.invocationOf(invocation.getName(), convertType(invocation.getType()), invocation.getCall(),
                 invocation.getArguments().stream()
                         .map(param -> convertExpression(rule, param))
                         .collect(Collectors.toCollection(() -> arguments)));
+    }
+
+    private Type convertType(Type type) {
+        return type.equals(Expression.UNDEFINED) ? Argument.UNKNOWN : type;
     }
 
     private Argument convertExpression(Rule rule, Expression param) throws IllegalArgumentException {

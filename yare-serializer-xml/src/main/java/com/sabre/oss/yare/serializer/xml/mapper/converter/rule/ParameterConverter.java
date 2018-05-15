@@ -93,7 +93,7 @@ class ParameterConverter implements ContextualConverter<ParameterSer, Expression
                 Type type = typeConverter.fromString(Type.class, typeName);
                 return valueOf(input.getName(), type, typeConverter.fromString(type, value));
             }
-            return valueOf(input.getName(), value != null ? value.getClass() : String.class, value);
+            return valueOf(input.getName(), String.class, value);
         }
     }
 

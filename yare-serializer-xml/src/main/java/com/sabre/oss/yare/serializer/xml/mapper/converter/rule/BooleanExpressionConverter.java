@@ -83,7 +83,7 @@ class BooleanExpressionConverter implements ContextualConverter<Object, Expressi
                 Type type = typeConverter.fromString(Type.class, typeName);
                 return valueOf(null, type, typeConverter.fromString(type, value));
             } else {
-                return valueOf(null, value != null ? value.getClass() : String.class, value);
+                return valueOf(null, String.class, value);
             }
         }
     }

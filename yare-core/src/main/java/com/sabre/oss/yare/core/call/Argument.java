@@ -86,7 +86,7 @@ public interface Argument {
         List<Argument> getArguments();
     }
 
-    class UnknownType {
+    final class UnknownType {
     }
 }
 

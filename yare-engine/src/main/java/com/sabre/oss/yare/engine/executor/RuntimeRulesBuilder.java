@@ -138,7 +138,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     private static class ValueProviderReferenceFactory implements ReferenceFactory<ValueProvider> {
 
         @Override
-        public ValueProvider create(String name, Type baseReferenceType, Type argumentType, String reference) {
+        public ValueProvider create(String name, Type baseReferenceType, Type referenceType, String reference) {
             String referenceName = reference;
             String path = null;
 
@@ -151,7 +151,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
             return ValueProviderFactory.createFromPath(
                     TypeUtils.getRawType(baseReferenceType, null),
                     referenceName,
-                    TypeUtils.getRawType(argumentType, null),
+                    TypeUtils.getRawType(referenceType, null),
                     path);
         }
     }
@@ -159,11 +159,11 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     private static class PredicateReferenceFactory extends ValueProviderReferenceFactory {
 
         @Override
-        public ValueProvider create(String name, Type baseReferenceType, Type argumentType, String reference) {
-            if (!argumentType.equals(Boolean.class) && !argumentType.equals(Boolean.TYPE)) {
+        public ValueProvider create(String name, Type baseReferenceType, Type referenceType, String reference) {
+            if (!referenceType.equals(Boolean.class) && !referenceType.equals(Boolean.TYPE)) {
                 throw new IllegalArgumentException("Only references of boolean type can be translated directly to predicate");
             }
-            return super.create(name, baseReferenceType, argumentType, reference);
+            return super.create(name, baseReferenceType, referenceType, reference);
         }
     }
 

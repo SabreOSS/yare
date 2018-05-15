@@ -50,13 +50,17 @@ class CallConverterTest {
     @ParameterizedTest
     @MethodSource("mappings")
     void shouldConvertExpressionToArgument(Expression expression, Argument argument) {
-        Argument.Invocation invocation = callConverter.convert(createRule(), ExpressionFactory.functionOf("name", Object.class, "call", expression));
+        Argument.Invocation invocation = callConverter.convert(createRule(), ExpressionFactory.functionOf("name", Integer.class, "call", expression));
 
-        assertThat(invocation).isEqualTo(ArgumentFactory.invocationOf("name", Argument.UNKNOWN, "call", argument));
+        assertThat(invocation).isEqualTo(ArgumentFactory.invocationOf("name", Integer.class, "call", argument));
     }
 
     private static Stream<Arguments> mappings() {
         return Stream.of(
+                Arguments.of(
+                        ExpressionFactory.valueOf("unknownType", Expression.UNDEFINED, "value"),
+                        Argument.valueOf("unknownType", Argument.UNKNOWN, "value")
+                ),
                 Arguments.of(
                         ExpressionFactory.valueOf("booleanFalse", false),
                         Argument.valueOf("booleanFalse", Boolean.FALSE)
@@ -132,7 +136,7 @@ class CallConverterTest {
     void shouldConvertMultipleExpressions() {
         Argument.Invocation invocation = callConverter.convert(
                 createRule(),
-                ExpressionFactory.functionOf("functionName", Object.class, "functionCall",
+                ExpressionFactory.functionOf("functionName", Expression.UNDEFINED, "functionCall",
                         ExpressionFactory.valueOf("string", "value"),
                         ExpressionFactory.valueOf("reference", "${fact.field}"),
                         ExpressionFactory.valueOf("boolean", false)

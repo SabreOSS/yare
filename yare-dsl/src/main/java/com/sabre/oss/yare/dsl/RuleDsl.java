@@ -209,8 +209,9 @@ public final class RuleDsl {
      * @param args function arguments
      * @return function call expression
      */
-    public static ExpressionOperand<Object> function(String name, Parameter... args) {
-        return function(name, Object.class, args);
+    public static <T> ExpressionOperand<T> function(String name, Parameter... args) {
+        Class<T> type = (Class<T>) com.sabre.oss.yare.core.model.Expression.UNDEFINED;
+        return function(name, type, args);
     }
 
     /**
@@ -273,7 +274,8 @@ public final class RuleDsl {
      * @return value operand
      */
     public static <T> ExpressionOperand<T> value(T value) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, value != null ? value.getClass() : Object.class, value);
+        Type type = value != null ? value.getClass() : com.sabre.oss.yare.core.model.Expression.UNDEFINED;
+        return (name, builder) -> ExpressionFactory.valueOf(name, type, value);
     }
 
     /**
@@ -286,7 +288,7 @@ public final class RuleDsl {
      * @return value operand
      */
     public static <T> ExpressionOperand<T> value(String value) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, value != null ? value.getClass() : Object.class, value);
+        return (name, builder) -> ExpressionFactory.valueOf(name, String.class, value);
     }
 
     /**
@@ -581,7 +583,7 @@ public final class RuleDsl {
          * @return this ruleBuilder instance
          */
         public RuleBuilder attribute(String name, Object value) {
-            Type type = value != null ? value.getClass() : Object.class;
+            Type type = value != null ? value.getClass() : com.sabre.oss.yare.core.model.Expression.UNDEFINED;
             attributes.add(new Attribute(name, type, value));
             return this;
         }

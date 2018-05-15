@@ -28,5 +28,5 @@ import java.lang.reflect.Type;
 
 @FunctionalInterface
 public interface ReferenceFactory<R> {
-    R create(String name, Type baseReferenceType, Type argumentType, String reference);
+    R create(String name, Type baseReferenceType, Type referenceType, String reference);
 }

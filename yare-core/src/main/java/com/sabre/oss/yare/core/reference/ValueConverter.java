@@ -24,7 +24,6 @@
 
 package com.sabre.oss.yare.core.reference;
 
-import com.sabre.oss.yare.core.call.Argument;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
@@ -47,9 +46,9 @@ public class ValueConverter<R> {
     }
 
     public R create(Rule rule, Expression.Value value) {
-        Optional<R> argument = tryCreateReference(rule, value);
-        if (argument.isPresent()) {
-            return argument.get();
+        Optional<R> reference = tryCreateReference(rule, value);
+        if (reference.isPresent()) {
+            return reference.get();
         }
         Object v = placeholderExtractor.unescapePlaceholder(value)
                 .orElse(value.getValue());
@@ -68,13 +67,13 @@ public class ValueConverter<R> {
         }
         Fact fact = extractFact(rule, path);
         if (fact != null) {
-            Type argumentType = extractArgumentType(fact, path);
-            if (argumentType != null) {
-                return referenceFactory.create(expressionName, fact.getType(), argumentType, path);
+            Type referenceType = extractReferenceType(fact, path);
+            if (referenceType != null) {
+                return referenceFactory.create(expressionName, fact.getType(), referenceType, path);
             }
         }
         if (CONTEXT_PATH.equals(path)) {
-            return referenceFactory.create(expressionName, Argument.UNKNOWN, Argument.UNKNOWN, path);
+            return referenceFactory.create(expressionName, Expression.UNDEFINED, Expression.UNDEFINED, path);
         }
 
         return null;
@@ -86,7 +85,7 @@ public class ValueConverter<R> {
         return rule.getFact(factName);
     }
 
-    private Type extractArgumentType(Fact fact, String path) {
+    private Type extractReferenceType(Fact fact, String path) {
         int dotIndex = path.indexOf('.');
         if (dotIndex > -1) {
             String fieldPath = path.substring(dotIndex + 1);
@@ -95,8 +94,7 @@ public class ValueConverter<R> {
             } catch (ChainedTypeExtractor.InvalidPathException e) {
                 return null;
             }
-        } else {
-            return fact.getType();
         }
+        return fact.getType();
     }
 }
