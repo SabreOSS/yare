@@ -22,33 +22,11 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.model.validator;
+package com.sabre.oss.yare.core.reference;
 
-import com.google.common.collect.ImmutableList;
-import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
-import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
+import java.lang.reflect.Type;
 
-public final class DefaultRuleValidator {
-    private static final Validator ruleValidator = createRuleValidator(false);
-    private static final Validator fastFailRuleValidator = createRuleValidator(true);
-
-    private DefaultRuleValidator() {
-    }
-
-    public static Validator getRuleValidator() {
-        return ruleValidator;
-    }
-
-    public static Validator getFailFastRuleValidator() {
-        return fastFailRuleValidator;
-    }
-
-    private static Validator createRuleValidator(boolean fastFail) {
-        return new CombinedValidator(
-                ImmutableList.of(
-                        new AttributeValidator(fastFail),
-                        new FactValidator(fastFail),
-                        new ReferenceValidator(fastFail, new ChainedTypeExtractor(), new PlaceholderExtractor()),
-                        new ActionValidator(fastFail)));
-    }
+@FunctionalInterface
+public interface ValueFactory<R> {
+    R create(String name, Type type, Object value);
 }

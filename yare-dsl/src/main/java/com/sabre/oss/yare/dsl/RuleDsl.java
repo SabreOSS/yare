@@ -278,7 +278,8 @@ public final class RuleDsl {
 
     /**
      * Creates a String-based value operand. References to attributes/facts or fact fields can be accessed using
-     * placeholders, e.g. "${factName.field}".
+     * placeholders, e.g. "${factName.field}". To create value formatted as placeholder it is possible
+     * to escape it, e.g. "\\${factName.field}".
      *
      * @param value string representation of the value
      * @param <T>   value type

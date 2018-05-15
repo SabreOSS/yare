@@ -82,6 +82,14 @@ class CallConverterTest {
                         Argument.valueOf("nullValue", String.class, null)
                 ),
                 Arguments.of(
+                        ExpressionFactory.valueOf("escapedPlaceholder", "\\${placeholder}"),
+                        Argument.valueOf("escapedPlaceholder", "${placeholder}")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("escapedPlaceholder", "\\\\${placeholder}"),
+                        Argument.valueOf("escapedPlaceholder", "\\${placeholder}")
+                ),
+                Arguments.of(
                         ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
                         Argument.valueOf("listOfNumbers", new InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))
                 ),

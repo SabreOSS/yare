@@ -31,33 +31,34 @@ import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
 
 import java.lang.reflect.Type;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
-public class ValuePlaceholderConverter<R> {
-    public static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("^\\$\\{(.*)}$");
-    private static final ChainedTypeExtractor CHAINED_TYPE_EXTRACTOR = new ChainedTypeExtractor();
+public class ValueConverter<R> {
+    private static final ChainedTypeExtractor chainedTypeExtractor = new ChainedTypeExtractor();
+    private static final PlaceholderExtractor placeholderExtractor = new PlaceholderExtractor();
     private static final String CONTEXT_PATH = "ctx";
 
-    private final ReferenceFactory<R> referenceFactory;
+    private final ReferenceFactory<? extends R> referenceFactory;
+    private final ValueFactory<? extends R> valueFactory;
 
-    public ValuePlaceholderConverter(ReferenceFactory<R> referenceFactory) {
+    public ValueConverter(ReferenceFactory<? extends R> referenceFactory, ValueFactory<? extends R> valueFactory) {
         this.referenceFactory = referenceFactory;
+        this.valueFactory = valueFactory;
     }
 
-    public R tryCreateReference(Rule rule, Expression.Value value) {
-        if (isReferenceCandidate(value)) {
-            Matcher matcher = PLACEHOLDER_PATTERN.matcher(value.getValue().toString());
-            if (matcher.find()) {
-                String path = matcher.group(1);
-                return createReference(rule, value.getName(), path);
-            }
+    public R create(Rule rule, Expression.Value value) {
+        Optional<R> argument = tryCreateReference(rule, value);
+        if (argument.isPresent()) {
+            return argument.get();
         }
-        return null;
+        Object v = placeholderExtractor.unescapePlaceholder(value)
+                .orElse(value.getValue());
+        return valueFactory.create(value.getName(), value.getType(), v);
     }
 
-    public static boolean isReferenceCandidate(Expression.Value value) {
-        return String.class.equals(value.getType()) && value.getValue() != null;
+    private Optional<R> tryCreateReference(Rule rule, Expression.Value value) {
+        return placeholderExtractor.extractPlaceholder(value)
+                .map(s -> createReference(rule, value.getName(), s));
     }
 
     private R createReference(Rule rule, String expressionName, String path) {
@@ -90,7 +91,7 @@ public class ValuePlaceholderConverter<R> {
         if (dotIndex > -1) {
             String fieldPath = path.substring(dotIndex + 1);
             try {
-                return CHAINED_TYPE_EXTRACTOR.findPathType(fact.getType(), fieldPath);
+                return chainedTypeExtractor.findPathType(fact.getType(), fieldPath);
             } catch (ChainedTypeExtractor.InvalidPathException e) {
                 return null;
             }

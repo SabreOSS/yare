@@ -26,14 +26,18 @@ package com.sabre.oss.yare.core.call;
 
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Rule;
-import com.sabre.oss.yare.core.reference.ValuePlaceholderConverter;
+import com.sabre.oss.yare.core.reference.ValueConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class CallConverter {
-    private final ValuePlaceholderConverter<Argument.Reference> converter = new ValuePlaceholderConverter<>(Argument::referenceOf);
+    private final ValueConverter<Argument> valueConverter;
+
+    CallConverter() {
+        this.valueConverter = new ValueConverter<>(Argument::referenceOf, Argument::valueOf);
+    }
 
     Argument.Invocation convert(Rule rule, Expression.Invocation invocation) {
         List<Argument> arguments = new ArrayList<>(invocation.getArguments().size() + 1);
@@ -47,8 +51,7 @@ class CallConverter {
     private Argument convertExpression(Rule rule, Expression param) throws IllegalArgumentException {
         if (param instanceof Expression.Value) {
             Expression.Value value = (Expression.Value) param;
-            Argument argument = converter.tryCreateReference(rule, value);
-            return argument != null ? argument : Argument.valueOf(value.getName(), value.getType(), value.getValue());
+            return valueConverter.create(rule, value);
         }
         if (param instanceof Expression.Invocation) {
             Expression.Invocation invocation = (Expression.Invocation) param;

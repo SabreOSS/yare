@@ -41,8 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.sabre.oss.yare.dsl.RuleDsl.param;
-import static com.sabre.oss.yare.dsl.RuleDsl.value;
+import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -116,6 +115,51 @@ public class ValuePredicateTest {
         assertThatThrownBy(() -> session.execute(null, Collections.emptyList()))
                 .isExactlyInstanceOf(UncheckedExecutionException.class)
                 .hasMessage("java.lang.IllegalArgumentException: Only references of boolean type can be translated directly to predicate");
+    }
+
+    @Test
+    void shouldUseEscapedPlaceholdersDirectly() {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on isValid fact field")
+                .fact("fact", NamedFact.class)
+                .predicate(
+                        or(
+                                equal(
+                                        value("${fact.name}"),
+                                        value("\\${escape}")
+                                ),
+                                equal(
+                                        value("${fact.name}"),
+                                        value("\\\\${doubleEscape}")
+                                )
+                        )
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("fact", value("${fact}"))
+                )
+                .build();
+
+        List<NamedFact> facts = Arrays.asList(
+                new NamedFact("${escape}", true),
+                new NamedFact("\\${doubleEscape}", true),
+                new NamedFact("anyName", true));
+
+        RulesEngine engine = new RulesEngineBuilder()
+                .withRulesRepository(uri -> Collections.singletonList(rule))
+                .withActionMapping("collect", method(this, a -> a.collect(null, null)))
+                .build();
+        RuleSession session = engine.createSession("uri");
+
+        // when
+        ArrayList<String> result = session.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(result).containsExactly(
+                "${escape}",
+                "\\${doubleEscape}"
+        );
     }
 
     public void collect(List<String> context, NamedFact fact) {

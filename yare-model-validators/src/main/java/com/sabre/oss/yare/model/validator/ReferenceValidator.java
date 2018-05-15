@@ -29,7 +29,7 @@ import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
-import com.sabre.oss.yare.core.reference.ValuePlaceholderConverter;
+import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -37,15 +37,18 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
     private final ChainedTypeExtractor chainedTypeExtractor;
+    private final PlaceholderExtractor placeholderExtractor;
 
-    public ReferenceValidator(boolean failFast, ChainedTypeExtractor chainedTypeExtractor) {
+    public ReferenceValidator(boolean failFast,
+                              ChainedTypeExtractor chainedTypeExtractor,
+                              PlaceholderExtractor placeholderExtractor) {
         super(failFast);
         this.chainedTypeExtractor = chainedTypeExtractor;
+        this.placeholderExtractor = placeholderExtractor;
     }
 
     @Override
@@ -94,13 +97,8 @@ public class ReferenceValidator extends BaseValidator {
             }
         }
         Expression.Value value = expression.as(Expression.Value.class);
-        if (value != null && ValuePlaceholderConverter.isReferenceCandidate(value)) {
-            Matcher matcher = ValuePlaceholderConverter.PLACEHOLDER_PATTERN.matcher(value.getValue().toString());
-            if (matcher.find()) {
-                String ref = matcher.group(1);
-                checkReference(ref, results, localReferences);
-            }
-        }
+        placeholderExtractor.extractPlaceholder(value)
+                .ifPresent(s -> checkReference(s, results, localReferences));
     }
 
     private void checkReference(String reference, ValidationResults results, Map<String, Type> localReferences) {

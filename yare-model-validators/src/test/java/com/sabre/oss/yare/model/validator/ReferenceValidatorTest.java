@@ -29,6 +29,7 @@ import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
+import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,7 +48,7 @@ class ReferenceValidatorTest {
 
     @BeforeEach
     void setUp() {
-        validator = new ReferenceValidator(false, new ChainedTypeExtractor());
+        validator = new ReferenceValidator(false, new ChainedTypeExtractor(), new PlaceholderExtractor());
     }
 
     @Test
