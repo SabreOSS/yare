@@ -24,10 +24,13 @@
 
 package com.sabre.oss.yare.core.model;
 
-import java.lang.reflect.ParameterizedType;
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
+
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -229,58 +232,4 @@ public final class ExpressionFactory {
             return value;
         }
     }
-
-    static class InternalParameterizedType implements ParameterizedType {
-        private final Type[] actualTypeArguments;
-        private final Class<?> rawType;
-        private final Type ownerType;
-
-        InternalParameterizedType(Type ownerType, Class<?> rawType, Type... actualTypeArguments) {
-            this.rawType = requireNonNull(rawType);
-            this.actualTypeArguments = requireNonNull(actualTypeArguments);
-            this.ownerType = ownerType;
-        }
-
-        @Override
-        public Type[] getActualTypeArguments() {
-            return actualTypeArguments;
-        }
-
-        @Override
-        public Type getRawType() {
-            return rawType;
-        }
-
-        @Override
-        public Type getOwnerType() {
-            return ownerType;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof ParameterizedType)) {
-                return false;
-            }
-            ParameterizedType that = (ParameterizedType) o;
-            return Objects.equals(rawType, that.getRawType()) &&
-                    Arrays.equals(actualTypeArguments, that.getActualTypeArguments()) &&
-                    Objects.equals(ownerType, that.getOwnerType());
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(this.actualTypeArguments) ^ Objects.hashCode(this.ownerType) ^ Objects.hashCode(this.rawType);
-        }
-
-        @Override
-        public String toString() {
-            return rawType.getTypeName() + Arrays.stream(actualTypeArguments)
-                    .map(Type::getTypeName)
-                    .collect(Collectors.joining(",", "<", ">"));
-        }
-    }
-
 }

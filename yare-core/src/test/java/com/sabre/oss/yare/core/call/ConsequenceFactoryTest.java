@@ -29,6 +29,7 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.core.call;
 
 import com.sabre.oss.yare.core.model.*;
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

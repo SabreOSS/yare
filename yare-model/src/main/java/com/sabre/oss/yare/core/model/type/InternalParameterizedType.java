@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.core.call;
+package com.sabre.oss.yare.core.model.type;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -32,12 +32,12 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-class InternalParameterizedType implements ParameterizedType {
+public class InternalParameterizedType implements ParameterizedType {
     private final Type[] actualTypeArguments;
     private final Class<?> rawType;
     private final Type ownerType;
 
-    InternalParameterizedType(Type ownerType, Class<?> rawType, Type... actualTypeArguments) {
+    public InternalParameterizedType(Type ownerType, Class<?> rawType, Type... actualTypeArguments) {
         this.rawType = requireNonNull(rawType);
         this.actualTypeArguments = requireNonNull(actualTypeArguments);
         this.ownerType = ownerType;
