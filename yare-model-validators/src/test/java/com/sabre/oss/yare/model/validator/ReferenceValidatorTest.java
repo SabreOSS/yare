@@ -374,15 +374,18 @@ class ReferenceValidatorTest {
 
         // then
         assertThat(results.getResults()).containsExactly(
-                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type")
+                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type -> fact.getterField[*]")
         );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {
             "${fact.collection[*]}",
+            "${fact.[*]collection}",
             "${fact.collection[*].collection[*]}",
-            "${fact.collection.collection[*]}"
+            "${fact.collection.collection[*]}",
+            "${fact.[*]collection.collection[*]}",
+            "${fact.[*]collection.[*]collection}"
     })
     void shouldPassOnCollectionWithMarker(String path) {
         // given
@@ -402,6 +405,36 @@ class ReferenceValidatorTest {
 
         // then
         assertThat(results.getResults()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "fact.collection[*][*]",
+            "fact.[*]collection[*]",
+            "fact.[*]collection[*][*]",
+            "fact.collection.collection[*][*]",
+            "fact.collection.[*]collection[*]"
+    })
+    void shouldWarnAboutMultipleCollectionMarkers(String path) {
+        // given
+        Rule rule = new Rule(
+                Collections.emptySet(),
+                Collections.singletonList(
+                        new Fact("fact", InnerFact.class)
+                ),
+                operatorOf(null, Boolean.class, "equal",
+                        valueOf(null, String.class, "${" + path + "}"),
+                        valueOf(null, Collection.class, Collections.emptyList())
+                ),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.warning("rule.ref.multiple-collection-markers", "Reference Error: field has more than one collection marker -> " + path)
+        );
     }
 
     @Test
@@ -504,7 +537,7 @@ class ReferenceValidatorTest {
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.privateField"),
                 ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> missingFact"),
                 ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> missingFact"),
-                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type"),
+                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type -> staticFact.nested.collection.getterField[*]"),
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.missingValue")
         );
     }
@@ -569,7 +602,7 @@ class ReferenceValidatorTest {
                 ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> missingFact"),
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.privateField"),
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.missing"),
-                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type")
+                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type -> staticFact.nested.collection.getterField[*]")
         );
     }
 

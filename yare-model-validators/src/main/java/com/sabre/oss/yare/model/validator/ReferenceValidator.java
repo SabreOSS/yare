@@ -127,21 +127,36 @@ public class ReferenceValidator extends BaseValidator {
 
     private void checkPath(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
         try {
-            checkCollectionOperator(localReferences.get(reference), path, results);
+            checkCollectionOperator(localReferences.get(reference), reference, path, results);
         } catch (ChainedTypeExtractor.InvalidPathException e) {
-            append(results, ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> " + reference + "." + path));
+            append(results, ValidationResult.error("rule.ref.unknown-field", String.format("Reference Error: unknown field used -> %s.%s", reference, path)));
         }
     }
 
-    private void checkCollectionOperator(Type referenceType, String path, ValidationResults results) {
+    private void checkCollectionOperator(Type referenceType, String reference, String path, ValidationResults results) {
         String[] pathParts = path.split("\\.", -1);
         Type currentType = referenceType;
         for (String pathPart : pathParts) {
             currentType = chainedTypeExtractor.findPathType(currentType, pathPart);
             if (!isCollection(currentType) && pathPart.contains("[*]")) {
-                append(results, ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type"));
+                append(results, ValidationResult.error("rule.ref.non-collection-field", String.format("Reference Error: field is not collection type -> %s.%s", reference, path)));
+            }
+            if (isCollection(currentType) && countCollectionMarkers(pathPart) > 1) {
+                append(results, ValidationResult.warning(
+                        "rule.ref.multiple-collection-markers",
+                        String.format("Reference Error: field has more than one collection marker -> %s.%s", reference, path)
+                ));
             }
         }
+    }
+
+    private int countCollectionMarkers(String pathPart) {
+        int count = 0;
+        int i = -1;
+        while ((i = pathPart.indexOf("[*]", i + 1)) != -1) {
+            count++;
+        }
+        return count;
     }
 
     private boolean isCollection(Type type) {

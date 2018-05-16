@@ -197,6 +197,33 @@ class ChainingOperatorTest {
     }
 
     @Test
+    void shouldIgnoreMultipleCollectionMarkers() {
+        // given
+        OuterChainingFact invalidFact = getInvalidFact();
+        InnerChainingFact innerChainingFact = new InnerChainingFact(Arrays.asList("test", "test"));
+        MidChainingFact midChainingFact = new MidChainingFact();
+        midChainingFact.put("instance", innerChainingFact);
+        OuterChainingFact validFact = new OuterChainingFact(midChainingFact);
+        List<Object> facts = Arrays.asList(invalidFact, validFact);
+
+        List<Rule> rule = getRule(
+                "Should match when all from outerChainingFact.instance.instance.collection are test",
+                contains(
+                        castToCollection(value("${outerChainingFact.instance.instance.[*]collection[*][*]}"), String.class),
+                        values(String.class, value("test"), value("test"))
+                )
+        );
+
+        RuleSession ruleSession = createRuleSession(rule);
+
+        // when
+        List<Object> matchingFacts = ruleSession.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(matchingFacts).containsExactly(validFact);
+    }
+
+    @Test
     void shouldCollectWhenInstancesInChainEndingWithCollectionAndNoGroupingOperator() {
         // given
         OuterChainingFact invalidFact = getInvalidFact();
