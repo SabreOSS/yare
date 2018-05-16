@@ -33,7 +33,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -119,6 +121,10 @@ class CallConverterTest {
                         Argument.referenceOf("factFieldReference", UserFact.class, String.class, "fact.field")
                 ),
                 Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${attribute.field}"),
+                        Argument.referenceOf("factFieldReference", UserAttribute.class, Long.class, "attribute.field")
+                ),
+                Arguments.of(
                         ExpressionFactory.valueOf("factFieldListReference", "${fact.list}"),
                         Argument.referenceOf("factFieldListReference", UserFact.class, new InternalParameterizedType(null, List.class, String.class), "fact.list")
                 ),
@@ -153,8 +159,13 @@ class CallConverterTest {
 
     private Rule createRule() {
         return new Rule(
-                Collections.singleton(new Attribute("ruleName", String.class, "nameOfRule")),
-                Collections.singletonList(new Fact("fact", UserFact.class)),
+                new LinkedHashSet<>(Arrays.asList(
+                        new Attribute("ruleName", String.class, "nameOfRule"),
+                        new Attribute("attribute", UserAttribute.class, new UserAttribute())
+                )),
+                Collections.singletonList(
+                        new Fact("fact", UserFact.class)
+                ),
                 null,
                 Collections.emptyList());
     }
@@ -162,5 +173,9 @@ class CallConverterTest {
     private static class UserFact {
         public String field;
         public List<String> list;
+    }
+
+    private static class UserAttribute {
+        public Long field = 10L;
     }
 }

@@ -61,40 +61,53 @@ public class ValueConverter<R> {
     }
 
     private R createReference(Rule rule, String expressionName, String path) {
-        Attribute attribute = rule.getAttribute(path);
-        if (attribute != null) {
-            return referenceFactory.create(expressionName, attribute.getType(), attribute.getType(), path);
-        }
-        Fact fact = extractFact(rule, path);
-        if (fact != null) {
-            Type referenceType = extractReferenceType(fact, path);
-            if (referenceType != null) {
-                return referenceFactory.create(expressionName, fact.getType(), referenceType, path);
-            }
-        }
-        if (CONTEXT_PATH.equals(path)) {
-            return referenceFactory.create(expressionName, Expression.UNDEFINED, Expression.UNDEFINED, path);
-        }
+        return extractType(rule, path)
+                .map(type -> tryCreateRuleBasedReference(expressionName, path, type))
+                .orElseGet(() -> tryCreateContextReference(expressionName, path));
+    }
 
+    private Optional<Type> extractType(Rule rule, String path) {
+        String reference = extractReference(path);
+
+        Attribute attribute = rule.getAttribute(reference);
+        if (attribute != null) {
+            return Optional.of(attribute)
+                    .map(Attribute::getType);
+        }
+        return Optional.ofNullable(rule.getFact(reference))
+                .map(Fact::getType);
+    }
+
+    private R tryCreateRuleBasedReference(String expressionName, String path, Type type) {
+        Type referenceType = extractReferenceType(type, path);
+        if (referenceType != null) {
+            return referenceFactory.create(expressionName, type, referenceType, path);
+        }
         return null;
     }
 
-    private Fact extractFact(Rule rule, String path) {
-        int dotIndex = path.indexOf('.');
-        String factName = dotIndex > -1 ? path.substring(0, dotIndex) : path;
-        return rule.getFact(factName);
+    private R tryCreateContextReference(String expressionName, String path) {
+        if (CONTEXT_PATH.equals(path)) {
+            return referenceFactory.create(expressionName, Expression.UNDEFINED, Expression.UNDEFINED, path);
+        }
+        return null;
     }
 
-    private Type extractReferenceType(Fact fact, String path) {
+    private String extractReference(String path) {
+        int dotIndex = path.indexOf('.');
+        return dotIndex > -1 ? path.substring(0, dotIndex) : path;
+    }
+
+    private Type extractReferenceType(Type type, String path) {
         int dotIndex = path.indexOf('.');
         if (dotIndex > -1) {
             String fieldPath = path.substring(dotIndex + 1);
             try {
-                return chainedTypeExtractor.findPathType(fact.getType(), fieldPath);
+                return chainedTypeExtractor.findPathType(type, fieldPath);
             } catch (ChainedTypeExtractor.InvalidPathException e) {
                 return null;
             }
         }
-        return fact.getType();
+        return type;
     }
 }
