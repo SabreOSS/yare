@@ -25,15 +25,15 @@
 package com.sabre.oss.yare.core.call;
 
 import com.sabre.oss.yare.core.invocation.Invocation;
+import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
+import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -59,7 +59,7 @@ class ConsequenceFactoryTest {
         bindings.put(ProcessingContext.CURRENT_RULE_NAME, "ruleOne");
 
         // when
-        Invocation<ProcessingContext, Void> consequence = consequenceFactory.createConsequence("ruleOne", getActions());
+        Invocation<ProcessingContext, Void> consequence = consequenceFactory.createConsequence(ruleWithName("ruleOne"), getActions());
         consequence.proceed(new StaticProcessingContext(bindings, new Object[0]));
 
         // then
@@ -77,10 +77,8 @@ class ConsequenceFactoryTest {
                 Argument.valueOf("arg3", 1234L),
                 Argument.valueOf("arg4", BigDecimal.valueOf(-123, 456)),
                 Argument.valueOf("arg5", "Just a string"),
-                Argument.valueOf("arg6", new CallConverter.InternalParameterizedType(null, List.class, Long.class), asList(1L, 2L)),
-                Argument.valueOf("arg7", new CallConverter.InternalParameterizedType(null, List.class, String.class), asList("one", "two")),
-                Argument.referenceOf("arg8", Object.class, Argument.UNKNOWN, "person"),
-                Argument.referenceOf("arg9", Object.class, Argument.UNKNOWN, "person.name"));
+                Argument.valueOf("arg6", new InternalParameterizedType(null, List.class, Long.class), asList(1L, 2L)),
+                Argument.valueOf("arg7", new InternalParameterizedType(null, List.class, String.class), asList("one", "two")));
         assertThat(invocations).containsKey("actionTwo");
         actionInvocation = invocations.get("actionTwo");
         assertThat(actionInvocation.getName()).isEqualTo("Second action");
@@ -89,6 +87,14 @@ class ConsequenceFactoryTest {
         assertThat(arguments.size()).isEqualTo(0);
 
         assertThat(proceedInvocations).containsKeys("actionOne", "actionTwo");
+    }
+
+    private Rule ruleWithName(String ruleName) {
+        return new Rule(
+                Collections.singleton(new Attribute("ruleName", String.class, ruleName)),
+                Collections.emptyList(),
+                null,
+                Collections.emptyList());
     }
 
     private List<Expression.Invocation> getActions() {
@@ -100,9 +106,7 @@ class ConsequenceFactoryTest {
                         ExpressionFactory.valueOf("arg4", BigDecimal.valueOf(-123, 456)),
                         ExpressionFactory.valueOf("arg5", "Just a string"),
                         ExpressionFactory.valueOf("arg6", asList(1L, 2L)),
-                        ExpressionFactory.valueOf("arg7", asList("one", "two")),
-                        ExpressionFactory.referenceOf("arg8", Object.class, "person"),
-                        ExpressionFactory.referenceOf("arg9", Object.class, "person", String.class, "name"))),
+                        ExpressionFactory.valueOf("arg7", asList("one", "two")))),
 
                 ExpressionFactory.actionOf("Second action", "actionTwo", emptyList())
         );

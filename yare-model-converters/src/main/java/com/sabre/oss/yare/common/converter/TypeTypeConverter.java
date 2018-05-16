@@ -24,6 +24,8 @@
 
 package com.sabre.oss.yare.common.converter;
 
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -32,7 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.sabre.oss.yare.common.converter.StringTypeConverter.NULL_LITERAL;
-import static java.util.Objects.requireNonNull;
 
 /**
  * {@link TypeTypeConverter} is able to fromString string to {@link Type}.
@@ -113,7 +114,7 @@ public class TypeTypeConverter implements TypeConverter {
                 for (String paramTypeName : parameters.split(",")) {
                     parameterTypes.add(fromString(Type.class, paramTypeName));
                 }
-                return new InternalParameterizedType((Class<?>) rawType, parameterTypes.toArray(new Type[0]));
+                return new InternalParameterizedType(null, (Class<?>) rawType, parameterTypes.toArray(new Type[0]));
             }
         }
         throw new IllegalArgumentException(String.format("Can't convert '%s' into Java type", value));
@@ -133,48 +134,5 @@ public class TypeTypeConverter implements TypeConverter {
             return stringJoiner.toString();
         }
         throw new IllegalArgumentException("Unsupported type");
-    }
-
-    private static class InternalParameterizedType implements ParameterizedType {
-        private final Class<?> rawType;
-        private final Type[] actualTypeArguments;
-
-        InternalParameterizedType(Class<?> rawType, Type... actualTypeArguments) {
-            this.rawType = requireNonNull(rawType);
-            this.actualTypeArguments = requireNonNull(actualTypeArguments);
-        }
-
-        @Override
-        public Type getOwnerType() {
-            return null;
-        }
-
-        @Override
-        public Type getRawType() {
-            return rawType;
-        }
-
-        @Override
-        public Type[] getActualTypeArguments() {
-            return actualTypeArguments;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof ParameterizedType)) {
-                return false;
-            }
-            ParameterizedType that = (ParameterizedType) o;
-            return Objects.equals(rawType, that.getRawType()) &&
-                    Arrays.equals(actualTypeArguments, that.getActualTypeArguments());
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(this.actualTypeArguments) ^ Objects.hashCode(this.rawType);
-        }
     }
 }

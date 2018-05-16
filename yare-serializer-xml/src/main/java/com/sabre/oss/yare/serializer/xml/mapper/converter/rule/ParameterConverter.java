@@ -27,7 +27,6 @@ package com.sabre.oss.yare.serializer.xml.mapper.converter.rule;
 import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.common.mapper.ByClassRegistry;
 import com.sabre.oss.yare.core.model.Expression;
-import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.serializer.model.*;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter.Context;
 
@@ -37,7 +36,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
+import static com.sabre.oss.yare.core.model.ExpressionFactory.functionOf;
+import static com.sabre.oss.yare.core.model.ExpressionFactory.valueOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
@@ -45,8 +45,6 @@ import static java.util.Objects.requireNonNull;
 
 class ParameterConverter implements ContextualConverter<ParameterSer, Expression> {
     private static final List<java.util.function.Function<ParameterSer, ?>> getters = asList(
-            ParameterSer::getField,
-            ParameterSer::getReference,
             ParameterSer::getValue,
             ParameterSer::getValues,
             ParameterSer::getCustomValue,
@@ -58,8 +56,6 @@ class ParameterConverter implements ContextualConverter<ParameterSer, Expression
     ParameterConverter(TypeConverter typeConverter) {
         this.typeConverter = requireNonNull(typeConverter, "typeConverter cannot be null");
 
-        converterRegistry.add(FieldSer.class, new FieldParameterConverter());
-        converterRegistry.add(ReferenceSer.class, new ReferenceParameterConverter());
         converterRegistry.add(CustomValueSer.class, new CustomValueParameterConverter());
         converterRegistry.add(ValueSer.class, new ValueParameterConverter());
         converterRegistry.add(ValuesSer.class, new ValuesParameterConverter());
@@ -78,31 +74,6 @@ class ParameterConverter implements ContextualConverter<ParameterSer, Expression
                 .orElseThrow(() -> new IllegalArgumentException(format("Parameter '%s' seems to be not defined.", parameter.getName())));
     }
 
-    private Type getReferenceType(Context ctx, String reference) {
-        return ctx.getFacts().stream()
-                .filter(f -> f.getIdentifier().equals(reference))
-                .map(Fact::getType)
-                .findFirst()
-                .orElse(Object.class);
-    }
-
-    private class FieldParameterConverter implements ContextualConverter<ParameterSer, Expression.Reference> {
-        @Override
-        public Expression.Reference convert(Context ctx, ParameterSer input) {
-            FieldSer field = input.getField();
-            Type type = typeConverter.fromString(Type.class, field.getType());
-            return referenceOf(input.getName(), getReferenceType(ctx, field.getRef()), field.getRef(), type, field.getPath());
-        }
-    }
-
-    private class ReferenceParameterConverter implements ContextualConverter<ParameterSer, Expression.Reference> {
-        @Override
-        public Expression.Reference convert(Context ctx, ParameterSer input) {
-            ReferenceSer reference = input.getReference();
-            return referenceOf(input.getName(), getReferenceType(ctx, reference.getRef()), reference.getRef());
-        }
-    }
-
     private class CustomValueParameterConverter implements ContextualConverter<ParameterSer, Expression.Value> {
         @Override
         public Expression.Value convert(Context ctx, ParameterSer input) {
@@ -115,9 +86,14 @@ class ParameterConverter implements ContextualConverter<ParameterSer, Expression
     private class ValueParameterConverter implements ContextualConverter<ParameterSer, Expression.Value> {
         @Override
         public Expression.Value convert(Context ctx, ParameterSer input) {
-            ValueSer value = input.getValue();
-            Type type = typeConverter.fromString(Type.class, value.getType());
-            return valueOf(input.getName(), type, typeConverter.fromString(type, value.getValue()));
+            ValueSer valueContainer = input.getValue();
+            String typeName = valueContainer.getType();
+            String value = valueContainer.getValue();
+            if (typeName != null) {
+                Type type = typeConverter.fromString(Type.class, typeName);
+                return valueOf(input.getName(), type, typeConverter.fromString(type, value));
+            }
+            return valueOf(input.getName(), String.class, value);
         }
     }
 

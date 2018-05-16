@@ -27,7 +27,6 @@ package com.sabre.oss.yare.serializer.xml.mapper.converter.rule;
 import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.common.mapper.ByClassRegistry;
 import com.sabre.oss.yare.core.model.Expression;
-import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.serializer.model.*;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter.Context;
 
@@ -52,8 +51,6 @@ class BooleanExpressionConverter implements ContextualConverter<Object, Expressi
         this.parameterConverter = requireNonNull(parameterConverter, "parameterConverter cannot be null");
         this.typeConverter = requireNonNull(typeConverter, "typeConverter cannot be null");
 
-        converterRegistry.add(FieldSer.class, new FieldConverter());
-        converterRegistry.add(ReferenceSer.class, new ReferenceConverter());
         converterRegistry.add(CustomValueSer.class, new CustomValueConverter());
         converterRegistry.add(ValueSer.class, new ValueConverter());
         converterRegistry.add(ValuesSer.class, new ValuesConverter());
@@ -69,31 +66,6 @@ class BooleanExpressionConverter implements ContextualConverter<Object, Expressi
         return ((ContextualConverter<Object, Expression>) converterRegistry.get(input.getClass())).convert(ctx, input);
     }
 
-    private Type getReferenceType(Context ctx, String reference) {
-        return ctx.getFacts().stream()
-                .filter(f -> f.getIdentifier().equals(reference))
-                .map(Fact::getType)
-                .findFirst()
-                .orElse(Object.class);
-    }
-
-    private class FieldConverter implements ContextualConverter<FieldSer, Expression.Reference> {
-        @Override
-        public Expression.Reference convert(Context ctx, FieldSer input) {
-            Type referenceType = getReferenceType(ctx, input.getRef());
-            Type type = typeConverter.fromString(Type.class, input.getType());
-            return referenceOf(null, referenceType, input.getRef(), type, input.getPath());
-        }
-    }
-
-    private class ReferenceConverter implements ContextualConverter<ReferenceSer, Expression.Reference> {
-        @Override
-        public Expression.Reference convert(Context ctx, ReferenceSer input) {
-            Type referenceType = getReferenceType(ctx, input.getRef());
-            return referenceOf(null, referenceType, input.getRef());
-        }
-    }
-
     private class CustomValueConverter implements ContextualConverter<CustomValueSer, Expression.Value> {
         @Override
         public Expression.Value convert(Context ctx, CustomValueSer input) {
@@ -105,8 +77,14 @@ class BooleanExpressionConverter implements ContextualConverter<Object, Expressi
     private class ValueConverter implements ContextualConverter<ValueSer, Expression.Value> {
         @Override
         public Expression.Value convert(Context ctx, ValueSer input) {
-            Type type = typeConverter.fromString(Type.class, input.getType());
-            return valueOf(null, type, typeConverter.fromString(type, input.getValue()));
+            String typeName = input.getType();
+            String value = input.getValue();
+            if (typeName != null) {
+                Type type = typeConverter.fromString(Type.class, typeName);
+                return valueOf(null, type, typeConverter.fromString(type, value));
+            } else {
+                return valueOf(null, String.class, value);
+            }
         }
     }
 

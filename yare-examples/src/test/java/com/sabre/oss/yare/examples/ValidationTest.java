@@ -52,19 +52,19 @@ class ValidationTest {
                 .predicate(
                         and(
                                 lessOrEqual(
-                                        field("flight.price", BigDecimal.class),
+                                        value("${flight.price}"),
                                         value(new BigDecimal(100))
                                 ),
                                 less(
                                         function("getDiffInHours", Long.class,
-                                                param("date", field("flight", "dateOfDeparture"))),
+                                                param("date", value("${flight.dateOfDeparture}"))),
                                         value(24L)
                                 )
                         )
                 )
                 .action("collect",
-                        param("context", reference("ctx")),
-                        param("fact", reference("flight")))
+                        param("context", value("${ctx}")),
+                        param("fact", value("${flight}")))
                 .build(false);
     }
 
@@ -77,19 +77,19 @@ class ValidationTest {
                         .predicate(
                                 and(
                                         lessOrEqual(
-                                                field("flight.price", BigDecimal.class),
+                                                value("${flight.price}"),
                                                 value(new BigDecimal(100))
                                         ),
                                         less(
                                                 function("getDiffInHours", Long.class,
-                                                        param("date", field("flight", "dateOfDeparture"))),
+                                                        param("date", value("${flight.dateOfDeparture}"))),
                                                 value(24L)
                                         )
                                 )
                         )
                         .action("collect",
-                                param("context", reference("ctx")),
-                                param("fact", reference("flight")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${flight}")))
                         .build()
         ).isExactlyInstanceOf(IllegalStateException.class);
     }

@@ -24,10 +24,13 @@
 
 package com.sabre.oss.yare.core.model;
 
-import java.lang.reflect.ParameterizedType;
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
+
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -60,24 +63,12 @@ public final class ExpressionFactory {
         return new Operator(name, returnType, call, arguments);
     }
 
-    public static Expression.Reference referenceOf(String name, Type referenceType, String reference) {
-        return new ExpressionFactory.Reference(name, referenceType, reference, referenceType, null);
-    }
-
-    public static Expression.Reference referenceOf(String name, Type referenceType, String reference, Type type, String path) {
-        return new ExpressionFactory.Reference(name, referenceType, reference, type, path);
-    }
-
     public static Expression.Value valueOf(String name, Object nonNullValue) {
         return new ExpressionFactory.Value(name, determineType(nonNullValue), nonNullValue);
     }
 
     public static Expression.Value valueOf(String name, Type type, Object value) {
         return new ExpressionFactory.Value(name, type, value);
-    }
-
-    public static Expression.Raw rawOf(String name, Type type, String value) {
-        return new ExpressionFactory.Raw(name, type, value);
     }
 
     private static Type determineType(Object value) {
@@ -230,23 +221,6 @@ public final class ExpressionFactory {
         }
     }
 
-    static final class Raw extends InternalOperand<String> implements Expression.Raw {
-
-        Raw(String name, Type type, String value) {
-            super(name, type, value);
-        }
-
-        @Override
-        public Type getType() {
-            return type;
-        }
-
-        @Override
-        public String getValue() {
-            return value;
-        }
-    }
-
     static final class Value extends InternalOperand<Object> implements Expression.Value {
 
         Value(String name, Type type, Object value) {
@@ -258,133 +232,4 @@ public final class ExpressionFactory {
             return value;
         }
     }
-
-    static final class Reference implements Expression.Reference {
-        protected final String name;
-        protected final String reference;
-        protected final String path;
-        protected final Type referenceType;
-        protected final Type type;
-
-        private final int hashCode;
-
-        Reference(String name, Type referenceType, String reference, Type type, String path) {
-            this.name = name;
-            this.referenceType = referenceType;
-            this.reference = reference;
-            this.type = type;
-            this.path = path;
-            this.hashCode = Objects.hash(name, referenceType, reference, type, path);
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public Type getReferenceType() {
-            return referenceType;
-        }
-
-        @Override
-        public String getReference() {
-            return reference;
-        }
-
-        @Override
-        public String getPath() {
-            return path;
-        }
-
-        @Override
-        public Type getType() {
-            return type;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof ExpressionFactory.Reference)) {
-                return false;
-            }
-            ExpressionFactory.Reference reference1 = (ExpressionFactory.Reference) o;
-            return Objects.equals(name, reference1.name) &&
-                    Objects.equals(referenceType, reference1.referenceType) &&
-                    Objects.equals(reference, reference1.reference) &&
-                    Objects.equals(type, reference1.type) &&
-                    Objects.equals(path, reference1.path);
-        }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        @Override
-        public String toString() {
-            return "Reference{" +
-                    "name='" + name + '\'' +
-                    ", type=" + type +
-                    ", reference='" + reference + '\'' +
-                    ", path='" + path + '\'' +
-                    '}';
-        }
-    }
-
-    static class InternalParameterizedType implements ParameterizedType {
-        private final Type[] actualTypeArguments;
-        private final Class<?> rawType;
-        private final Type ownerType;
-
-        InternalParameterizedType(Type ownerType, Class<?> rawType, Type... actualTypeArguments) {
-            this.rawType = requireNonNull(rawType);
-            this.actualTypeArguments = requireNonNull(actualTypeArguments);
-            this.ownerType = ownerType;
-        }
-
-        @Override
-        public Type[] getActualTypeArguments() {
-            return actualTypeArguments;
-        }
-
-        @Override
-        public Type getRawType() {
-            return rawType;
-        }
-
-        @Override
-        public Type getOwnerType() {
-            return ownerType;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof ParameterizedType)) {
-                return false;
-            }
-            ParameterizedType that = (ParameterizedType) o;
-            return Objects.equals(rawType, that.getRawType()) &&
-                    Arrays.equals(actualTypeArguments, that.getActualTypeArguments()) &&
-                    Objects.equals(ownerType, that.getOwnerType());
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(this.actualTypeArguments) ^ Objects.hashCode(this.ownerType) ^ Objects.hashCode(this.rawType);
-        }
-
-        @Override
-        public String toString() {
-            return rawType.getTypeName() + Arrays.stream(actualTypeArguments)
-                    .map(Type::getTypeName)
-                    .collect(Collectors.joining(",", "<", ">"));
-        }
-    }
-
 }

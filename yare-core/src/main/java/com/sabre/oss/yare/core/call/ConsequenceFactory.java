@@ -28,13 +28,13 @@ import com.sabre.oss.yare.core.ErrorHandler;
 import com.sabre.oss.yare.core.error.ConsequenceCreationError;
 import com.sabre.oss.yare.core.invocation.Invocation;
 import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.core.model.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -43,7 +43,7 @@ public final class ConsequenceFactory {
     private static final Logger log = LoggerFactory.getLogger(ConsequenceFactory.class);
 
     private final ProcessingInvocationFactory<Void> invocationFactory;
-    private final Function<Expression.Invocation, Argument.Invocation> callConverter;
+    private final CallConverter callConverter;
     private final ErrorHandler errorHandler;
 
     public ConsequenceFactory(ProcessingInvocationFactory<Void> invocationFactory) {
@@ -54,23 +54,24 @@ public final class ConsequenceFactory {
         this(invocationFactory, errorHandler, new CallConverter());
     }
 
-    public ConsequenceFactory(ProcessingInvocationFactory<Void> invocationFactory, ErrorHandler errorHandler, Function<Expression.Invocation, Argument.Invocation> actionConverter) {
+    public ConsequenceFactory(ProcessingInvocationFactory<Void> invocationFactory, ErrorHandler errorHandler, CallConverter actionConverter) {
         this.invocationFactory = Objects.requireNonNull(invocationFactory);
         this.errorHandler = errorHandler;
         this.callConverter = Objects.requireNonNull(actionConverter);
     }
 
-    public Invocation<ProcessingContext, Void> createConsequence(String ruleId, List<? extends Expression.Invocation> actions) {
+    public Invocation<ProcessingContext, Void> createConsequence(Rule rule, List<? extends Expression.Invocation> actions) {
         List<Invocation<ProcessingContext, Void>> invocations = actions.stream()
-                .map(action -> createInvocation(ruleId, action))
+                .map(action -> createInvocation(rule, action))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
         return new Consequence(invocations, errorHandler);
     }
 
-    private Invocation<ProcessingContext, Void> createInvocation(String ruleId, Expression.Invocation action) {
+    private Invocation<ProcessingContext, Void> createInvocation(Rule rule, Expression.Invocation action) {
+        String ruleId = rule.getAttribute("ruleName").getValue().toString();
         try {
-            return invocationFactory.create(callConverter.apply(action));
+            return invocationFactory.create(callConverter.convert(rule, action));
         } catch (Exception e) {
             if (Objects.isNull(errorHandler) || !errorHandler.handleError(new ConsequenceCreationError(ruleId, action, e))) {
                 throw e;

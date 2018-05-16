@@ -28,12 +28,17 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
+import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +48,7 @@ class ReferenceValidatorTest {
 
     @BeforeEach
     void setUp() {
-        validator = new ReferenceValidator(false);
+        validator = new ReferenceValidator(false, new ChainedTypeExtractor(), new PlaceholderExtractor());
     }
 
     @Test
@@ -75,30 +80,11 @@ class ReferenceValidatorTest {
     }
 
     @Test
-    void shouldFailOnNullReference() {
-        // given
-        Rule rule = ruleWithPredicate(
-                operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, String.class, null),
-                        valueOf(null, String.class, "")
-                )
-        );
-
-        // when
-        ValidationResults results = validator.validate(rule);
-
-        // then
-        assertThat(results.getResults()).containsExactly(
-                ValidationResult.error("rule.ref.empty-reference", "Reference Error: empty reference used")
-        );
-    }
-
-    @Test
     void shouldFailOnEmptyReference() {
         // given
         Rule rule = ruleWithPredicate(
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, String.class, ""),
+                        valueOf(null, String.class, "${}"),
                         valueOf(null, String.class, "")
                 )
         );
@@ -117,7 +103,7 @@ class ReferenceValidatorTest {
         // given
         Rule rule = ruleWithPredicate(
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, String.class, "unknown"),
+                        valueOf(null, String.class, "${unknown}"),
                         valueOf(null, String.class, "")
                 )
         );
@@ -131,16 +117,12 @@ class ReferenceValidatorTest {
         );
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "ruleName",
-            "ctx"
-    })
-    void shouldPassOnPredefinedReference(String reference) {
+    @Test
+    void shouldPassOnPredefinedContextReference() {
         // given
         Rule rule = ruleWithPredicate(
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, String.class, reference),
+                        valueOf(null, String.class, "${ctx}"),
                         valueOf(null, String.class, "")
                 )
         );
@@ -161,7 +143,7 @@ class ReferenceValidatorTest {
                 )),
                 Collections.emptyList(),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, String.class, "existing"),
+                        valueOf(null, String.class, "${existing}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -182,7 +164,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact"),
+                        valueOf(null, String.class, "${fact}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -195,49 +177,11 @@ class ReferenceValidatorTest {
     }
 
     @Test
-    void shouldFailOnNullFieldReference() {
-        // given
-        Rule rule = ruleWithPredicate(
-                operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, Object.class, null, String.class, null),
-                        valueOf(null, String.class, "")
-                )
-        );
-
-        // when
-        ValidationResults results = validator.validate(rule);
-
-        // then
-        assertThat(results.getResults()).containsExactly(
-                ValidationResult.error("rule.ref.empty-reference", "Reference Error: empty reference used")
-        );
-    }
-
-    @Test
-    void shouldFailOnEmptyFieldReference() {
-        // given
-        Rule rule = ruleWithPredicate(
-                operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, Object.class, "", String.class, null),
-                        valueOf(null, String.class, "")
-                )
-        );
-
-        // when
-        ValidationResults results = validator.validate(rule);
-
-        // then
-        assertThat(results.getResults()).containsExactly(
-                ValidationResult.error("rule.ref.empty-reference", "Reference Error: empty reference used")
-        );
-    }
-
-    @Test
     void shouldFailOnNonExistingFact() {
         // given
         Rule rule = ruleWithPredicate(
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, Object.class, "fact", String.class, ""),
+                        valueOf(null, String.class, "${fact}"),
                         valueOf(null, String.class, "")
                 )
         );
@@ -253,10 +197,11 @@ class ReferenceValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            ".",
-            "..",
-            "empty..inside",
-            "ending.."
+            "${fact.}",
+            "${fact..}",
+            "${fact..empty}",
+            "${fact.empty..inside}",
+            "${fact.ending..}"
     })
     void shouldFailOnEmptyPathSegment(String path) {
         // given
@@ -266,7 +211,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", String.class, path),
+                        valueOf(null, String.class, path),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -289,7 +234,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", String.class, "missing"),
+                        valueOf(null, String.class, "${fact.missing}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -312,7 +257,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", String.class, "privateField"),
+                        valueOf(null, String.class, "${fact.privateField}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -335,7 +280,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", String.class, "publicField"),
+                        valueOf(null, String.class, "${fact.publicField}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -356,7 +301,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", String.class, "getterField"),
+                        valueOf(null, String.class, "${fact.getterField}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -377,7 +322,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", Boolean.class, "accessible"),
+                        valueOf(null, String.class, "${fact.accessible}"),
                         valueOf(null, Boolean.class, true)
                 ),
                 Collections.emptyList());
@@ -398,7 +343,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", String.class, "nested.nested.publicField"),
+                        valueOf(null, String.class, "${fact.nested.nested.publicField}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -419,7 +364,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", List.class, "getterField[*]"),
+                        valueOf(null, String.class, "${fact.getterField[*]}"),
                         valueOf(null, Collection.class, Collections.emptyList())
                 ),
                 Collections.emptyList());
@@ -429,15 +374,18 @@ class ReferenceValidatorTest {
 
         // then
         assertThat(results.getResults()).containsExactly(
-                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type")
+                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type -> fact.getterField[*]")
         );
     }
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "collection[*]",
-            "collection[*].collection[*]",
-            "collection.collection[*]"
+            "${fact.collection[*]}",
+            "${fact.[*]collection}",
+            "${fact.collection[*].collection[*]}",
+            "${fact.collection.collection[*]}",
+            "${fact.[*]collection.collection[*]}",
+            "${fact.[*]collection.[*]collection}"
     })
     void shouldPassOnCollectionWithMarker(String path) {
         // given
@@ -447,7 +395,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", InnerFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, InnerFact.class, "fact", List.class, path),
+                        valueOf(null, String.class, path),
                         valueOf(null, Collection.class, Collections.emptyList())
                 ),
                 Collections.emptyList());
@@ -459,6 +407,36 @@ class ReferenceValidatorTest {
         assertThat(results.getResults()).isEmpty();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "fact.collection[*][*]",
+            "fact.[*]collection[*]",
+            "fact.[*]collection[*][*]",
+            "fact.collection.collection[*][*]",
+            "fact.collection.[*]collection[*]"
+    })
+    void shouldWarnAboutMultipleCollectionMarkers(String path) {
+        // given
+        Rule rule = new Rule(
+                Collections.emptySet(),
+                Collections.singletonList(
+                        new Fact("fact", InnerFact.class)
+                ),
+                operatorOf(null, Boolean.class, "equal",
+                        valueOf(null, String.class, "${" + path + "}"),
+                        valueOf(null, Collection.class, Collections.emptyList())
+                ),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.warning("rule.ref.multiple-collection-markers", "Reference Error: field has more than one collection marker -> " + path)
+        );
+    }
+
     @Test
     void shouldPassOnMapFact() {
         // given
@@ -468,7 +446,7 @@ class ReferenceValidatorTest {
                         new Fact("fact", MapFact.class)
                 ),
                 operatorOf(null, Boolean.class, "equal",
-                        referenceOf(null, MapFact.class, "fact", String.class, "dynamicValue"),
+                        valueOf(null, String.class, "${fact.dynamicValue}"),
                         valueOf(null, String.class, "")
                 ),
                 Collections.emptyList());
@@ -491,21 +469,21 @@ class ReferenceValidatorTest {
                 ),
                 operatorOf(null, Boolean.class, "or",
                         operatorOf(null, Boolean.class, "equal",
-                                referenceOf(null, InnerFact.class, "staticFact", String.class, "publicField"),
+                                valueOf(null, String.class, "${staticFact.publicField}"),
                                 valueOf(null, String.class, "")
                         ),
                         operatorOf(null, Boolean.class, "and",
                                 functionOf(null, Boolean.class, "function",
-                                        referenceOf("param1", InnerFact.class, "staticFact"),
-                                        referenceOf("param2", MapFact.class, "mapFact", String.class, "dynamic"),
+                                        valueOf("param1", String.class, "${staticFact}"),
+                                        valueOf("param2", String.class, "${mapFact.dynamic}"),
                                         functionOf("param3", Boolean.class, "function",
-                                                referenceOf("param1", InnerFact.class, "staticFact"),
-                                                referenceOf("param2", InnerFact.class, "staticFact", String.class, "nested.collection[*].getterField")
+                                                valueOf("param1", String.class, "${staticFact}"),
+                                                valueOf("param2", String.class, "${staticFact.nested.collection[*].getterField}")
                                         )
                                 ),
                                 operatorOf(null, Boolean.class, "not",
                                         operatorOf(null, Boolean.class, "equal",
-                                                referenceOf(null, MapFact.class, "mapFact", String.class, "dynamicValue"),
+                                                valueOf(null, String.class, "${mapFact.dynamicValue}"),
                                                 valueOf(null, String.class, "")
                                         )
                                 )
@@ -530,20 +508,20 @@ class ReferenceValidatorTest {
                 ),
                 operatorOf(null, Boolean.class, "or",
                         operatorOf(null, Boolean.class, "equal",
-                                referenceOf(null, InnerFact.class, "staticFact", String.class, "privateField"),
+                                valueOf(null, String.class, "${staticFact.privateField}"),
                                 valueOf(null, String.class, "")
                         ),
                         operatorOf(null, Boolean.class, "and",
                                 functionOf(null, Boolean.class, "function",
-                                        referenceOf("param1", MapFact.class, "missingFact"),
-                                        referenceOf("param2", MapFact.class, "missingFact", String.class, "dynamic"),
+                                        valueOf("param1", String.class, "${missingFact}"),
+                                        valueOf("param2", String.class, "${missingFact.dynamic}"),
                                         functionOf("param3", Boolean.class, "function",
-                                                referenceOf("param", InnerFact.class, "staticFact", String.class, "nested.collection.getterField[*]")
+                                                valueOf("param", String.class, "${staticFact.nested.collection.getterField[*]}")
                                         )
                                 ),
                                 operatorOf(null, Boolean.class, "not",
                                         operatorOf(null, Boolean.class, "equal",
-                                                referenceOf(null, InnerFact.class, "staticFact", String.class, "missingValue"),
+                                                valueOf(null, String.class, "${staticFact.missingValue}"),
                                                 valueOf(null, String.class, "")
                                         )
                                 )
@@ -559,7 +537,7 @@ class ReferenceValidatorTest {
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.privateField"),
                 ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> missingFact"),
                 ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> missingFact"),
-                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type"),
+                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type -> staticFact.nested.collection.getterField[*]"),
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.missingValue")
         );
     }
@@ -576,13 +554,13 @@ class ReferenceValidatorTest {
                 valueOf(null, Boolean.class, true),
                 Arrays.asList(
                         actionOf("first", "first",
-                                referenceOf("param1", MapFact.class, "mapFact"),
-                                referenceOf("param2", MapFact.class, "mapFact", String.class, "dynamic")
+                                valueOf("param1", String.class, "${mapFact}"),
+                                valueOf("param2", String.class, "${mapFact.dynamic}")
                         ),
                         actionOf("second", "second",
                                 functionOf("function", Boolean.class, "function",
-                                        referenceOf("param1", InnerFact.class, "staticFact"),
-                                        referenceOf("param2", InnerFact.class, "staticFact", String.class, "nested.collection[*].getterField")
+                                        valueOf("param1", String.class, "${staticFact}"),
+                                        valueOf("param2", String.class, "${staticFact.nested.collection[*].getterField}")
                                 )
                         )
                 ));
@@ -605,13 +583,13 @@ class ReferenceValidatorTest {
                 valueOf(null, Boolean.class, true),
                 Arrays.asList(
                         actionOf("first", "first",
-                                referenceOf("param1", MapFact.class, "missingFact"),
-                                referenceOf("param2", InnerFact.class, "staticFact", String.class, "privateField")
+                                valueOf("param1", String.class, "${missingFact}"),
+                                valueOf("param2", String.class, "${staticFact.privateField}")
                         ),
                         actionOf("second", "second",
                                 functionOf("function", Boolean.class, "function",
-                                        referenceOf("param1", InnerFact.class, "staticFact", String.class, "missing"),
-                                        referenceOf("param2", InnerFact.class, "staticFact", String.class, "nested.collection.getterField[*]")
+                                        valueOf("param1", String.class, "${staticFact.missing}"),
+                                        valueOf("param2", String.class, "${staticFact.nested.collection.getterField[*]}")
                                 )
                         )
                 ));
@@ -624,7 +602,7 @@ class ReferenceValidatorTest {
                 ValidationResult.error("rule.ref.unknown-reference", "Reference Error: unknown reference used -> missingFact"),
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.privateField"),
                 ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> staticFact.missing"),
-                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type")
+                ValidationResult.error("rule.ref.non-collection-field", "Reference Error: field is not collection type -> staticFact.nested.collection.getterField[*]")
         );
     }
 

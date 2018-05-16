@@ -73,7 +73,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when all from outerChainingFact.collection.instance.string are test",
                 contains(
-                        castToCollection(field("outerChainingFact.collection.instance.string", List.class), String.class),
+                        castToCollection(value("${outerChainingFact.collection.instance.string}"), String.class),
                         values(String.class, value("test"), value("test")))
         );
 
@@ -99,7 +99,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when outerChainingFact.instance.instance.string is test",
                 equal(
-                        field("outerChainingFact.instance.instance.string", String.class),
+                        value("${outerChainingFact.instance.instance.string}"),
                         value("test")
                 )
         );
@@ -126,7 +126,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when all from outerChainingFact.collection.instance.collection are test",
                 contains(
-                        castToCollection(field("outerChainingFact.collection.instance.collection[*]", List.class), String.class),
+                        castToCollection(value("${outerChainingFact.collection.instance.collection[*]}"), String.class),
                         values(String.class, value("test"), value("test"), value("test"), value("test"))
                 )
         );
@@ -154,7 +154,7 @@ class ChainingOperatorTest {
                 "Should match when all from outerChainingFact.collection.instance.collection are test",
                 equal(
                         function(FLATTEN_AND_CONTAINS, boolean.class,
-                                param("collection", field("outerChainingFact.collection.instance.collection", List.class)),
+                                param("collection", value("${outerChainingFact.collection.instance.collection}")),
                                 param("value", value("test"))),
                         value(true)
                 )
@@ -182,7 +182,34 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when all from outerChainingFact.instance.instance.collection are test",
                 contains(
-                        castToCollection(field("outerChainingFact.instance.instance.collection[*]", List.class), String.class),
+                        castToCollection(value("${outerChainingFact.instance.instance.collection[*]}"), String.class),
+                        values(String.class, value("test"), value("test"))
+                )
+        );
+
+        RuleSession ruleSession = createRuleSession(rule);
+
+        // when
+        List<Object> matchingFacts = ruleSession.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(matchingFacts).containsExactly(validFact);
+    }
+
+    @Test
+    void shouldIgnoreMultipleCollectionMarkers() {
+        // given
+        OuterChainingFact invalidFact = getInvalidFact();
+        InnerChainingFact innerChainingFact = new InnerChainingFact(Arrays.asList("test", "test"));
+        MidChainingFact midChainingFact = new MidChainingFact();
+        midChainingFact.put("instance", innerChainingFact);
+        OuterChainingFact validFact = new OuterChainingFact(midChainingFact);
+        List<Object> facts = Arrays.asList(invalidFact, validFact);
+
+        List<Rule> rule = getRule(
+                "Should match when all from outerChainingFact.instance.instance.collection are test",
+                contains(
+                        castToCollection(value("${outerChainingFact.instance.instance.[*]collection[*][*]}"), String.class),
                         values(String.class, value("test"), value("test"))
                 )
         );
@@ -209,7 +236,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when all from outerChainingFact.collection.instance.collection are test",
                 contains(
-                        castToCollection(field("outerChainingFact.instance.instance.collection", List.class), String.class),
+                        castToCollection(value("${outerChainingFact.instance.instance.collection}"), String.class),
                         values(String.class, value("test"))
                 )
         );
@@ -236,7 +263,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when all of outerChainingFact.collection.instance.string are null",
                 contains(
-                        castToCollection(field("outerChainingFact.collection.instance.string", List.class), String.class),
+                        castToCollection(value("${outerChainingFact.collection.instance.string}"), String.class),
                         values(String.class, value(null, String.class), value(null, String.class)))
         );
 
@@ -260,7 +287,7 @@ class ChainingOperatorTest {
                 "Should match when outerChainingFact.instance is null",
                 equal(
                         function(IS_NULL, boolean.class,
-                                param("object", field("outerChainingFact.instance.instance.string", String.class))),
+                                param("object", value("${outerChainingFact.instance.instance.string}"))),
                         value(true)
                 )
         );
@@ -288,7 +315,7 @@ class ChainingOperatorTest {
                 "Should match when all from outerChainingFact.collection.instance.collection are null",
                 equal(
                         function(FLATTEN_AND_CONTAINS, boolean.class,
-                                param("collection", field("outerChainingFact.collection.instance.collection", String.class)),
+                                param("collection", value("${outerChainingFact.collection.instance.collection}")),
                                 param("value", value(null, String.class))),
                         value(true)
                 )
@@ -316,7 +343,7 @@ class ChainingOperatorTest {
         List<Rule> rule = getRule(
                 "Should match when all from outerChainingFact.collection.instance.collection are null",
                 contains(
-                        castToCollection(field("outerChainingFact.collection.instance.collection[*]", List.class), String.class),
+                        castToCollection(value("${outerChainingFact.collection.instance.collection[*]}"), String.class),
                         values(String.class, value(null, String.class), value(null, String.class))
                 )
         );
@@ -336,7 +363,7 @@ class ChainingOperatorTest {
         assertThatThrownBy(() -> getRule(
                 "Should match when all from outerChainingFact.objectString.instance.string are nulls",
                 equal(
-                        field("outerChainingFact.objectField.instance.instance", String.class),
+                        value("${outerChainingFact.objectField.instance.instance}"),
                         value(null, String.class)
                 )
         )).isExactlyInstanceOf(IllegalStateException.class);
@@ -348,7 +375,7 @@ class ChainingOperatorTest {
         assertThatThrownBy(() -> getRule(
                 "Should match when all from outerChainingFact.objectString.instance.string are nulls",
                 equal(
-                        field("outerChainingFact.objectField.instance.string[*]", String.class),
+                        value("${outerChainingFact.objectField.instance.string[*]}"),
                         value(null, String.class)
                 )
         )).isExactlyInstanceOf(IllegalStateException.class);
@@ -371,8 +398,8 @@ class ChainingOperatorTest {
                         .fact("outerChainingFact", OuterChainingFact.class)
                         .predicate(expression)
                         .action(ACTION_NAME,
-                                param("context", reference("ctx")),
-                                param("fact", reference("outerChainingFact")))
+                                param("context", value("${ctx}")),
+                                param("fact", value("${outerChainingFact}")))
                         .build()
         );
     }

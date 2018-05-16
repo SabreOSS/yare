@@ -28,32 +28,33 @@ import com.sabre.oss.yare.core.ErrorHandler;
 import com.sabre.oss.yare.core.error.ConsequenceCreationError;
 import com.sabre.oss.yare.core.invocation.Invocation;
 import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.core.model.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public class FunctionFactory {
     private static final Logger log = LoggerFactory.getLogger(FunctionFactory.class);
 
     private final ProcessingInvocationFactory<Object> invocationFactory;
-    private final Function<Expression.Invocation, Argument.Invocation> callConverter;
+    private final CallConverter callConverter;
     private final ErrorHandler errorHandler;
 
     public FunctionFactory(ProcessingInvocationFactory<Object> invocationFactory) {
         this(invocationFactory, null, new CallConverter());
     }
 
-    public FunctionFactory(ProcessingInvocationFactory<Object> invocationFactory, ErrorHandler errorHandler, Function<Expression.Invocation, Argument.Invocation> callConverter) {
+    public FunctionFactory(ProcessingInvocationFactory<Object> invocationFactory, ErrorHandler errorHandler, CallConverter callConverter) {
         this.invocationFactory = Objects.requireNonNull(invocationFactory);
         this.errorHandler = errorHandler;
         this.callConverter = Objects.requireNonNull(callConverter);
     }
 
-    public Invocation<ProcessingContext, Object> create(String ruleId, Expression.Invocation function) {
+    public Invocation<ProcessingContext, Object> create(Rule rule, Expression.Invocation function) {
+        String ruleId = rule.getAttribute("ruleName").getValue().toString();
         try {
-            return invocationFactory.create(callConverter.apply(function));
+            return invocationFactory.create(callConverter.convert(rule, function));
         } catch (Exception e) {
             if (Objects.isNull(errorHandler) || !errorHandler.handleError(new ConsequenceCreationError(ruleId, function, e))) {
                 throw e;

@@ -112,10 +112,10 @@ class ArgumentPassingTest extends AbstractBaseRulesTest {
                 .fact("factTwo", BaseRulesUtils.FactTwo.class)
                 .predicate(value(true))
                 .action("collectMore",
-                        param("context", reference("ctx")),
-                        param("ruleName", reference("ruleName")),
-                        param("factOne", reference("factOne")),
-                        param("factTwo", reference("factTwo")),
+                        param("context", value("${ctx}")),
+                        param("ruleName", value("${ruleName}")),
+                        param("factOne", value("${factOne}")),
+                        param("factTwo", value("${factTwo}")),
                         param("extra", operand))
                 .build(false);
     }

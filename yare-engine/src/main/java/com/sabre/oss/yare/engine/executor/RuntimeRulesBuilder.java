@@ -32,6 +32,9 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.reference.ReferenceFactory;
+import com.sabre.oss.yare.core.reference.ValueConverter;
+import com.sabre.oss.yare.core.reference.ValueFactory;
 import com.sabre.oss.yare.engine.executor.runtime.operator.logical.False;
 import com.sabre.oss.yare.engine.executor.runtime.operator.logical.True;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.Predicate;
@@ -56,11 +59,15 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     private final PredicateFactory predicateFactory;
     private final FunctionFactory functionFactory;
     private final ConsequenceFactory consequenceFactory;
+    private final ValueConverter<ValueProvider> valueProviderConverter;
+    private final ValueConverter<Predicate> predicateValueConverter;
 
     public RuntimeRulesBuilder(PredicateFactory predicateFactory, FunctionFactory functionFactory, ConsequenceFactory consequenceFactory) {
         this.predicateFactory = predicateFactory;
         this.functionFactory = requireNonNull(functionFactory);
         this.consequenceFactory = requireNonNull(consequenceFactory);
+        this.valueProviderConverter = new ValueConverter<>(new ValueProviderReferenceFactory(), new ValueProviderValueFactory());
+        this.predicateValueConverter = new ValueConverter<>(new PredicateReferenceFactory(), new PredicateValueFactory());
     }
 
     public RuntimeRules build(Collection<Rule> rules) {
@@ -79,21 +86,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     public Predicate createPredicate(PredicateFactoryContext context, Expression expression) {
         if (expression instanceof Expression.Value) {
             Expression.Value value = (Expression.Value) expression;
-            if (value.getValue() == null) {
-                return ValueProviderFactory.constantNull();
-            }
-            if (!(value.getValue() instanceof Boolean)) {
-                throw new IllegalArgumentException("Only boolean values can be translated directly to predicate");
-            }
-            return (Boolean) value.getValue() ? new True() : new False();
-        }
-        if (expression instanceof Expression.Reference) {
-            ValueProvider valueProvider = createValueProvider(context, expression);
-            Type type = valueProvider.getType();
-            if (!type.equals(Boolean.class) && !type.equals(Boolean.TYPE) && !type.equals(Object.class)) {
-                throw new IllegalArgumentException("Only references of boolean type can be translated directly to predicate");
-            }
-            return valueProvider;
+            return predicateValueConverter.create(context.getRule(), value);
         }
         if (expression instanceof Expression.Operator) {
             Expression.Operator operator = (Expression.Operator) expression;
@@ -112,17 +105,12 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     public ValueProvider createValueProvider(PredicateFactoryContext context, Expression expression) {
         if (expression instanceof Expression.Value) {
             Expression.Value value = (Expression.Value) expression;
-            return ValueProviderFactory.createFromConstant(value.getValue());
+            return valueProviderConverter.create(context.getRule(), value);
         }
         if (expression instanceof Expression.Function) {
             Expression.Function function = (Expression.Function) expression;
-            Invocation<ProcessingContext, Object> invocation = functionFactory.create((String) context.getRule().getAttribute("ruleName").getValue(), function);
+            Invocation<ProcessingContext, Object> invocation = functionFactory.create(context.getRule(), function);
             return ValueProviderFactory.createFromInvocation(invocation);
-        }
-        if (expression instanceof Expression.Reference) {
-            Expression.Reference reference = (Expression.Reference) expression;
-            return ValueProviderFactory.createFromPath(TypeUtils.getRawType(reference.getReferenceType(), null), reference.getReference(),
-                    TypeUtils.getRawType(reference.getType(), null), reference.getPath());
         }
         throw new IllegalArgumentException(String.format("Unsupported expression: %s", expression));
     }
@@ -144,7 +132,60 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     }
 
     private Invocation<ProcessingContext, Void> prepareConsequence(Rule rule) {
-        String ruleName = (String) rule.getAttribute("ruleName").getValue();
-        return consequenceFactory.createConsequence(ruleName, rule.getActions());
+        return consequenceFactory.createConsequence(rule, rule.getActions());
+    }
+
+    private static class ValueProviderReferenceFactory implements ReferenceFactory<ValueProvider> {
+
+        @Override
+        public ValueProvider create(String name, Type baseReferenceType, Type referenceType, String reference) {
+            String referenceName = reference;
+            String path = null;
+
+            int dotIndex = reference.indexOf('.');
+            if (dotIndex > -1) {
+                referenceName = reference.substring(0, dotIndex);
+                path = reference.substring(dotIndex + 1);
+            }
+
+            return ValueProviderFactory.createFromPath(
+                    TypeUtils.getRawType(baseReferenceType, null),
+                    referenceName,
+                    TypeUtils.getRawType(referenceType, null),
+                    path);
+        }
+    }
+
+    private static class PredicateReferenceFactory extends ValueProviderReferenceFactory {
+
+        @Override
+        public ValueProvider create(String name, Type baseReferenceType, Type referenceType, String reference) {
+            if (!referenceType.equals(Boolean.class) && !referenceType.equals(Boolean.TYPE)) {
+                throw new IllegalArgumentException("Only references of boolean type can be translated directly to predicate");
+            }
+            return super.create(name, baseReferenceType, referenceType, reference);
+        }
+    }
+
+    private static class ValueProviderValueFactory implements ValueFactory<ValueProvider> {
+
+        @Override
+        public ValueProvider create(String name, Type type, Object value) {
+            return ValueProviderFactory.createFromConstant(value);
+        }
+    }
+
+    private class PredicateValueFactory implements ValueFactory<Predicate> {
+
+        @Override
+        public Predicate create(String name, Type type, Object value) {
+            if (value == null) {
+                return ValueProviderFactory.constantNull();
+            }
+            if (!(value instanceof Boolean)) {
+                throw new IllegalArgumentException("Only boolean values can be translated directly to predicate");
+            }
+            return (Boolean) value ? new True() : new False();
+        }
     }
 }

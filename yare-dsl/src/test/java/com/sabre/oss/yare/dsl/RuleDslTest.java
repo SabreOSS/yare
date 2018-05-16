@@ -64,18 +64,18 @@ class RuleDslTest {
                                 or(
                                         lessOrEqual(
                                                 value(123L),
-                                                field("otherFact.number", Long.class)
+                                                value("${otherFact.number}")
                                         ),
                                         match(
-                                                reference("stringValue", String.class),
+                                                value("${stringValue}"),
                                                 value("10")
                                         ),
                                         operator("asd",
-                                                field("otherFact", "enabled", String.class),
+                                                value("${otherFact.enabled}"),
                                                 value(true)
                                         ),
                                         and(
-                                                equal(field("otherFact.enabled", Boolean.class),
+                                                equal(value("${otherFact.enabled}"),
                                                         value(true)
                                                 ),
                                                 not(
@@ -84,17 +84,17 @@ class RuleDslTest {
                                         )
                                 ),
                                 less(
-                                        field("exampleFact.startDate"),
-                                        field("exampleFact.stopDate")
+                                        value("${exampleFact.startDate}"),
+                                        value("${exampleFact.stopDate}")
                                 ),
                                 operator("contains", values(String.class, value("a"), value("b"), value("c")), value("c")),
                                 function("function", Boolean.class,
-                                        param("param1", reference("ruleName")),
+                                        param("param1", value("${ruleName}")),
                                         param("param2", value("my value"))
                                 )
                         )
                 )
-                .action("exampleAction", param("param1", reference("ctx")))
+                .action("exampleAction", param("param1", value("${ctx}")))
                 .build();
 
         assertThat(rule.getAttributes()).containsExactly(
@@ -109,7 +109,7 @@ class RuleDslTest {
         assertThat(rule.getPredicate()).isEqualTo(expectedValidPredicateModel());
         assertThat(rule.getActions()).containsExactly(
                 actionOf("exampleAction", "exampleAction",
-                        referenceOf("param1", Object.class, "ctx")
+                        valueOf("param1", String.class, "${ctx}")
                 )
         );
     }
@@ -172,24 +172,45 @@ class RuleDslTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("deprecatedReferenceMethods")
+    void shouldSupportDeprecatedMethods(Operand<Object> operand, String value) {
+        Expression expression = operand.getExpression(null, null);
+
+        assertThat(expression)
+                .isInstanceOfSatisfying(Expression.Value.class,
+                        e -> assertThat(e.getValue()).isEqualTo(value));
+    }
+
+    private static Stream<Arguments> deprecatedReferenceMethods() {
+        return Stream.of(
+                Arguments.of(field("field"), "${field}"),
+                Arguments.of(field("stringField", String.class), "${stringField}"),
+                Arguments.of(field("reference", "path"), "${reference.path}"),
+                Arguments.of(field("reference", "path.longValue", Long.class), "${reference.path.longValue}"),
+                Arguments.of(reference("reference"), "${reference}"),
+                Arguments.of(reference("integerReference", Integer.class), "${integerReference}")
+        );
+    }
+
     private Expression.Operator expectedValidPredicateModel() {
         return operatorOf(null, Boolean.class, "and",
                 operatorOf(null, Boolean.class, "or",
                         operatorOf(null, Boolean.class, "less-or-equal",
                                 valueOf(null, Long.class, 123L),
-                                referenceOf(null, OtherFact.class, "otherFact", Long.class, "number")
+                                valueOf(null, String.class, "${otherFact.number}")
                         ),
                         operatorOf(null, Boolean.class, "match",
-                                referenceOf(null, String.class, "stringValue"),
+                                valueOf(null, String.class, "${stringValue}"),
                                 valueOf(null, String.class, "10")
                         ),
                         operatorOf(null, Boolean.class, "asd",
-                                referenceOf(null, OtherFact.class, "otherFact", String.class, "enabled"),
+                                valueOf(null, String.class, "${otherFact.enabled}"),
                                 valueOf(null, Boolean.class, true)
                         ),
                         operatorOf(null, Boolean.class, "and",
                                 operatorOf(null, Boolean.class, "equal",
-                                        referenceOf(null, OtherFact.class, "otherFact", Boolean.class, "enabled"),
+                                        valueOf(null, String.class, "${otherFact.enabled}"),
                                         valueOf(null, Boolean.class, true)
                                 ),
                                 operatorOf(null, Boolean.class, "not",
@@ -198,15 +219,15 @@ class RuleDslTest {
                         )
                 ),
                 operatorOf(null, Boolean.class, "less",
-                        referenceOf(null, ExampleFact.class, "exampleFact", Object.class, "startDate"),
-                        referenceOf(null, ExampleFact.class, "exampleFact", Object.class, "stopDate")
+                        valueOf(null, String.class, "${exampleFact.startDate}"),
+                        valueOf(null, String.class, "${exampleFact.stopDate}")
                 ),
                 operatorOf(null, Boolean.class, "contains",
                         valueOf(null, converter.fromString(Type.class, "java.util.List<java.lang.String>"), Arrays.asList("a", "b", "c")),
                         valueOf(null, String.class, "c")
                 ),
                 functionOf("function", Boolean.class, "function",
-                        referenceOf("param1", Object.class, "ruleName"),
+                        valueOf("param1", String.class, "${ruleName}"),
                         valueOf("param2", String.class, "my value")
                 )
         );

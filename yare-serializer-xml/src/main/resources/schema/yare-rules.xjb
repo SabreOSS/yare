@@ -59,10 +59,6 @@
             <jaxb:class name="FactSer"/>
         </jaxb:bindings>
 
-        <jaxb:bindings scd="~yare:Field">
-            <jaxb:class name="FieldSer"/>
-        </jaxb:bindings>
-
         <jaxb:bindings scd="~yare:Function">
             <jaxb:class name="FunctionSer"/>
         </jaxb:bindings>
@@ -73,10 +69,6 @@
 
         <jaxb:bindings scd="~yare:Predicate">
             <jaxb:class name="PredicateSer"/>
-        </jaxb:bindings>
-
-        <jaxb:bindings scd="~yare:Reference">
-            <jaxb:class name="ReferenceSer"/>
         </jaxb:bindings>
 
         <jaxb:bindings scd="~yare:Rule">

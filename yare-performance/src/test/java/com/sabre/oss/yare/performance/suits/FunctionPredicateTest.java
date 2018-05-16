@@ -87,15 +87,15 @@ public class FunctionPredicateTest extends AbstractPerformanceTest {
                     .predicate(
                             equal(
                                     function("mapFunction.getKey", String.class,
-                                            param("map", reference("stringMapFact")),
+                                            param("map", value("${stringMapFact}")),
                                             param("key", value("key"))),
                                     value("VALUE"))
                     )
                     .action("collect", param("context",
-                            reference("ctx", List.class)),
+                            value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("stringMapFact")))
+                            param("fact", value("${stringMapFact}")))
                     .build()
             );
 
@@ -105,14 +105,14 @@ public class FunctionPredicateTest extends AbstractPerformanceTest {
                     .predicate(
                             equal(
                                     function("mapFunction.getKey", String.class,
-                                            param("map", reference("stringMapFact")),
+                                            param("map", value("${stringMapFact}")),
                                             param("key2", value("key2"))), value("VALUE2"))
                     )
                     .action("collect", param("context",
-                            reference("ctx", List.class)),
+                            value("${ctx}")),
                             param("ruleName",
                                     value("name", String.class)),
-                            param("fact", reference("stringMapFact")))
+                            param("fact", value("${stringMapFact}")))
                     .build()
             );
 

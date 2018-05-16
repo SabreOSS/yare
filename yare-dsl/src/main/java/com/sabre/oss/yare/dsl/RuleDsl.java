@@ -40,8 +40,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 /**
  * {@link RuleDsl} is a class providing simple DSL for {@link Rule}s creation.
  * <p>
@@ -53,22 +51,21 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  *      .name("example.Rule001")
  *      .fact("fact1", FactOne.class)
  *      .fact("fact2", FactTwo.class)
- *      .active(true)
- *      .attribute("my.custom.property", "my value", Message.class)
+ *      .attribute("my.custom.property", "my value")
  *      .predicate(
  *              or(
  *                      lessOrEqual(
  *                              function("math.add", Long.class,
- *                                      param("arg1", field("fact1", "counter", Long.class)),
- *                                      param("arg2", field("fact2.counter", Long.class))),
+ *                                      param("arg1", value("${fact1.counter}")),
+ *                                      param("arg2", value("${fact2.counter}"))),
  *                              value(190L)),
  *                      match(
- *                              field("fact1.mode", String.class),
+ *                              value("{fact1.mode}"),
  *                              value("my string value"))
  *                 ))
  *      .action("example.ActionOne",
- *              param("ctx", reference("ctx")),
- *              param("ruleName", reference("ruleName")),
+ *              param("ctx", value("${ctx}")),
+ *              param("ruleName", value("${ruleName}")),
  *              param("value", value("String value")))
  *      .action("example.ActionTwo")
  *      .build();
@@ -99,16 +96,11 @@ public final class RuleDsl {
      * @param type class describing the field type
      * @param <T>  type of the field
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${ref.path}"
      */
+    @Deprecated
     public static <T> Operand<T> field(String ref, String path, Class<T> type) {
-        return (name, builder) -> {
-            Type referenceType = builder.facts.stream()
-                    .filter(f -> Objects.equals(f.getIdentifier(), ref))
-                    .map(Fact::getType)
-                    .findFirst()
-                    .orElse(Object.class);
-            return ExpressionFactory.referenceOf(name, referenceType, ref, type, path);
-        };
+        return value(String.format("${%s.%s}", ref, path));
     }
 
     /**
@@ -130,18 +122,11 @@ public final class RuleDsl {
      * @param type  class describing the field type
      * @param <T>   type of the field
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${field}"
      */
+    @Deprecated
     public static <T> Operand<T> field(String field, Class<T> type) {
-        if (isEmpty(field)) {
-            return field(field, field, type);
-        }
-        int dotIdx = field.indexOf('.');
-        if (dotIdx == -1) {
-            return field(field, null, type);
-        }
-        String ref = field.substring(0, dotIdx);
-        String path = field.substring(dotIdx + 1);
-        return field(ref, path, type);
+        return value(String.format("${%s}", field));
     }
 
     /**
@@ -150,7 +135,9 @@ public final class RuleDsl {
      * @param ref  instance identifier
      * @param path field (property) path
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${ref.path}"
      */
+    @Deprecated
     public static Operand<Object> field(String ref, String path) {
         return field(ref, path, Object.class);
     }
@@ -160,7 +147,9 @@ public final class RuleDsl {
      *
      * @param field combined (with dot) instance identifier and the path of field
      * @return field operand
+     * @deprecated Please create field reference directly by passing placeholder in {@link #value(String)} with format: "${field}"
      */
+    @Deprecated
     public static Operand<Object> field(String field) {
         return field(field, Object.class);
     }
@@ -172,9 +161,11 @@ public final class RuleDsl {
      * @param type      class describing referenced instance
      * @param <T>       type of the instance
      * @return reference operand
+     * @deprecated Please create reference directly by passing placeholder in {@link #value(String)} with format: "${reference}"
      */
+    @Deprecated
     public static <T> Operand<T> reference(String reference, Class<T> type) {
-        return (name, builder) -> ExpressionFactory.referenceOf(name, type, reference);
+        return field(reference, type);
     }
 
     /**
@@ -182,16 +173,11 @@ public final class RuleDsl {
      *
      * @param reference instance identifier
      * @return reference operand
+     * @deprecated Please create reference directly by passing placeholder in {@link #value(String)} with format: "${reference}"
      */
+    @Deprecated
     public static Operand<Object> reference(String reference) {
-        return (name, builder) -> {
-            Type referenceType = builder.facts.stream()
-                    .filter(f -> Objects.equals(f.getIdentifier(), reference))
-                    .map(Fact::getType)
-                    .findFirst()
-                    .orElse(Object.class);
-            return ExpressionFactory.referenceOf(name, referenceType, reference);
-        };
+        return field(reference);
     }
 
     /**
@@ -223,8 +209,9 @@ public final class RuleDsl {
      * @param args function arguments
      * @return function call expression
      */
-    public static ExpressionOperand<Object> function(String name, Parameter... args) {
-        return function(name, Object.class, args);
+    public static <T> ExpressionOperand<T> function(String name, Parameter... args) {
+        Class<T> type = (Class<T>) com.sabre.oss.yare.core.model.Expression.UNDEFINED;
+        return function(name, type, args);
     }
 
     /**
@@ -287,7 +274,21 @@ public final class RuleDsl {
      * @return value operand
      */
     public static <T> ExpressionOperand<T> value(T value) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, value != null ? value.getClass() : Object.class, value);
+        Type type = value != null ? value.getClass() : com.sabre.oss.yare.core.model.Expression.UNDEFINED;
+        return (name, builder) -> ExpressionFactory.valueOf(name, type, value);
+    }
+
+    /**
+     * Creates a String-based value operand. References to attributes/facts or fact fields can be accessed using
+     * placeholders, e.g. "${factName.field}". To create value formatted as placeholder it is possible
+     * to escape it, e.g. "\\${factName.field}".
+     *
+     * @param value string representation of the value
+     * @param <T>   value type
+     * @return value operand
+     */
+    public static <T> ExpressionOperand<T> value(String value) {
+        return (name, builder) -> ExpressionFactory.valueOf(name, String.class, value);
     }
 
     /**
@@ -582,7 +583,7 @@ public final class RuleDsl {
          * @return this ruleBuilder instance
          */
         public RuleBuilder attribute(String name, Object value) {
-            Type type = value != null ? value.getClass() : Object.class;
+            Type type = value != null ? value.getClass() : com.sabre.oss.yare.core.model.Expression.UNDEFINED;
             attributes.add(new Attribute(name, type, value));
             return this;
         }

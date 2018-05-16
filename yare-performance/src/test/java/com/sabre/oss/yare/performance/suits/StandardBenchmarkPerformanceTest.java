@@ -151,11 +151,11 @@ public class StandardBenchmarkPerformanceTest {
                     .priority(0L)
                     .predicate(
                             RuleDsl.equal(
-                                    RuleDsl.field("simpleStringValueFact", "value", String.class),
+                                    RuleDsl.value("${simpleStringValueFact.value}"),
                                     RuleDsl.value("TEST" + index)))
                     .action("collectValueAction",
-                            RuleDsl.param("context", RuleDsl.reference("ctx")),
-                            RuleDsl.param("fact", RuleDsl.reference("simpleStringValueFact")))
+                            RuleDsl.param("context", RuleDsl.value("${ctx}")),
+                            RuleDsl.param("fact", RuleDsl.value("${simpleStringValueFact}")))
                     .build();
         }
 

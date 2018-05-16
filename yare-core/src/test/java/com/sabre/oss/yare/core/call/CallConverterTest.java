@@ -24,19 +24,23 @@
 
 package com.sabre.oss.yare.core.call;
 
-import com.sabre.oss.yare.core.model.Expression;
-import com.sabre.oss.yare.core.model.ExpressionFactory;
+import com.sabre.oss.yare.core.model.*;
+import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
 class CallConverterTest {
     private CallConverter callConverter;
@@ -46,64 +50,132 @@ class CallConverterTest {
         callConverter = new CallConverter();
     }
 
-    @Test
-    void shouldProperlyConvertAction() {
-        // given
-        Expression.Action action = getAction();
+    @ParameterizedTest
+    @MethodSource("mappings")
+    void shouldConvertExpressionToArgument(Expression expression, Argument argument) {
+        Argument.Invocation invocation = callConverter.convert(createRule(), ExpressionFactory.functionOf("name", Integer.class, "call", expression));
 
-        // when
-        Argument.Invocation invocation = callConverter.apply(action);
-
-        // then
-        assertThat(invocation).isNotNull();
-        assertThat(invocation.getName()).isEqualTo(action.getName());
-        assertThat(invocation.getCall()).isEqualTo(action.getName());
-        assertThat(invocation.getArguments().stream()
-                .map(Argument::getName)
-                .collect(Collectors.toSet()))
-                .isEqualTo(action.getArguments().stream()
-                        .map(Expression::getName)
-                        .collect(Collectors.toSet()));
+        assertThat(invocation).isEqualTo(ArgumentFactory.invocationOf("name", Integer.class, "call", argument));
     }
 
-    @Test
-    void shouldProperlyConvertActionParametersToArguments() {
-        // given
-        List<? extends Expression> actionParameters = getActionParameters();
-
-        // when
-        Map<String, Argument> arguments = actionParameters.stream()
-                .map(parameter -> new Object[]{parameter.getName(), callConverter.convert(parameter)})
-                .collect(Collectors.toMap((Object[] k) -> k[0].toString(), (Object[] v) -> (Argument) v[1]));
-
-        // then
-        assertThat(arguments).containsOnly(
-                entry("booleanFalse", Argument.valueOf("booleanFalse", Boolean.FALSE)),
-                entry("booleanTrue", Argument.valueOf("booleanTrue", Boolean.TRUE)),
-                entry("number", Argument.valueOf("number", Long.parseLong("1234"))),
-                entry("decimalNumber", Argument.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456))),
-                entry("ordinaryString", Argument.valueOf("ordinaryString", "Just a string")),
-                entry("listOfNumbers", Argument.valueOf("listOfNumbers", new CallConverter.InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))),
-                entry("listOfStrings", Argument.valueOf("listOfStrings", new CallConverter.InternalParameterizedType(null, List.class, String.class), asList("one", "two"))),
-                entry("simpleReference", Argument.referenceOf("simpleReference", Object.class, Argument.UNKNOWN, "person")),
-                entry("propertyReference", Argument.referenceOf("propertyReference", Object.class, Argument.UNKNOWN, "person.name"))
+    private static Stream<Arguments> mappings() {
+        return Stream.of(
+                Arguments.of(
+                        ExpressionFactory.valueOf("unknownType", Expression.UNDEFINED, "value"),
+                        Argument.valueOf("unknownType", Argument.UNKNOWN, "value")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("booleanFalse", false),
+                        Argument.valueOf("booleanFalse", Boolean.FALSE)
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("booleanTrue", true),
+                        Argument.valueOf("booleanTrue", Boolean.TRUE)
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("number", 1234L),
+                        Argument.valueOf("number", Long.parseLong("1234"))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456)),
+                        Argument.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("ordinaryString", "Just a string"),
+                        Argument.valueOf("ordinaryString", "Just a string")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("nullValue", String.class, null),
+                        Argument.valueOf("nullValue", String.class, null)
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("escapedPlaceholder", "\\${placeholder}"),
+                        Argument.valueOf("escapedPlaceholder", "${placeholder}")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("escapedPlaceholder", "\\\\${placeholder}"),
+                        Argument.valueOf("escapedPlaceholder", "\\${placeholder}")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
+                        Argument.valueOf("listOfNumbers", new InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("listOfStrings", asList("one", "two")),
+                        Argument.valueOf("listOfStrings", new InternalParameterizedType(null, List.class, String.class), asList("one", "two"))
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${ruleName}"),
+                        Argument.referenceOf("factFieldReference", String.class, String.class, "ruleName")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${ctx}"),
+                        Argument.referenceOf("factFieldReference", Argument.UNKNOWN, Argument.UNKNOWN, "ctx")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, UserFact.class, "fact")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact.field}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, String.class, "fact.field")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${attribute.field}"),
+                        Argument.referenceOf("factFieldReference", UserAttribute.class, Long.class, "attribute.field")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldListReference", "${fact.list}"),
+                        Argument.referenceOf("factFieldListReference", UserFact.class, new InternalParameterizedType(null, List.class, String.class), "fact.list")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("nonExistingReference", "${nonExisting}"),
+                        Argument.valueOf("nonExistingReference", String.class, "${nonExisting}")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("nonExistingField", "${fact.nonExisting}"),
+                        Argument.valueOf("nonExistingField", String.class, "${fact.nonExisting}")
+                )
         );
     }
 
-    Expression.Action getAction() {
-        return ExpressionFactory.actionOf("actionOne", "actionOne", getActionParameters());
+    @Test
+    void shouldConvertMultipleExpressions() {
+        Argument.Invocation invocation = callConverter.convert(
+                createRule(),
+                ExpressionFactory.functionOf("functionName", Expression.UNDEFINED, "functionCall",
+                        ExpressionFactory.valueOf("string", "value"),
+                        ExpressionFactory.valueOf("reference", "${fact.field}"),
+                        ExpressionFactory.valueOf("boolean", false)
+                ));
+
+        assertThat(invocation).isEqualTo(
+                ArgumentFactory.invocationOf("functionName", Argument.UNKNOWN, "functionCall",
+                        Argument.valueOf("string", "value"),
+                        Argument.referenceOf("reference", UserFact.class, String.class, "fact.field"),
+                        Argument.valueOf("boolean", Boolean.FALSE)
+                ));
     }
 
-    List<Expression> getActionParameters() {
-        return asList(
-                ExpressionFactory.valueOf("booleanFalse", false),
-                ExpressionFactory.valueOf("booleanTrue", true),
-                ExpressionFactory.valueOf("number", 1234L),
-                ExpressionFactory.valueOf("decimalNumber", BigDecimal.valueOf(-123, 456)),
-                ExpressionFactory.valueOf("ordinaryString", "Just a string"),
-                ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
-                ExpressionFactory.valueOf("listOfStrings", asList("one", "two")),
-                ExpressionFactory.referenceOf("simpleReference", Object.class, "person"),
-                ExpressionFactory.referenceOf("propertyReference", Object.class, "person", String.class, "name"));
+    private Rule createRule() {
+        return new Rule(
+                new LinkedHashSet<>(Arrays.asList(
+                        new Attribute("ruleName", String.class, "nameOfRule"),
+                        new Attribute("attribute", UserAttribute.class, new UserAttribute())
+                )),
+                Collections.singletonList(
+                        new Fact("fact", UserFact.class)
+                ),
+                null,
+                Collections.emptyList());
+    }
+
+    private static class UserFact {
+        public String field;
+        public List<String> list;
+    }
+
+    private static class UserAttribute {
+        public Long field = 10L;
     }
 }
