@@ -674,11 +674,12 @@ public final class RuleDsl {
             List<com.sabre.oss.yare.core.model.Expression.Action> actions = this.actions.stream()
                     .map(this::createAction)
                     .collect(Collectors.toList());
+            com.sabre.oss.yare.core.model.Expression predicateExpression = predicate != null ? predicate.getExpression(null, this) : null;
 
             return new Rule(
                     new LinkedHashSet<>(attributes),
                     new ArrayList<>(facts),
-                    predicate.getExpression(null, this),
+                    predicateExpression,
                     actions);
         }
 
