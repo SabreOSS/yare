@@ -28,7 +28,13 @@ import com.google.common.collect.ImmutableList;
 import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
 import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
 
+import java.util.*;
+
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableSet;
+
 public final class DefaultRuleValidator {
+    private static final Set<String> reservedNames = unmodifiableSet(new LinkedHashSet<>(singletonList("ctx")));
     private static final Validator ruleValidator = createRuleValidator(false);
     private static final Validator fastFailRuleValidator = createRuleValidator(true);
 
@@ -48,6 +54,8 @@ public final class DefaultRuleValidator {
                 ImmutableList.of(
                         new AttributeValidator(fastFail),
                         new FactValidator(fastFail),
+                        new ReservedValidator(fastFail, reservedNames),
+                        new DuplicateValidator(fastFail),
                         new ReferenceValidator(fastFail, new ChainedTypeExtractor(), new PlaceholderExtractor()),
                         new ActionValidator(fastFail)));
     }
