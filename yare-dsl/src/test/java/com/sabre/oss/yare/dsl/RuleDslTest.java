@@ -126,13 +126,12 @@ class RuleDslTest {
     }
 
     @Test
-    void shouldProperlyAssignNullPredicate() {
+    void shouldProperlyInitializeEmptyRule() {
         Rule rule = ruleBuilder()
-                .name("this.is.MyRuleName")
-                .fact("exampleFact", ExampleFact.class)
-                .predicate(null)
-                .action("exampleAction", param("param1", value("${ctx}")))
                 .build(false);
+        assertThat(rule.getActions()).isEmpty();
+        assertThat(rule.getAttributes()).isEmpty();
+        assertThat(rule.getFacts()).isEmpty();
         assertThat(rule.getPredicate()).isNull();
     }
 
