@@ -38,15 +38,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RuleDslTest {
     private TypeConverter converter = DefaultTypeConverters.getDefaultTypeConverter();
@@ -112,6 +110,29 @@ class RuleDslTest {
                         valueOf("param1", String.class, "${ctx}")
                 )
         );
+    }
+
+    @Test
+    void shouldProperlyValidateNullPredicate() {
+        assertThatThrownBy(() -> ruleBuilder()
+                .name("this.is.MyRuleName")
+                .fact("exampleFact", ExampleFact.class)
+                .predicate(null)
+                .action("exampleAction", param("param1", value("${ctx}")))
+                .build())
+                .hasMessage("Rule validation error(s):\n" +
+                        "[ERROR] Predicate Error: predicate was not specified")
+                .hasSameClassAs(new IllegalStateException());
+    }
+
+    @Test
+    void shouldProperlyInitializeEmptyRule() {
+        Rule rule = ruleBuilder()
+                .build(false);
+        assertThat(rule.getActions()).isEmpty();
+        assertThat(rule.getAttributes()).isEmpty();
+        assertThat(rule.getFacts()).isEmpty();
+        assertThat(rule.getPredicate()).isNull();
     }
 
     @ParameterizedTest
