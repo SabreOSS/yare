@@ -61,15 +61,7 @@ public class ValuesTest {
                 .build();
         List<Fact> facts = Collections.singletonList(new Fact("first", "second"));
 
-        RulesEngine engine = new RulesEngineBuilder()
-                .withRulesRepository(i -> Collections.singletonList(rule))
-                .withActionMapping("return", method(this, a -> a.append(null, null)))
-                .withFunctionMapping("stringFunction", method(this, ValuesTest::getString))
-                .build();
-
-        RuleSession session = engine.createSession("session");
-
-        ArrayList<String> result = session.execute(new ArrayList<>(), facts);
+        ArrayList<String> result = execute(facts, rule);
 
         assertThat(result).containsExactly(
                 "first",
@@ -78,8 +70,53 @@ public class ValuesTest {
                 "constantValue");
     }
 
+    @Test
+    void shouldResolveValuesInOperators() {
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Should resolve values in action")
+                .fact("fact", Fact.class)
+                .predicate(
+                        contains(
+                                expressions(String.class,
+                                        value("${fact.name}"),
+                                        value("${fact.field}"),
+                                        function("stringFunction"),
+                                        value("third")
+                                ),
+                                values(String.class,
+                                        value("first"),
+                                        value("second"),
+                                        value("third"),
+                                        value(getString())
+                                )
+                        )
+                )
+                .action("return",
+                        param("context", value("${ctx}")),
+                        param("values", values(String.class, "matched"))
+                )
+                .build();
+        List<Fact> facts = Collections.singletonList(new Fact("first", "second"));
+
+        ArrayList<String> result = execute(facts, rule);
+
+        assertThat(result).containsExactly("matched");
+    }
+
+    private ArrayList<String> execute(List<Fact> facts, Rule rule) {
+        RulesEngine engine = new RulesEngineBuilder()
+                .withRulesRepository(i -> Collections.singletonList(rule))
+                .withActionMapping("return", method(this, a -> a.append(null, null)))
+                .withFunctionMapping("stringFunction", method(this, ValuesTest::getString))
+                .build();
+
+        RuleSession session = engine.createSession("session");
+
+        return session.execute(new ArrayList<>(), facts);
+    }
+
     public String getString() {
-        return "functionString";
+        return "function value";
     }
 
     public void append(List<String> context, List<String> values) {
