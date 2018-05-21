@@ -25,7 +25,6 @@
 package com.sabre.oss.yare.engine;
 
 import com.sabre.oss.yare.core.call.*;
-import com.sabre.oss.yare.core.call.Argument.Values;
 import com.sabre.oss.yare.core.invocation.Invocation;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
 import com.sabre.oss.yare.engine.executor.runtime.value.FieldReferringClassFactory;
@@ -33,8 +32,6 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.util.stream.Collectors;
 
-import static com.sabre.oss.yare.core.call.Argument.Reference;
-import static com.sabre.oss.yare.core.call.Argument.Value;
 import static java.util.Objects.requireNonNull;
 
 public class DefaultArgumentValueResolver implements ArgumentValueResolver {
@@ -47,19 +44,19 @@ public class DefaultArgumentValueResolver implements ArgumentValueResolver {
 
     @Override
     public Object resolve(VariableResolver variableResolver, Argument argument) {
-        if (argument instanceof Value) {
-            return ((Value) argument).getValue();
+        if (argument instanceof Argument.Value) {
+            return ((Argument.Value) argument).getValue();
         }
-        if (argument instanceof Values) {
-            return ((Values) argument).getArguments().stream()
+        if (argument instanceof Argument.Values) {
+            return ((Argument.Values) argument).getArguments().stream()
                     .map(a -> resolve(variableResolver, a))
                     .collect(Collectors.toList());
         }
-        if (argument instanceof Reference) {
+        if (argument instanceof Argument.Reference) {
             if (!(variableResolver instanceof PredicateContext)) {
                 throw new IllegalArgumentException("Expected PredicateContext as VariableResolver");
             }
-            Reference reference = (Reference) argument;
+            Argument.Reference reference = (Argument.Reference) argument;
             String path = reference.getReference();
             int dotIndex = path.indexOf(".");
             if (dotIndex == -1) {
@@ -74,7 +71,7 @@ public class DefaultArgumentValueResolver implements ArgumentValueResolver {
                     : referenceType;
             return FieldReferringClassFactory.create(referenceType, identifier, path).get((PredicateContext) variableResolver);
         }
-        if (argument instanceof Invocation) {
+        if (argument instanceof Argument.Invocation) {
             if (!(variableResolver instanceof ProcessingContext)) {
                 throw new IllegalArgumentException("Expected ProcessingContext as VariableResolver");
             }
