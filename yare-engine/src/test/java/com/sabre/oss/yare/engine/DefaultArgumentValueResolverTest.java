@@ -27,11 +27,17 @@ package com.sabre.oss.yare.engine;
 import com.sabre.oss.yare.core.call.Argument;
 import com.sabre.oss.yare.core.call.Argument.Reference;
 import com.sabre.oss.yare.core.call.Argument.Value;
+import com.sabre.oss.yare.core.call.Argument.Values;
 import com.sabre.oss.yare.core.call.ProcessingInvocationFactory;
 import com.sabre.oss.yare.core.call.VariableResolver;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.sabre.oss.yare.core.call.Argument.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,15 +92,57 @@ public class DefaultArgumentValueResolverTest {
         assertThat(resultValueBRef).isEqualTo("valueB");
     }
 
-    public static class MyProperty {
+    @Nested
+    class ValuesResolving {
+
+        @Test
+        void shouldResolveEmptyValues() {
+            // given
+            Values valueArgument = Argument.valuesOf("myValues", String.class,
+                    Collections.emptyList()
+            );
+
+            // when
+            Object resolvedValue = defaultArgumentValueResolver.resolve(null, valueArgument);
+
+            // then
+            assertThat(resolvedValue).isInstanceOfSatisfying(List.class,
+                    l -> assertThat(l).isEmpty());
+        }
+
+        @Test
+        void shouldResolveMultipleValues() {
+            // given
+            Values valueArgument = Argument.valuesOf("myValues", String.class,
+                    Arrays.asList(
+                            Argument.valueOf("value", "string"),
+                            Argument.referenceOf("reference", MyProperty.class, UNKNOWN, "myProperty.value")
+                    )
+            );
+            VariableResolver variableResolver = mock(PredicateContext.class);
+            when(variableResolver.resolve("myProperty")).thenReturn(new MyProperty("referenceValue"));
+
+            // when
+            Object resolvedValue = defaultArgumentValueResolver.resolve(variableResolver, valueArgument);
+
+            // then
+            assertThat(resolvedValue).isInstanceOfSatisfying(List.class,
+                    l -> assertThat(l).containsExactly(
+                            "string",
+                            "referenceValue"
+                    ));
+        }
+    }
+
+    public static final class MyProperty {
         private String value;
         private MyProperty nested;
 
-        public MyProperty(String value) {
+        private MyProperty(String value) {
             this.value = value;
         }
 
-        public MyProperty(String value, MyProperty nested) {
+        private MyProperty(String value, MyProperty nested) {
             this.value = value;
             this.nested = nested;
         }

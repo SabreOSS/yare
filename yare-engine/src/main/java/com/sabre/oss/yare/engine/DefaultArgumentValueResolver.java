@@ -25,10 +25,13 @@
 package com.sabre.oss.yare.engine;
 
 import com.sabre.oss.yare.core.call.*;
+import com.sabre.oss.yare.core.call.Argument.Values;
 import com.sabre.oss.yare.core.invocation.Invocation;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
 import com.sabre.oss.yare.engine.executor.runtime.value.FieldReferringClassFactory;
 import org.apache.commons.lang3.reflect.TypeUtils;
+
+import java.util.stream.Collectors;
 
 import static com.sabre.oss.yare.core.call.Argument.Reference;
 import static com.sabre.oss.yare.core.call.Argument.Value;
@@ -46,6 +49,11 @@ public class DefaultArgumentValueResolver implements ArgumentValueResolver {
     public Object resolve(VariableResolver variableResolver, Argument argument) {
         if (argument instanceof Value) {
             return ((Value) argument).getValue();
+        }
+        if (argument instanceof Values) {
+            return ((Values) argument).getArguments().stream()
+                    .map(a -> resolve(variableResolver, a))
+                    .collect(Collectors.toList());
         }
         if (argument instanceof Reference) {
             if (!(variableResolver instanceof PredicateContext)) {
