@@ -42,7 +42,8 @@ class TypeAliasResolverTest {
         TypeAlias alias = resolver.getAliasFor(name);
 
         //then
-        assertThat(alias).isEqualTo(TypeAlias.STRING);
+        assertThat(alias.getAlias()).isEqualTo("String");
+        assertThat(alias.getType()).isEqualTo(String.class);
     }
 
     @Test
@@ -66,7 +67,8 @@ class TypeAliasResolverTest {
         TypeAlias alias = resolver.getAliasFor(type);
 
         //then
-        assertThat(alias).isEqualTo(TypeAlias.STRING);
+        assertThat(alias.getAlias()).isEqualTo("String");
+        assertThat(alias.getType()).isEqualTo(String.class);
     }
 
     @Test

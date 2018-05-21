@@ -182,5 +182,4 @@ public class TypeTypeConverter implements TypeConverter {
         }
         return stringJoiner.toString();
     }
-
 }

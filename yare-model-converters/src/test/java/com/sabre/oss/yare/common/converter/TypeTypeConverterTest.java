@@ -143,5 +143,4 @@ class TypeTypeConverterTest {
 
     private static class NestedClass {
     }
-
 }
