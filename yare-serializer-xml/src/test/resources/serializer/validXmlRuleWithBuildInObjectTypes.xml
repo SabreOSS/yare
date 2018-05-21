@@ -26,8 +26,8 @@
 <!--suppress XmlUnusedNamespaceDeclaration -->
 <yare:Rule xmlns:custom="http://example.sabre.com/custom/schema"
            xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1">
-    <yare:Attribute name="ruleName" type="java.lang.String" value="RuleName"/>
-    <yare:Attribute name="ruleType" type="java.lang.String" value="RuleType"/>
+    <yare:Attribute name="ruleName" type="String" value="RuleName"/>
+    <yare:Attribute name="ruleType" type="String" value="RuleType"/>
     <yare:Attribute name="startDate" type="java.time.ZonedDateTime" value="2016-06-30T00:00+01:00[Europe/London]"/>
     <yare:Attribute name="expireDate" type="java.time.ZonedDateTime" value="2017-01-02T00:00Z"/>
     <yare:Attribute name="someVariable" type="java.lang.Boolean" value="true"/>
@@ -80,12 +80,12 @@
     </yare:Predicate>
     <yare:Action name="ActionName1">
         <yare:Parameter name="ParameterName1">
-            <yare:Values type="java.lang.String">
+            <yare:Values type="String">
                 <yare:Value>anyValueA</yare:Value>
             </yare:Values>
         </yare:Parameter>
         <yare:Parameter name="ParameterName2">
-            <yare:Values type="java.lang.String">
+            <yare:Values type="String">
                 <yare:Value>anyValueB</yare:Value>
             </yare:Values>
         </yare:Parameter>

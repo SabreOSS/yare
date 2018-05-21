@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.common.converter;
 
+import com.sabre.oss.yare.common.converter.aliases.TypeAliasResolver;
 import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 
 import java.lang.reflect.ParameterizedType;
@@ -57,6 +58,8 @@ public class TypeTypeConverter implements TypeConverter {
     private final Map<String, Type> stringToTypeCache = new ConcurrentHashMap<>();
     private final Map<Type, String> typeToStringCache = new ConcurrentHashMap<>();
 
+    private final TypeAliasResolver typeAliasResolver = new TypeAliasResolver();
+
     @Override
     public boolean isApplicable(Type type) {
         return Type.class.equals(type);
@@ -88,6 +91,9 @@ public class TypeTypeConverter implements TypeConverter {
     }
 
     private Type convertString(String value) {
+        if (typeAliasResolver.hasAliasFor(value)) {
+            return typeAliasResolver.getAliasFor(value).getType();
+        }
         Matcher matcher = typePattern.matcher(value);
         if (matcher.matches()) {
             String rawTypeName = matcher.group(1);
@@ -122,7 +128,10 @@ public class TypeTypeConverter implements TypeConverter {
 
     private String convertType(Object value) {
         if (value instanceof Class) {
-            return ((Class<?>) value).getCanonicalName();
+            Class<?> type = (Class<?>) value;
+            return typeAliasResolver.hasAliasFor(type) ?
+                    typeAliasResolver.getAliasFor(type).getAlias() :
+                    type.getCanonicalName();
         }
         if (value instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) value;
@@ -135,4 +144,5 @@ public class TypeTypeConverter implements TypeConverter {
         }
         throw new IllegalArgumentException("Unsupported type");
     }
+
 }
