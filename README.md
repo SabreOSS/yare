@@ -85,7 +85,7 @@ Rule rule = RuleDsl.ruleBuilder()
 or using XML:
 ```xml
 <Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
-    <Attribute name="ruleName" value="Should match flight with first class of service" type="java.lang.String"/>
+    <Attribute name="ruleName" value="Should match flight with first class of service" type="String"/>
     <Fact name="flightFact" type="com.sabre.oss.yare.example.Flight"/>
     <Predicate>
         <Operator type="equal">
