@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
@@ -88,8 +89,7 @@ class RuleDslTest {
                                         value("${exampleFact.startDate}"),
                                         value("${exampleFact.stopDate}")
                                 ),
-                                operator("contains", values(String.class, value("a"), value("b"), value("c")), value("c")),
-                                operator("contains", expressions(String.class, value("${stringValue}"), value("e"), value("f")), value("string")),
+                                operator("contains", values(String.class, value("${stringValue}"), value("b"), value("c")), value("string")),
                                 function("function", Boolean.class,
                                         param("param1", value("${ruleName}")),
                                         param("param2", value("my value"))
@@ -177,9 +177,13 @@ class RuleDslTest {
 
         // then
         Expression expression = operand.getExpression(null, null);
-        assertThat(expression).isInstanceOf(Expression.Value.class);
-
-        assertThat(((Expression.Value) expression).getValue()).isEqualTo(Arrays.asList(objects));
+        assertThat(expression).isInstanceOfSatisfying(Expression.Values.class, v -> {
+            List<Object> values = v.getValues().stream()
+                    .map(Expression.Value.class::cast)
+                    .map(Expression.Value::getValue)
+                    .collect(Collectors.toList());
+            assertThat(values).containsExactly(objects);
+        });
 
         String parametrizedType = String.format("java.util.List<%s>", converter.toString(Type.class, type));
         Type fullType = DefaultTypeConverters.getDefaultTypeConverter().fromString(Type.class, parametrizedType);
@@ -248,14 +252,10 @@ class RuleDslTest {
                         valueOf(null, String.class, "${exampleFact.stopDate}")
                 ),
                 operatorOf(null, Boolean.class, "contains",
-                        valueOf(null, converter.fromString(Type.class, "java.util.List<java.lang.String>"), Arrays.asList("a", "b", "c")),
-                        valueOf(null, String.class, "c")
-                ),
-                operatorOf(null, Boolean.class, "contains",
                         valuesOf(null, converter.fromString(Type.class, "java.util.List<java.lang.String>"), Arrays.asList(
                                 valueOf(null, "${stringValue}"),
-                                valueOf(null, "e"),
-                                valueOf(null, "f")
+                                valueOf(null, "b"),
+                                valueOf(null, "c")
                         )),
                         valueOf(null, String.class, "string")
                 ),

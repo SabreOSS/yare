@@ -291,18 +291,8 @@ public final class RuleDsl {
         return (name, builder) -> ExpressionFactory.valueOf(name, String.class, value);
     }
 
-    @SafeVarargs
-    public static <T> CollectionOperand<T> expressions(Class<T> type, Operand<T>... values) {
-        return (name, builder) -> {
-            List<com.sabre.oss.yare.core.model.Expression> collect = Stream.of(values)
-                    .map(v -> v.getExpression(null, builder))
-                    .collect(Collectors.toList());
-            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), collect);
-        };
-    }
-
     /**
-     * Creates an operand representing a collection of constant values.
+     * Creates an operand representing a collection of expressions.
      *
      * @param type   class describing collection item type
      * @param values values of the collection
@@ -312,13 +302,10 @@ public final class RuleDsl {
     @SafeVarargs
     public static <T> CollectionOperand<T> values(Class<T> type, Operand<T>... values) {
         return (name, builder) -> {
-            List<Object> extracted = Stream.of(values)
+            List<com.sabre.oss.yare.core.model.Expression> expressions = Stream.of(values)
                     .map(v -> v.getExpression(null, builder))
-                    .filter(com.sabre.oss.yare.core.model.Expression.Value.class::isInstance)
-                    .map(com.sabre.oss.yare.core.model.Expression.Value.class::cast)
-                    .map(com.sabre.oss.yare.core.model.Expression.Value::getValue)
                     .collect(Collectors.toList());
-            return ExpressionFactory.valueOf(name, extractParametrizedType(type), extracted);
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
         };
     }
 
@@ -332,7 +319,12 @@ public final class RuleDsl {
      */
     @SafeVarargs
     public static <T> CollectionOperand<T> values(Class<T> type, T... values) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, extractParametrizedType(type), Arrays.asList(values));
+        return (name, builder) -> {
+            List<com.sabre.oss.yare.core.model.Expression> expressions = Stream.of(values)
+                    .map(v -> ExpressionFactory.valueOf(null, type, v))
+                    .collect(Collectors.toList());
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
+        };
     }
 
     /**

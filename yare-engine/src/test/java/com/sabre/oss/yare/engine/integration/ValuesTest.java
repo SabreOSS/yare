@@ -51,7 +51,7 @@ public class ValuesTest {
                 )
                 .action("return",
                         param("context", value("${ctx}")),
-                        param("values", expressions(String.class,
+                        param("values", values(String.class,
                                 value("${fact.name}"),
                                 value("${fact.field}"),
                                 function("stringFunction"),
@@ -77,7 +77,7 @@ public class ValuesTest {
                 .fact("fact", Fact.class)
                 .predicate(
                         contains(
-                                expressions(String.class,
+                                values(String.class,
                                         value("${fact.name}"),
                                         value("${fact.field}"),
                                         function("stringFunction"),
