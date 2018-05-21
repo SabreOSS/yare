@@ -71,6 +71,10 @@ public final class ExpressionFactory {
         return new ExpressionFactory.Value(name, type, value);
     }
 
+    public static Expression.Values valuesOf(String name, Type type, List<Expression> expressions) {
+        return new ExpressionFactory.Values(name, type, expressions);
+    }
+
     private static Type determineType(Object value) {
         Class<?> clazz = value.getClass();
         if (value instanceof Collection) {
@@ -178,12 +182,7 @@ public final class ExpressionFactory {
 
         @Override
         public String toString() {
-            return "Action{" +
-                    "name='" + name + '\'' +
-                    ", type=" + type +
-                    ", value=" + value +
-                    ", arguments=" + arguments +
-                    '}';
+            return String.format("Action{name='%s', type=%s, value=%s, arguments=%s}", name, type, value, arguments);
         }
     }
 
@@ -195,12 +194,7 @@ public final class ExpressionFactory {
 
         @Override
         public String toString() {
-            return "Operator{" +
-                    "name='" + name + '\'' +
-                    ", type=" + type +
-                    ", value=" + value +
-                    ", arguments=" + arguments +
-                    '}';
+            return String.format("Operator{name='%s', type=%s, value=%s, arguments=%s}", name, type, value, arguments);
         }
     }
 
@@ -212,12 +206,7 @@ public final class ExpressionFactory {
 
         @Override
         public String toString() {
-            return "Function{" +
-                    "name='" + name + '\'' +
-                    ", type=" + type +
-                    ", value=" + value +
-                    ", arguments=" + arguments +
-                    '}';
+            return String.format("Function{name='%s', type=%s, value=%s, arguments=%s}", name, type, value, arguments);
         }
     }
 
@@ -230,6 +219,28 @@ public final class ExpressionFactory {
         @Override
         public Object getValue() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Value{name='%s', type=%s, value=%s}", name, type, value);
+        }
+    }
+
+    static final class Values extends InternalOperand<List<Expression>> implements Expression.Values {
+
+        Values(String name, Type type, List<Expression> expressions) {
+            super(name, type, expressions);
+        }
+
+        @Override
+        public List<Expression> getValues() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Values{name='%s', type=%s, value=%s}", name, type, value);
         }
     }
 }

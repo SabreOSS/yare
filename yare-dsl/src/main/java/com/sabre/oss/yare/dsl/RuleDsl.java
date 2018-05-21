@@ -291,6 +291,16 @@ public final class RuleDsl {
         return (name, builder) -> ExpressionFactory.valueOf(name, String.class, value);
     }
 
+    @SafeVarargs
+    public static <T> CollectionOperand<T> expressions(Class<T> type, Operand<T>... values) {
+        return (name, builder) -> {
+            List<com.sabre.oss.yare.core.model.Expression> collect = Stream.of(values)
+                    .map(v -> v.getExpression(null, builder))
+                    .collect(Collectors.toList());
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), collect);
+        };
+    }
+
     /**
      * Creates an operand representing a collection of constant values.
      *

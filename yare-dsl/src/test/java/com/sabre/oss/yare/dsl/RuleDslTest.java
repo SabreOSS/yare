@@ -38,7 +38,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
@@ -86,6 +89,7 @@ class RuleDslTest {
                                         value("${exampleFact.stopDate}")
                                 ),
                                 operator("contains", values(String.class, value("a"), value("b"), value("c")), value("c")),
+                                operator("contains", expressions(String.class, value("${stringValue}"), value("e"), value("f")), value("string")),
                                 function("function", Boolean.class,
                                         param("param1", value("${ruleName}")),
                                         param("param2", value("my value"))
@@ -246,6 +250,14 @@ class RuleDslTest {
                 operatorOf(null, Boolean.class, "contains",
                         valueOf(null, converter.fromString(Type.class, "java.util.List<java.lang.String>"), Arrays.asList("a", "b", "c")),
                         valueOf(null, String.class, "c")
+                ),
+                operatorOf(null, Boolean.class, "contains",
+                        valuesOf(null, converter.fromString(Type.class, "java.util.List<java.lang.String>"), Arrays.asList(
+                                valueOf(null, "${stringValue}"),
+                                valueOf(null, "e"),
+                                valueOf(null, "f")
+                        )),
+                        valueOf(null, String.class, "string")
                 ),
                 functionOf("function", Boolean.class, "function",
                         valueOf("param1", String.class, "${ruleName}"),
