@@ -26,7 +26,7 @@ package com.sabre.oss.yare.common.converter.aliases;
 
 import java.lang.reflect.Type;
 
-public class TypeAlias {
+public final class TypeAlias {
     private final String name;
     private final Type type;
 

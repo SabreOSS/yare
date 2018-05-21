@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class TypeAliases {
-    private final static Map<String, TypeAlias> nameToAliasMap;
-    private final static Map<Type, TypeAlias> typeToAliasMap;
+final class TypeAliases {
+    private static final Map<String, TypeAlias> nameToAliasMap;
+    private static final Map<Type, TypeAlias> typeToAliasMap;
 
     static {
         nameToAliasMap = new HashMap<>();
@@ -70,6 +70,10 @@ class TypeAliases {
         TypeAlias alias = TypeAlias.of(name, type);
         nameToAliasMap.put(name, alias);
         typeToAliasMap.put(type, alias);
+    }
+
+    private TypeAliases() {
+
     }
 
     static Map<String, TypeAlias> mapAliasesByName() {
