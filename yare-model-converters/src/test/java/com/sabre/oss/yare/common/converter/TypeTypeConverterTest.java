@@ -114,6 +114,14 @@ class TypeTypeConverterTest {
         assertThat(converted).isEqualTo(String.class);
     }
 
+    @Test
+    void shouldProperlyConvertNestedGenericToString() {
+        String converted = typeConverter.toString(null,
+                TypeUtils.parameterize(Map.class, String.class, TypeUtils.parameterize(List.class, Object.class)));
+
+        assertThat(converted).isEqualTo("Map<String,List<Object>>");
+    }
+
     @ParameterizedTest
     @MethodSource("conversionParameters")
     void shouldProperlyConvertFromString(String toConvert, Type expected) {
