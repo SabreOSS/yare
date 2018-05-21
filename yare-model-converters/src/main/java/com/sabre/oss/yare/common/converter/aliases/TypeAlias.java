@@ -4,7 +4,8 @@ import java.lang.reflect.Type;
 
 public enum TypeAlias {
     STRING("String", String.class),
-    INTEGER("Integer", Integer.class);
+    INTEGER("Integer", Integer.class),
+    INT("int", int.class);
     //TODO!!!
 
     private final String name;

@@ -22,7 +22,7 @@ class TypeAliasResolverTest {
     }
 
     @Test
-    void shouldResolveTypeExistenceAliasForGivenName() {
+    void shouldResolveTypeAliasExistenceForGivenName() {
         //given
         String name = "String";
 
@@ -35,30 +35,58 @@ class TypeAliasResolverTest {
 
     @Test
     void shouldResolveTypeAliasForGivenType() {
-    }
-
-    @Test
-    void shouldThrowExceptionForGivenName() {
         //given
-        String name = "NOT_EXISTING_NAME";
+        Class<?> type = String.class;
 
         //when
-        TypeAlias alias = resolver.getAliasFor(name);
+        TypeAlias alias = resolver.getAliasFor(type);
 
         //then
         assertThat(alias).isEqualTo(TypeAlias.STRING);
     }
 
     @Test
-    void shouldThrowExceptionForGivenType() {
+    void shouldResolveTypeAliasExistenceForGivenType() {
         //given
-        Class<?> not_handled_class = TypeAlias.class;
+        Class<?> type = String.class;
+
+        //when
+        Boolean hasAlias = resolver.hasAliasFor(type);
 
         //then
-        assertThrows(IllegalArgumentException.class, () -> {
-            //when
-            resolver.getAliasFor(not_handled_class);
-        }, "Could not find type alias for given type: xxx!"); //TODO!!!
+        assertThat(hasAlias).isTrue();
+    }
+
+
+    @Test
+    void shouldThrowExceptionForUnknownName() {
+        //given
+        String unknownName = "UNKNOWN_NAME";
+
+        //when
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> resolver.getAliasFor(unknownName));
+
+
+        //then
+        String expectedMessage = String.format("Could not find type alias for given name: %s", unknownName);
+        assertThat(e.getMessage()).isEqualTo(expectedMessage);
+    }
+
+    @Test
+    void shouldThrowExceptionForUnknownType() {
+        //given
+        Class<?> unknownType = TypeAlias.class;
+
+        //when
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> resolver.getAliasFor(unknownType));
+
+        //then
+        String expectedMessage = String.format("Could not find type alias for given type: %s", unknownType);
+        assertThat(e.getMessage()).isEqualTo(expectedMessage);
     }
 
 }
