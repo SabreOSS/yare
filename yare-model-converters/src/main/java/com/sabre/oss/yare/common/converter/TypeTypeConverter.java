@@ -129,24 +129,9 @@ public class TypeTypeConverter implements TypeConverter {
 
     private Type loadAsInnerClass(String typeName) {
         return tryToResolveInnerClassName(typeName)
-                .map(this::loadClass)
+                .flatMap(this::tryToLoadClass)
                 .orElseThrow(() -> new IllegalArgumentException(
                         String.format("Can't convert '%s' into Java type", typeName)));
-    }
-
-    private Type loadClass(String typeName) {
-        return tryToLoadClass(typeName)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Can't convert '%s' into Java type", typeName)));
-    }
-
-    private Optional<Type> tryToLoadClass(String typeName) {
-        try {
-            Type type = Thread.currentThread().getContextClassLoader().loadClass(typeName);
-            return Optional.of(type);
-        } catch (ClassNotFoundException ex) {
-            return Optional.empty();
-        }
     }
 
     private Optional<String> tryToResolveInnerClassName(String typeName) {
@@ -156,6 +141,15 @@ public class TypeTypeConverter implements TypeConverter {
             return Optional.of(innerClassName);
         }
         return Optional.empty();
+    }
+
+    private Optional<Type> tryToLoadClass(String typeName) {
+        try {
+            Type type = Thread.currentThread().getContextClassLoader().loadClass(typeName);
+            return Optional.of(type);
+        } catch (ClassNotFoundException ex) {
+            return Optional.empty();
+        }
     }
 
     private String convertType(Object value) {
