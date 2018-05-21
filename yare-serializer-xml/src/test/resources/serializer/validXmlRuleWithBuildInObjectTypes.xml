@@ -28,18 +28,18 @@
            xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1">
     <yare:Attribute name="ruleName" type="String" value="RuleName"/>
     <yare:Attribute name="ruleType" type="String" value="RuleType"/>
-    <yare:Attribute name="startDate" type="java.time.ZonedDateTime" value="2016-06-30T00:00+01:00[Europe/London]"/>
-    <yare:Attribute name="expireDate" type="java.time.ZonedDateTime" value="2017-01-02T00:00Z"/>
-    <yare:Attribute name="someVariable" type="java.lang.Boolean" value="true"/>
+    <yare:Attribute name="startDate" type="ZonedDateTime" value="2016-06-30T00:00+01:00[Europe/London]"/>
+    <yare:Attribute name="expireDate" type="ZonedDateTime" value="2017-01-02T00:00Z"/>
+    <yare:Attribute name="someVariable" type="Boolean" value="true"/>
     <yare:Fact name="fact" type="com.sabre.oss.yare.serializer.SimpleFact"/>
     <yare:Fact name="otherFact" type="com.sabre.oss.yare.serializer.OtherFact"/>
     <yare:Predicate>
         <yare:And>
             <yare:And>
-                <yare:Value type="java.lang.Boolean">false</yare:Value>
+                <yare:Value type="Boolean">false</yare:Value>
                 <yare:Operator type="EQUALS">
                     <yare:Value>${someVariable}</yare:Value>
-                    <yare:Value type="java.lang.Boolean">false</yare:Value>
+                    <yare:Value type="Boolean">false</yare:Value>
                 </yare:Operator>
                 <yare:Operator type="EQUALS">
                     <yare:Value>${fact.boolField}</yare:Value>
@@ -47,20 +47,20 @@
                 </yare:Operator>
             </yare:And>
             <yare:Or>
-                <yare:Value type="java.lang.Boolean">false</yare:Value>
+                <yare:Value type="Boolean">false</yare:Value>
                 <yare:Operator type="EQUALS">
                     <yare:Value>${someVariable}</yare:Value>
-                    <yare:Value type="java.lang.Boolean">false</yare:Value>
+                    <yare:Value type="Boolean">false</yare:Value>
                 </yare:Operator>
             </yare:Or>
             <yare:Not>
-                <yare:Value type="java.lang.Boolean">false</yare:Value>
+                <yare:Value type="Boolean">false</yare:Value>
             </yare:Not>
             <yare:Operator type="EQUALS">
                 <yare:Value>${someVariable}</yare:Value>
-                <yare:Value type="java.lang.Boolean">false</yare:Value>
+                <yare:Value type="Boolean">false</yare:Value>
             </yare:Operator>
-            <yare:Function name="someFunction" returnType="java.lang.Boolean">
+            <yare:Function name="someFunction" returnType="Boolean">
                 <yare:Parameter name="funcArg1">
                     <yare:Value>value</yare:Value>
                 </yare:Parameter>
@@ -68,14 +68,14 @@
                     <yare:Value>${fact}</yare:Value>
                 </yare:Parameter>
                 <yare:Parameter name="funcArg3">
-                    <yare:Function name="otherFunction" returnType="java.lang.Long">
+                    <yare:Function name="otherFunction" returnType="Long">
                         <yare:Parameter name="param">
                             <yare:Value>${fact.stringField}</yare:Value>
                         </yare:Parameter>
                     </yare:Function>
                 </yare:Parameter>
             </yare:Function>
-            <yare:Value type="java.lang.Boolean">false</yare:Value>
+            <yare:Value type="Boolean">false</yare:Value>
         </yare:And>
     </yare:Predicate>
     <yare:Action name="ActionName1">

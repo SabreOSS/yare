@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.common.converter.aliases;
 
 import java.lang.reflect.Type;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,8 +34,24 @@ public enum TypeAlias {
     OBJECT("Object", Object.class),
     STRING("String", String.class),
     INTEGER("Integer", Integer.class),
-    INT("int", int.class),
-    //TODO!!! add missing!
+    LONG("Long", Long.class),
+    DOUBLE("Double", Double.class),
+    BOOLEAN("Boolean", Boolean.class),
+    BYTE("Byte", Byte.class),
+    SHORT("Short", Short.class),
+    CHARACTER("Character", Character.class),
+    FLOAT("Float", Float.class),
+
+    P_INT("int", int.class),
+    P_LONG("long", long.class),
+    P_DOUBLE("double", double.class),
+    P_BOOLEAN("boolean", boolean.class),
+    P_BYTE("byte", byte.class),
+    P_SHORT("short", short.class),
+    P_CHAR("char", char.class),
+    P_FLOAT("float", float.class),
+
+    ZONED_DATE_TIME("ZonedDateTime", ZonedDateTime.class),
 
     LIST("List", List.class),
     MAP("Map", Map.class),

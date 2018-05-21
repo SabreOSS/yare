@@ -152,7 +152,7 @@ public class TypeTypeConverter implements TypeConverter {
     private Optional<String> tryToResolveInnerClassName(String typeName) {
         int lastDot = typeName.lastIndexOf('.');
         if (lastDot != -1) {
-            String innerClassName =  typeName.substring(0, lastDot) + '$' + typeName.substring(lastDot + 1);
+            String innerClassName = typeName.substring(0, lastDot) + '$' + typeName.substring(lastDot + 1);
             return Optional.of(innerClassName);
         }
         return Optional.empty();
@@ -170,7 +170,8 @@ public class TypeTypeConverter implements TypeConverter {
 
     private String convertType(Class<?> type) {
         return typeAliasResolver.hasAliasFor(type) ?
-                typeAliasResolver.getAliasFor(type).getAlias() : type.getCanonicalName();
+                typeAliasResolver.getAliasFor(type).getAlias() :
+                type.getCanonicalName();
     }
 
     private String convertType(ParameterizedType type) {
