@@ -135,6 +135,22 @@ class CallConverterTest {
                 Arguments.of(
                         ExpressionFactory.valueOf("nonExistingField", "${fact.nonExisting}"),
                         Argument.valueOf("nonExistingField", String.class, "${fact.nonExisting}")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valuesOf("emptyValues", String.class, Collections.emptyList()),
+                        Argument.valuesOf("emptyValues", String.class, Collections.emptyList())
+                ),
+                Arguments.of(
+                        ExpressionFactory.valuesOf("expressionValues", String.class, Arrays.asList(
+                                ExpressionFactory.valueOf("value", "string"),
+                                ExpressionFactory.valueOf("reference", "${fact.field}"),
+                                ExpressionFactory.functionOf("function", Integer.class, "call")
+                        )),
+                        Argument.valuesOf("expressionValues", String.class, Arrays.asList(
+                                Argument.valueOf("value", "string"),
+                                Argument.referenceOf("reference", UserFact.class, String.class, "fact.field"),
+                                Argument.invocationOf("function", Integer.class, "call")
+                        ))
                 )
         );
     }

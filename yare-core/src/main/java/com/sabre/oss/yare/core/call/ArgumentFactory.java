@@ -55,6 +55,10 @@ final class ArgumentFactory {
         return new ArgumentFactory.Value(name, type, value);
     }
 
+    static Argument.Values valuesOf(String name, Type type, List<Argument> values) {
+        return new ArgumentFactory.Values(name, type, values);
+    }
+
     abstract static class InternalArgument<V> implements Argument {
         protected final String name;
         protected final Type type;
@@ -146,8 +150,7 @@ final class ArgumentFactory {
     }
 
     static final class Reference extends InternalArgument<String> implements Argument.Reference {
-
-        protected final Type referenceType;
+        private final Type referenceType;
 
         Reference(String name, Type referenceType, Type type, String value) {
             super(name, type, value);
@@ -197,6 +200,22 @@ final class ArgumentFactory {
 
         @Override
         public Object getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return "value(\"" + Objects.toString(value, "null") + "\")";
+        }
+    }
+
+    static final class Values extends InternalArgument<List<Argument>> implements Argument.Values {
+        Values(String name, Type type, List<Argument> value) {
+            super(name, type, value);
+        }
+
+        @Override
+        public List<Argument> getArguments() {
             return value;
         }
 
