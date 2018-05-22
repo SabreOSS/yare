@@ -30,12 +30,13 @@ import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.model.*;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
-import static java.util.Objects.isNull;
 
 class NodeConverter {
     private final ByClassRegistry<Class<?>, Converter<?>> converterRegistry = new ByClassRegistry<>();
@@ -88,13 +89,7 @@ class NodeConverter {
     private Converter<ValuesSer> createValuesConverter() {
         return (name, input) -> {
             Type globalItemType = typeConverter.fromString(Type.class, input.getType());
-            Collection<Object> collection = new ArrayList<>(input.getValue().size());
-            for (ValueSer value : input.getValue()) {
-                Type itemType = isNull(value.getType()) ? globalItemType : typeConverter.fromString(Type.class, value.getType());
-                Object item = typeConverter.fromString(itemType, value.getValue());
-                collection.add(item);
-            }
-            return valueOf(name, globalItemType, collection);
+            return valuesOf(name, globalItemType, convert(input.getValue()));
         };
     }
 
