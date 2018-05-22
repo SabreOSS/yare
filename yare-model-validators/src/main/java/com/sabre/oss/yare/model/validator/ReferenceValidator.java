@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.model.validator;
 
+import com.google.common.collect.Streams;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
@@ -37,9 +38,13 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
+    private final String context = "ctx";
     private final ChainedTypeExtractor chainedTypeExtractor;
     private final PlaceholderExtractor placeholderExtractor;
 
@@ -57,6 +62,7 @@ public class ReferenceValidator extends BaseValidator {
         Map<String, Type> localReferences = initReferences(rule);
         checkReferencesInPredicate(rule, results, localReferences);
         checkReferencesInActions(rule, results, localReferences);
+        checkNamesForValidity(rule, results);
         return results;
     }
 
@@ -117,6 +123,27 @@ public class ReferenceValidator extends BaseValidator {
             } else {
                 checkPath(referenceName, path, results, localReferences);
             }
+        }
+    }
+
+    private void checkNamesForValidity(Rule rule, ValidationResults results) {
+        Stream<String> attributeNames = rule.getAttributes().stream()
+                .map(Attribute::getName);
+        Stream<String> factNames = rule.getFacts().stream()
+                .map(Fact::getIdentifier);
+        Set<String> duplicatedNames = Streams.concat(attributeNames, factNames)
+                .collect(Collectors.groupingBy(
+                        Function.identity(), Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() > 1 || entry.getKey().equals(context))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+
+        if (!duplicatedNames.isEmpty()) {
+            append(results, ValidationResult.error("rule.ref.duplicated-names",
+                    "Naming Error: There are duplicated names -> " + duplicatedNames));
         }
     }
 

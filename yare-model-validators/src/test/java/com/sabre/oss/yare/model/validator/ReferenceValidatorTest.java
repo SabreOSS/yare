@@ -606,6 +606,45 @@ class ReferenceValidatorTest {
         );
     }
 
+    @Test
+    void shouldFailOnDuplicatedNames() {
+        // given
+        Attribute attribute1 = new Attribute("duplicatedName1", null, null);
+        Attribute attribute2 = new Attribute("duplicatedName2", null, null);
+        Fact fact1 = new Fact("duplicatedName1", null);
+        Fact fact2 = new Fact("duplicatedName2", null);
+        Rule rule = new Rule(new LinkedHashSet<>(Arrays.asList(attribute1, attribute2)),
+                Arrays.asList(fact1, fact2),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [duplicatedName1, duplicatedName2]")
+        );
+    }
+
+    @Test
+    void shouldFailOnCtxName() {
+        // given
+        Fact fact = new Fact("ctx", null);
+        Rule rule = new Rule(Collections.emptySet(),
+                Collections.singletonList(fact),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [ctx]")
+        );
+    }
+
     private Rule ruleWithPredicate(Expression expression) {
         return new Rule(Collections.emptySet(), Collections.emptyList(),
                 expression,
