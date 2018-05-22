@@ -40,7 +40,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
-    private final String context = "ctx";
+    private static final String CONTEXT = "ctx";
+
     private final ChainedTypeExtractor chainedTypeExtractor;
     private final PlaceholderExtractor placeholderExtractor;
 
@@ -56,9 +57,9 @@ public class ReferenceValidator extends BaseValidator {
     public ValidationResults validate(Rule rule) {
         ValidationResults results = new ValidationResults();
         Map<String, Type> localReferences = initReferences(rule);
+        checkNamesValidity(rule, results);
         checkReferencesInPredicate(rule, results, localReferences);
         checkReferencesInActions(rule, results, localReferences);
-        checkNamesValidity(rule, results);
         return results;
     }
 
@@ -133,8 +134,7 @@ public class ReferenceValidator extends BaseValidator {
         return Stream.of(pathParts).anyMatch(StringUtils::isEmpty);
     }
 
-    private void checkPath(String reference, String path, ValidationResults
-            results, Map<String, Type> localReferences) {
+    private void checkPath(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
         try {
             checkCollectionOperator(localReferences.get(reference), reference, path, results);
         } catch (ChainedTypeExtractor.InvalidPathException e) {
@@ -142,8 +142,7 @@ public class ReferenceValidator extends BaseValidator {
         }
     }
 
-    private void checkCollectionOperator(Type referenceType, String reference, String path, ValidationResults
-            results) {
+    private void checkCollectionOperator(Type referenceType, String reference, String path, ValidationResults results) {
         String[] pathParts = path.split("\\.", -1);
         Type currentType = referenceType;
         for (String pathPart : pathParts) {
@@ -181,7 +180,7 @@ public class ReferenceValidator extends BaseValidator {
     }
 
     private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
-        if (names.contains(context)) {
+        if (names.contains(CONTEXT)) {
             append(results, ValidationResult.error("rule.ref.reserved-names",
                     "Naming Error: Reserved names are used -> [ctx]"));
         }

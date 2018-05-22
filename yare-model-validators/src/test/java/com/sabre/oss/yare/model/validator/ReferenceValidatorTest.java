@@ -609,14 +609,17 @@ class ReferenceValidatorTest {
     @Test
     void shouldFailOnDuplicatedNames() {
         // given
-        Attribute attribute1 = new Attribute("duplicatedName1", null, null);
-        Attribute attribute2 = new Attribute("duplicatedName2", null, null);
-        Fact fact1 = new Fact("duplicatedName1", null);
-        Fact fact2 = new Fact("duplicatedName2", null);
-        Rule rule = new Rule(new LinkedHashSet<>(Arrays.asList(attribute1, attribute2)),
-                Arrays.asList(fact1, fact2),
-                valueOf(null, Boolean.class, true),
-                Collections.emptyList());
+        Rule rule = new Rule(new LinkedHashSet<>(
+                        Arrays.asList(
+                                new Attribute("duplicatedName1", null, null),
+                                new Attribute("duplicatedName2", null, null))),
+                        Arrays.asList(
+                                new Fact("duplicatedName1", null),
+                                new Fact("duplicatedName2", null)
+                        ),
+                        valueOf(null, Boolean.class, true),
+                        Collections.emptyList()
+                );
 
         // when
         ValidationResults results = validator.validate(rule);
@@ -630,10 +633,11 @@ class ReferenceValidatorTest {
     @Test
     void shouldFailOnDuplicatedFactNames() {
         // given
-        Fact fact1 = new Fact("duplicatedFactName", String.class);
-        Fact fact2 = new Fact("duplicatedFactName", Integer.class);
         Rule rule = new Rule(Collections.emptySet(),
-                Arrays.asList(fact1, fact2),
+                Arrays.asList(
+                        new Fact("duplicatedFactName", String.class),
+                        new Fact("duplicatedFactName", Integer.class)
+                ),
                 valueOf(null, Boolean.class, true),
                 Collections.emptyList());
 
@@ -649,9 +653,13 @@ class ReferenceValidatorTest {
     @Test
     void shouldFailOnDuplicatedAttributeNames() {
         // given
-        Attribute attribute1 = new Attribute("duplicatedAttributeName", String.class, null);
-        Attribute attribute2 = new Attribute("duplicatedAttributeName", Integer.class, null);
-        Rule rule = new Rule(new LinkedHashSet<>(Arrays.asList(attribute1, attribute2)),
+        Rule rule = new Rule(
+                new LinkedHashSet<>(
+                        Arrays.asList(
+                                new Attribute("duplicatedAttributeName", String.class, null),
+                                new Attribute("duplicatedAttributeName", Integer.class, null)
+                        )
+                ),
                 Collections.emptyList(),
                 valueOf(null, Boolean.class, true),
                 Collections.emptyList());
@@ -668,9 +676,8 @@ class ReferenceValidatorTest {
     @Test
     void shouldFailOnCtxName() {
         // given
-        Fact fact = new Fact("ctx", null);
         Rule rule = new Rule(Collections.emptySet(),
-                Collections.singletonList(fact),
+                Collections.singletonList(new Fact("ctx", null)),
                 valueOf(null, Boolean.class, true),
                 Collections.emptyList());
 
