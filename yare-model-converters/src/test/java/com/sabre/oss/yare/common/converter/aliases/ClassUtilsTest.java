@@ -27,7 +27,7 @@ package com.sabre.oss.yare.common.converter.aliases;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ClassUtilsTest {
     @Test
@@ -59,13 +59,10 @@ class ClassUtilsTest {
         //given
         String unknownTypeName = "UNKNOWN_TYPE_NAME";
 
-        //when
-        IllegalArgumentException e = assertThrows(
-                IllegalArgumentException.class,
-                () -> ClassUtils.forName(unknownTypeName));
-
-        //then
+        //when /then
         String expectedMessage = String.format("Could not resolve type for name: %s", unknownTypeName);
-        assertThat(e.getMessage()).isEqualTo(expectedMessage);
+        assertThatThrownBy(() -> ClassUtils.forName(unknownTypeName))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
     }
 }

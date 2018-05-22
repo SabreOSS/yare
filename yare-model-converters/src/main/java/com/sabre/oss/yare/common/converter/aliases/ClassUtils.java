@@ -68,7 +68,6 @@ final class ClassUtils {
     }
 
     private static Optional<Class<?>> tryResolvePrimitiveTypeFor(String name) {
-        return primitiveTypes.containsKey(name) ?
-                Optional.of(primitiveTypes.get(name)) : Optional.empty();
+        return Optional.ofNullable(primitiveTypes.get(name));
     }
 }

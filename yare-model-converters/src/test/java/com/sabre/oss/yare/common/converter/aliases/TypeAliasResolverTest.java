@@ -27,7 +27,7 @@ package com.sabre.oss.yare.common.converter.aliases;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TypeAliasResolverTest {
     private TypeAliasResolver resolver = new TypeAliasResolver();
@@ -88,15 +88,11 @@ class TypeAliasResolverTest {
         //given
         String unknownName = "UNKNOWN_NAME";
 
-        //when
-        IllegalArgumentException e = assertThrows(
-                IllegalArgumentException.class,
-                () -> resolver.getAliasFor(unknownName));
-
-
-        //then
+        //when /then
         String expectedMessage = String.format("Could not find type alias for given name: %s", unknownName);
-        assertThat(e.getMessage()).isEqualTo(expectedMessage);
+        assertThatThrownBy(() -> resolver.getAliasFor(unknownName))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
     }
 
     @Test
@@ -104,13 +100,10 @@ class TypeAliasResolverTest {
         //given
         Class<?> unknownType = TypeAlias.class;
 
-        //when
-        IllegalArgumentException e = assertThrows(
-                IllegalArgumentException.class,
-                () -> resolver.getAliasFor(unknownType));
-
-        //then
+        //when /then
         String expectedMessage = String.format("Could not find type alias for given type: %s", unknownType);
-        assertThat(e.getMessage()).isEqualTo(expectedMessage);
+        assertThatThrownBy(() -> resolver.getAliasFor(unknownType))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
     }
 }

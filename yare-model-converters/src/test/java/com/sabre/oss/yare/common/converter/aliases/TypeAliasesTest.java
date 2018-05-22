@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,13 +42,23 @@ class TypeAliasesTest {
         //then
         assertThat(typeAliases.getAliasesMappedByName()).isNotEmpty();
         assertThat(typeAliases.getAliasesMappedByName())
-                .containsKeys("Object", "String", "int", "ZonedDateTime", "List");
+                .containsOnlyKeys(
+                        "Integer", "Long", "Double", "Boolean", "Byte",
+                        "Short", "Character", "Float", "Void",
+                        "int", "long", "double", "boolean", "byte",
+                        "short", "char", "float", "void",
+                        "Object", "String", "ZonedDateTime", "List", "Map", "Set");
         assertThat(typeAliases.getAliasesMappedByName().get("String"))
                 .isEqualTo(TypeAlias.of("String", String.class));
 
         assertThat(typeAliases.getAliasesMappedByType()).isNotEmpty();
         assertThat(typeAliases.getAliasesMappedByType())
-                .containsKeys(Object.class, String.class, int.class, ZonedDateTime.class, List.class);
+                .containsOnlyKeys(
+                        Integer.class, Long.class, Double.class, Boolean.class, Byte.class,
+                        Short.class, Character.class, Float.class, Void.class,
+                        int.class, long.class, double.class, boolean.class, byte.class,
+                        short.class, char.class, float.class, void.class,
+                        Object.class, String.class, ZonedDateTime.class, List.class, Map.class, Set.class);
         assertThat(typeAliases.getAliasesMappedByType().get(String.class))
                 .isEqualTo(TypeAlias.of("String", String.class));
     }
