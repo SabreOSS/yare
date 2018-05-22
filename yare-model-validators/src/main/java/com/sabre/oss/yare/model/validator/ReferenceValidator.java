@@ -35,11 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +58,7 @@ public class ReferenceValidator extends BaseValidator {
         Map<String, Type> localReferences = initReferences(rule);
         checkReferencesInPredicate(rule, results, localReferences);
         checkReferencesInActions(rule, results, localReferences);
-        checkNamesForValidity(rule, results);
+        checkNamesValidity(rule, results);
         return results;
     }
 
@@ -126,25 +122,10 @@ public class ReferenceValidator extends BaseValidator {
         }
     }
 
-    private void checkNamesForValidity(Rule rule, ValidationResults results) {
-        Stream<String> attributeNames = rule.getAttributes().stream()
-                .map(Attribute::getName);
-        Stream<String> factNames = rule.getFacts().stream()
-                .map(Fact::getIdentifier);
-        Set<String> duplicatedNames = Streams.concat(attributeNames, factNames)
-                .collect(Collectors.groupingBy(
-                        Function.identity(), Collectors.counting()
-                ))
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() > 1 || entry.getKey().equals(context))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-
-        if (!duplicatedNames.isEmpty()) {
-            append(results, ValidationResult.error("rule.ref.duplicated-names",
-                    "Naming Error: There are duplicated names -> " + duplicatedNames));
-        }
+    private void checkNamesValidity(Rule rule, ValidationResults results) {
+        List<String> names = resolveNames(rule);
+        checkNamesAreNotDuplicated(names, results);
+        checkReservedNamesAreNotUsed(names, results);
     }
 
     private boolean hasEmptyPathSegment(String path) {
@@ -152,7 +133,8 @@ public class ReferenceValidator extends BaseValidator {
         return Stream.of(pathParts).anyMatch(StringUtils::isEmpty);
     }
 
-    private void checkPath(String reference, String path, ValidationResults results, Map<String, Type> localReferences) {
+    private void checkPath(String reference, String path, ValidationResults
+            results, Map<String, Type> localReferences) {
         try {
             checkCollectionOperator(localReferences.get(reference), reference, path, results);
         } catch (ChainedTypeExtractor.InvalidPathException e) {
@@ -160,7 +142,8 @@ public class ReferenceValidator extends BaseValidator {
         }
     }
 
-    private void checkCollectionOperator(Type referenceType, String reference, String path, ValidationResults results) {
+    private void checkCollectionOperator(Type referenceType, String reference, String path, ValidationResults
+            results) {
         String[] pathParts = path.split("\\.", -1);
         Type currentType = referenceType;
         for (String pathPart : pathParts) {
@@ -174,6 +157,33 @@ public class ReferenceValidator extends BaseValidator {
                         String.format("Reference Error: field has more than one collection marker -> %s.%s", reference, path)
                 ));
             }
+        }
+    }
+
+    private List<String> resolveNames(Rule rule) {
+        return Streams.concat(
+                rule.getAttributes().stream()
+                        .map(Attribute::getName),
+                rule.getFacts().stream()
+                        .map(Fact::getIdentifier)
+        ).collect(Collectors.toList());
+    }
+
+    private void checkNamesAreNotDuplicated(List<String> names, ValidationResults results) {
+        Set<String> duplicatedNames = names.stream()
+                .filter(i -> Collections.frequency(names, i) > 1)
+                .collect(Collectors.toSet());
+        if (!duplicatedNames.isEmpty()) {
+            append(results, ValidationResult.error("rule.ref.duplicated-names",
+                    "Naming Error: There are duplicated names -> " + duplicatedNames));
+
+        }
+    }
+
+    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
+        if (names.contains(context)) {
+            append(results, ValidationResult.error("rule.ref.reserved-names",
+                    "Naming Error: Reserved names are used -> [ctx]"));
         }
     }
 

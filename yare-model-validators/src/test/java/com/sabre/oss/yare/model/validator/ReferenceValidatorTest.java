@@ -628,6 +628,44 @@ class ReferenceValidatorTest {
     }
 
     @Test
+    void shouldFailOnDuplicatedFactNames() {
+        // given
+        Fact fact1 = new Fact("duplicatedFactName", String.class);
+        Fact fact2 = new Fact("duplicatedFactName", Integer.class);
+        Rule rule = new Rule(Collections.emptySet(),
+                Arrays.asList(fact1, fact2),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [duplicatedFactName]")
+        );
+    }
+
+    @Test
+    void shouldFailOnDuplicatedAttributeNames() {
+        // given
+        Attribute attribute1 = new Attribute("duplicatedAttributeName", String.class, null);
+        Attribute attribute2 = new Attribute("duplicatedAttributeName", Integer.class, null);
+        Rule rule = new Rule(new LinkedHashSet<>(Arrays.asList(attribute1, attribute2)),
+                Collections.emptyList(),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [duplicatedAttributeName]")
+        );
+    }
+
+    @Test
     void shouldFailOnCtxName() {
         // given
         Fact fact = new Fact("ctx", null);
@@ -641,7 +679,7 @@ class ReferenceValidatorTest {
 
         // then
         assertThat(results.getResults()).containsExactly(
-                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [ctx]")
+                ValidationResult.error("rule.ref.reserved-names", "Naming Error: Reserved names are used -> [ctx]")
         );
     }
 
