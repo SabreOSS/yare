@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TypeAliasResolverTest {
-
     private TypeAliasResolver resolver = new TypeAliasResolver();
 
     @Test
@@ -114,5 +113,4 @@ class TypeAliasResolverTest {
         String expectedMessage = String.format("Could not find type alias for given type: %s", unknownType);
         assertThat(e.getMessage()).isEqualTo(expectedMessage);
     }
-
 }

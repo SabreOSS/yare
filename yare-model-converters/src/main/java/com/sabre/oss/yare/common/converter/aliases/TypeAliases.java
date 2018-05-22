@@ -24,63 +24,65 @@
 
 package com.sabre.oss.yare.common.converter.aliases;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 final class TypeAliases {
-    private static final Map<String, TypeAlias> nameToAliasMap;
-    private static final Map<Type, TypeAlias> typeToAliasMap;
+    private static final String ALIAS_CONFIGURATION_RESOURCE_FILE =
+            "com/sabre/oss/yare/common/converter/aliases/typeAliases.properties";
 
-    static {
-        nameToAliasMap = new HashMap<>();
-        typeToAliasMap = new HashMap<>();
+    private final Map<String, TypeAlias> nameToAliasMap;
+    private final Map<Type, TypeAlias> typeToAliasMap;
 
-        registerAlias("Object", Object.class);
-        registerAlias("String", String.class);
-        registerAlias("Integer", Integer.class);
-        registerAlias("Long", Long.class);
-        registerAlias("Double", Double.class);
-        registerAlias("Boolean", Boolean.class);
-        registerAlias("Byte", Byte.class);
-        registerAlias("Short", Short.class);
-        registerAlias("Character", Character.class);
-        registerAlias("Float", Float.class);
-
-        registerAlias("int", int.class);
-        registerAlias("long", long.class);
-        registerAlias("double", double.class);
-        registerAlias("boolean", boolean.class);
-        registerAlias("byte", byte.class);
-        registerAlias("short", short.class);
-        registerAlias("char", char.class);
-        registerAlias("float", float.class);
-
-        registerAlias("ZonedDateTime", ZonedDateTime.class);
-
-        registerAlias("List", List.class);
-        registerAlias("Map", Map.class);
-        registerAlias("Set", Set.class);
+    TypeAliases() {
+        Properties properties = loadAliasProperties();
+        nameToAliasMap = Collections.unmodifiableMap(mapAliasesByName(properties));
+        typeToAliasMap = Collections.unmodifiableMap(mapAliasesByType(properties));
     }
 
-    private static void registerAlias(String name, Type type) {
-        TypeAlias alias = TypeAlias.of(name, type);
-        nameToAliasMap.put(name, alias);
-        typeToAliasMap.put(type, alias);
+    private Properties loadAliasProperties() {
+        InputStream stream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(ALIAS_CONFIGURATION_RESOURCE_FILE);
+        try {
+            Properties result = new Properties();
+            result.load(stream);
+            return result;
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    String.format("Could not initialize type aliases form property file: %s",
+                            ALIAS_CONFIGURATION_RESOURCE_FILE));
+        }
     }
 
-    private TypeAliases() {
-
+    private Map<String, TypeAlias> mapAliasesByName(Properties properties) {
+        return properties.entrySet()
+                .stream()
+                .map(this::mapToAlias)
+                .collect(Collectors.toMap(TypeAlias::getAlias, a -> a));
     }
 
-    static Map<String, TypeAlias> mapAliasesByName() {
+    private Map<Type, TypeAlias> mapAliasesByType(Properties properties) {
+        return properties.entrySet()
+                .stream()
+                .map(this::mapToAlias)
+                .collect(Collectors.toMap(TypeAlias::getType, a -> a));
+    }
+
+    private TypeAlias mapToAlias(Map.Entry<Object, Object> property) {
+        return TypeAlias.of(
+                property.getKey().toString(),
+                ClassUtils.forName(property.getValue().toString()));
+    }
+
+    Map<String, TypeAlias> getAliasesMappedByName() {
         return nameToAliasMap;
     }
 
-    static Map<Type, TypeAlias> mapAliasesByType() {
+    Map<Type, TypeAlias> getAliasesMappedByType() {
         return typeToAliasMap;
     }
 }

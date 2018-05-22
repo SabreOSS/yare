@@ -24,45 +24,30 @@
 
 package com.sabre.oss.yare.common.converter.aliases;
 
-import java.lang.reflect.Type;
-import java.util.Objects;
+import org.junit.jupiter.api.Test;
 
-public final class TypeAlias {
-    private final String name;
-    private final Type type;
+import java.time.ZonedDateTime;
+import java.util.List;
 
-    private TypeAlias(String name, Type type) {
-        this.name = name;
-        this.type = type;
-    }
+import static org.assertj.core.api.Assertions.assertThat;
 
-    public static TypeAlias of(String name, Type type) {
-        return new TypeAlias(name, type);
-    }
+class TypeAliasesTest {
+    @Test
+    void shouldInitializeTypeAliasesFromPropertiesFile() {
+        //when
+        TypeAliases typeAliases = new TypeAliases();
 
-    public String getAlias() {
-        return name;
-    }
+        //then
+        assertThat(typeAliases.getAliasesMappedByName()).isNotEmpty();
+        assertThat(typeAliases.getAliasesMappedByName())
+                .containsKeys("Object", "String", "int", "ZonedDateTime", "List");
+        assertThat(typeAliases.getAliasesMappedByName().get("String"))
+                .isEqualTo(TypeAlias.of("String", String.class));
 
-    public Type getType() {
-        return type;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TypeAlias alias = (TypeAlias) o;
-        return Objects.equals(name, alias.name) &&
-                Objects.equals(type, alias.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, type);
+        assertThat(typeAliases.getAliasesMappedByType()).isNotEmpty();
+        assertThat(typeAliases.getAliasesMappedByType())
+                .containsKeys(Object.class, String.class, int.class, ZonedDateTime.class, List.class);
+        assertThat(typeAliases.getAliasesMappedByType().get(String.class))
+                .isEqualTo(TypeAlias.of("String", String.class));
     }
 }

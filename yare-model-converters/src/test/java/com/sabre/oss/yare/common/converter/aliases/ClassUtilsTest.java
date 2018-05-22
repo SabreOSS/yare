@@ -24,45 +24,48 @@
 
 package com.sabre.oss.yare.common.converter.aliases;
 
-import java.lang.reflect.Type;
-import java.util.Objects;
+import org.junit.jupiter.api.Test;
 
-public final class TypeAlias {
-    private final String name;
-    private final Type type;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    private TypeAlias(String name, Type type) {
-        this.name = name;
-        this.type = type;
+class ClassUtilsTest {
+    @Test
+    void shouldResolvePrimitiveTypeProperly() {
+        //given
+        String name = "int";
+
+        //when
+        Class<?> type = ClassUtils.forName(name);
+
+        //then
+        assertThat(type).isEqualTo(int.class);
     }
 
-    public static TypeAlias of(String name, Type type) {
-        return new TypeAlias(name, type);
+    @Test
+    void shouldResolveObjectTypeProperly() {
+        //given
+        String name = "java.lang.String";
+
+        //when
+        Class<?> type = ClassUtils.forName(name);
+
+        //then
+        assertThat(type).isEqualTo(String.class);
     }
 
-    public String getAlias() {
-        return name;
-    }
+    @Test
+    void shouldThrowExceptionForUnknownType() {
+        //given
+        String unknownTypeName = "UNKNOWN_TYPE_NAME";
 
-    public Type getType() {
-        return type;
-    }
+        //when
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> ClassUtils.forName(unknownTypeName));
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TypeAlias alias = (TypeAlias) o;
-        return Objects.equals(name, alias.name) &&
-                Objects.equals(type, alias.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, type);
+        //then
+        String expectedMessage = String.format("Could not resolve type for name: %s", unknownTypeName);
+        assertThat(e.getMessage()).isEqualTo(expectedMessage);
     }
 }

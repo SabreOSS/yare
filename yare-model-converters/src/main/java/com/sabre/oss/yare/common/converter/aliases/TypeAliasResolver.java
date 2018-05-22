@@ -27,16 +27,22 @@ package com.sabre.oss.yare.common.converter.aliases;
 import java.lang.reflect.Type;
 
 public class TypeAliasResolver {
+    private TypeAliases typeAliases;
+
+    public TypeAliasResolver() {
+        this.typeAliases = new TypeAliases();
+    }
+
     public boolean hasAliasFor(Type type) {
-        return TypeAliases.mapAliasesByType().containsKey(type);
+        return typeAliases.getAliasesMappedByType().containsKey(type);
     }
 
     public boolean hasAliasFor(String name) {
-        return TypeAliases.mapAliasesByName().containsKey(name);
+        return typeAliases.getAliasesMappedByName().containsKey(name);
     }
 
     public TypeAlias getAliasFor(Type type) {
-        TypeAlias alias = TypeAliases.mapAliasesByType().get(type);
+        TypeAlias alias = typeAliases.getAliasesMappedByType().get(type);
         if (alias == null) {
             String message = String.format("Could not find type alias for given type: %s", type);
             throw new IllegalArgumentException(message);
@@ -45,7 +51,7 @@ public class TypeAliasResolver {
     }
 
     public TypeAlias getAliasFor(String name) {
-        TypeAlias alias = TypeAliases.mapAliasesByName().get(name);
+        TypeAlias alias = typeAliases.getAliasesMappedByName().get(name);
         if (alias == null) {
             String message = String.format("Could not find type alias for given name: %s", name);
             throw new IllegalArgumentException(message);
