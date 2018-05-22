@@ -107,6 +107,21 @@ class TypeTypeConverterTest {
         assertThat(converted).isEqualTo("@null");
     }
 
+    @Test
+    void shouldProperlyConvertAliasTypeFromFullyQualifiedString() {
+        Type converted = typeConverter.fromString(null, "java.lang.String");
+
+        assertThat(converted).isEqualTo(String.class);
+    }
+
+    @Test
+    void shouldProperlyConvertNestedGenericToString() {
+        String converted = typeConverter.toString(null,
+                TypeUtils.parameterize(Map.class, String.class, TypeUtils.parameterize(List.class, Object.class)));
+
+        assertThat(converted).isEqualTo("Map<String,List<Object>>");
+    }
+
     @ParameterizedTest
     @MethodSource("conversionParameters")
     void shouldProperlyConvertFromString(String toConvert, Type expected) {
@@ -125,10 +140,12 @@ class TypeTypeConverterTest {
 
     private static Stream<Arguments> conversionParameters() {
         return Stream.of(
-                Arguments.of("java.lang.Object", Object.class),
-                Arguments.of(NestedClass.class.getCanonicalName(), NestedClass.class),
-                Arguments.of("java.util.List<java.lang.String>", TypeUtils.parameterize(List.class, String.class)),
-                Arguments.of("java.util.Map<java.lang.String,java.lang.Object>", TypeUtils.parameterize(Map.class, String.class, Object.class))
+                Arguments.of("String", String.class),
+                Arguments.of("List<String>", TypeUtils.parameterize(List.class, String.class)),
+                Arguments.of("Object", Object.class),
+                Arguments.of("List<String>", TypeUtils.parameterize(List.class, String.class)),
+                Arguments.of("Map<String,Object>", TypeUtils.parameterize(Map.class, String.class, Object.class)),
+                Arguments.of(NestedClass.class.getCanonicalName(), NestedClass.class)
         );
     }
 

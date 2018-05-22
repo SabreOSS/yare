@@ -25,11 +25,11 @@
 
 <yare:Rule xmlns:custom="http://example.sabre.com/custom/schema"
            xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1">
-    <yare:Attribute name="ruleName" value="ruleOperatingOnCustomObjectTypes" type="java.lang.String"/>
-    <yare:Fact name="fact" type="java.lang.Object"/>
+    <yare:Attribute name="ruleName" value="ruleOperatingOnCustomObjectTypes" type="String"/>
+    <yare:Fact name="fact" type="Object"/>
     <yare:Predicate>
         <yare:Or>
-            <yare:Function name="functionTakingCustomObjectsAsArguments" returnType="java.lang.Object">
+            <yare:Function name="functionTakingCustomObjectsAsArguments" returnType="Object">
                 <yare:Parameter name="object">
                     <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.Isbn">
                         <custom:Isbn>

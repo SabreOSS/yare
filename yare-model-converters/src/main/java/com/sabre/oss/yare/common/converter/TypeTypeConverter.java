@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.common.converter;
 
+import com.sabre.oss.yare.common.converter.aliases.TypeAliasResolver;
 import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 
 import java.lang.reflect.ParameterizedType;
@@ -52,10 +53,13 @@ import static com.sabre.oss.yare.common.converter.StringTypeConverter.NULL_LITER
  * </pre>
  */
 public class TypeTypeConverter implements TypeConverter {
-    private static final Pattern typePattern = Pattern.compile("([a-zA-Z][a-zA-Z0-9_$\\.]*)(?:<((?:,{0,1}[a-zA-Z][a-zA-Z0-9_$\\.]*)*)>){0,1}");
+    private static final Pattern typePattern =
+            Pattern.compile("([a-zA-Z][a-zA-Z0-9_$\\.]*)(?:<((?:,{0,1}[a-zA-Z][a-zA-Z0-9_$\\.]*)*)>){0,1}");
 
     private final Map<String, Type> stringToTypeCache = new ConcurrentHashMap<>();
     private final Map<Type, String> typeToStringCache = new ConcurrentHashMap<>();
+
+    private final TypeAliasResolver typeAliasResolver = new TypeAliasResolver();
 
     @Override
     public boolean isApplicable(Type type) {
@@ -88,51 +92,88 @@ public class TypeTypeConverter implements TypeConverter {
     }
 
     private Type convertString(String value) {
+        return typeAliasResolver.hasAliasFor(value) ?
+                typeAliasResolver.getAliasFor(value).getType() :
+                convertRawTypeString(value);
+    }
+
+    private Type convertRawTypeString(String value) {
         Matcher matcher = typePattern.matcher(value);
         if (matcher.matches()) {
             String rawTypeName = matcher.group(1);
             String parameters = matcher.group(2);
-
-            if (parameters == null || parameters.isEmpty()) {
-                try {
-                    return Thread.currentThread().getContextClassLoader().loadClass(rawTypeName);
-                } catch (ClassNotFoundException e) {
-                    int lastDot = rawTypeName.lastIndexOf('.');
-                    if (lastDot != -1) {
-                        String innerClassName = rawTypeName.substring(0, lastDot) + '$' + rawTypeName.substring(lastDot + 1);
-                        try {
-                            return Thread.currentThread().getContextClassLoader().loadClass(innerClassName);
-                        } catch (ClassNotFoundException ex) {
-                            throw new IllegalArgumentException(String.format("Can't convert '%s' into Java type", innerClassName));
-                        }
-                    }
-                    throw new IllegalArgumentException(String.format("Can't convert '%s' into Java type", rawTypeName));
-                }
-            } else {
-                Type rawType = fromString(Type.class, rawTypeName);
-                List<Type> parameterTypes = new ArrayList<>();
-                for (String paramTypeName : parameters.split(",")) {
-                    parameterTypes.add(fromString(Type.class, paramTypeName));
-                }
-                return new InternalParameterizedType(null, (Class<?>) rawType, parameterTypes.toArray(new Type[0]));
-            }
+            return isParametrizedType(parameters) ?
+                    convertParametrizedTypeStrings(rawTypeName, parameters) :
+                    convertSimpleTypeString(rawTypeName);
         }
         throw new IllegalArgumentException(String.format("Can't convert '%s' into Java type", value));
     }
 
+    private Boolean isParametrizedType(String parameters) {
+        return parameters != null && !parameters.isEmpty();
+    }
+
+    private Type convertParametrizedTypeStrings(String rawTypeName, String parameters) {
+        List<Type> parameterTypes = new ArrayList<>();
+        for (String paramTypeName : parameters.split(",")) {
+            parameterTypes.add(fromString(Type.class, paramTypeName));
+        }
+        Class<?> rawType = (Class<?>) fromString(Type.class, rawTypeName);
+        return new InternalParameterizedType(null, rawType, parameterTypes.toArray(new Type[0]));
+    }
+
+    private Type convertSimpleTypeString(String typeName) {
+        return tryToLoadClass(typeName)
+                .orElseGet(() -> loadAsInnerClass(typeName));
+    }
+
+    private Type loadAsInnerClass(String typeName) {
+        return tryToResolveInnerClassName(typeName)
+                .flatMap(this::tryToLoadClass)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Can't convert '%s' into Java type", typeName)));
+    }
+
+    private Optional<String> tryToResolveInnerClassName(String typeName) {
+        int lastDot = typeName.lastIndexOf('.');
+        if (lastDot != -1) {
+            String innerClassName = typeName.substring(0, lastDot) + '$' + typeName.substring(lastDot + 1);
+            return Optional.of(innerClassName);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Type> tryToLoadClass(String typeName) {
+        try {
+            Type type = Thread.currentThread().getContextClassLoader().loadClass(typeName);
+            return Optional.of(type);
+        } catch (ClassNotFoundException ex) {
+            return Optional.empty();
+        }
+    }
+
     private String convertType(Object value) {
         if (value instanceof Class) {
-            return ((Class<?>) value).getCanonicalName();
+            return convertType((Class<?>) value);
         }
         if (value instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) value;
-            String prefix = toString(null, parameterizedType.getRawType()) + '<';
-            StringJoiner stringJoiner = new StringJoiner(",", prefix, ">");
-            for (Type paramType : parameterizedType.getActualTypeArguments()) {
-                stringJoiner.add(toString(null, paramType));
-            }
-            return stringJoiner.toString();
+            return convertType((ParameterizedType) value);
         }
         throw new IllegalArgumentException("Unsupported type");
+    }
+
+    private String convertType(Class<?> type) {
+        return typeAliasResolver.hasAliasFor(type) ?
+                typeAliasResolver.getAliasFor(type).getAlias() :
+                type.getCanonicalName();
+    }
+
+    private String convertType(ParameterizedType type) {
+        String prefix = toString(null, type.getRawType()) + '<';
+        StringJoiner stringJoiner = new StringJoiner(",", prefix, ">");
+        for (Type paramType : type.getActualTypeArguments()) {
+            stringJoiner.add(toString(null, paramType));
+        }
+        return stringJoiner.toString();
     }
 }

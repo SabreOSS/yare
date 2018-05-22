@@ -89,7 +89,7 @@ class DefaultTypeConvertersTest {
                 Arguments.of(Integer.class, "123", 123),
                 Arguments.of(Long.class, "123", 123L),
                 Arguments.of(String.class, "test", "test"),
-                Arguments.of(Type.class, "java.lang.Object", Object.class),
+                Arguments.of(Type.class, "Object", Object.class),
                 Arguments.of(ZonedDateTime.class, "2014-12-02T10:45:30+02:00", ZonedDateTime.parse("2014-12-02T10:45:30+02:00"))
         );
     }
