@@ -24,42 +24,88 @@
 
 package com.sabre.oss.yare.common.converter.aliases;
 
+import org.assertj.core.data.MapEntry;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 class TypeAliasesTest {
+    private TypeAliases typeAliases = new TypeAliases();
+
     @Test
-    void shouldInitializeTypeAliasesFromPropertiesFile() {
-        //when
-        TypeAliases typeAliases = new TypeAliases();
+    void shouldInitializeMapOfAliasesByNameProperly() {
+        //given /when /then
+        assertThat(typeAliases.getAliasesMappedByName().entrySet())
+                .containsExactlyInAnyOrder(
+                        getEntryWithNameKey("Object", Object.class),
+                        getEntryWithNameKey("String", String.class),
+                        getEntryWithNameKey("Integer", Integer.class),
+                        getEntryWithNameKey("Long", Long.class),
+                        getEntryWithNameKey("Double", Double.class),
+                        getEntryWithNameKey("Boolean", Boolean.class),
+                        getEntryWithNameKey("Byte", Byte.class),
+                        getEntryWithNameKey("Short", Short.class),
+                        getEntryWithNameKey("Character", Character.class),
+                        getEntryWithNameKey("Float", Float.class),
+                        getEntryWithNameKey("Void", Void.class),
+                        getEntryWithNameKey("int", int.class),
+                        getEntryWithNameKey("long", long.class),
+                        getEntryWithNameKey("double", double.class),
+                        getEntryWithNameKey("boolean", boolean.class),
+                        getEntryWithNameKey("byte", byte.class),
+                        getEntryWithNameKey("short", short.class),
+                        getEntryWithNameKey("char", char.class),
+                        getEntryWithNameKey("float", float.class),
+                        getEntryWithNameKey("void", void.class),
+                        getEntryWithNameKey("ZonedDateTime", ZonedDateTime.class),
+                        getEntryWithNameKey("List", List.class),
+                        getEntryWithNameKey("Map", Map.class),
+                        getEntryWithNameKey("Set", Set.class));
+    }
 
-        //then
-        assertThat(typeAliases.getAliasesMappedByName()).isNotEmpty();
-        assertThat(typeAliases.getAliasesMappedByName())
-                .containsOnlyKeys(
-                        "Integer", "Long", "Double", "Boolean", "Byte",
-                        "Short", "Character", "Float", "Void",
-                        "int", "long", "double", "boolean", "byte",
-                        "short", "char", "float", "void",
-                        "Object", "String", "ZonedDateTime", "List", "Map", "Set");
-        assertThat(typeAliases.getAliasesMappedByName().get("String"))
-                .isEqualTo(TypeAlias.of("String", String.class));
+    @Test
+    void shouldInitializeMapOfAliasesByTypeProperly() {
+        //given /when /then
+        assertThat(typeAliases.getAliasesMappedByType().entrySet())
+                .containsExactlyInAnyOrder(
+                        getEntryWithTypeKey("Object", Object.class),
+                        getEntryWithTypeKey("String", String.class),
+                        getEntryWithTypeKey("Integer", Integer.class),
+                        getEntryWithTypeKey("Long", Long.class),
+                        getEntryWithTypeKey("Double", Double.class),
+                        getEntryWithTypeKey("Boolean", Boolean.class),
+                        getEntryWithTypeKey("Byte", Byte.class),
+                        getEntryWithTypeKey("Short", Short.class),
+                        getEntryWithTypeKey("Character", Character.class),
+                        getEntryWithTypeKey("Float", Float.class),
+                        getEntryWithTypeKey("Void", Void.class),
+                        getEntryWithTypeKey("int", int.class),
+                        getEntryWithTypeKey("long", long.class),
+                        getEntryWithTypeKey("double", double.class),
+                        getEntryWithTypeKey("boolean", boolean.class),
+                        getEntryWithTypeKey("byte", byte.class),
+                        getEntryWithTypeKey("short", short.class),
+                        getEntryWithTypeKey("char", char.class),
+                        getEntryWithTypeKey("float", float.class),
+                        getEntryWithTypeKey("void", void.class),
+                        getEntryWithTypeKey("ZonedDateTime", ZonedDateTime.class),
+                        getEntryWithTypeKey("List", List.class),
+                        getEntryWithTypeKey("Map", Map.class),
+                        getEntryWithTypeKey("Set", Set.class));
+    }
 
-        assertThat(typeAliases.getAliasesMappedByType()).isNotEmpty();
-        assertThat(typeAliases.getAliasesMappedByType())
-                .containsOnlyKeys(
-                        Integer.class, Long.class, Double.class, Boolean.class, Byte.class,
-                        Short.class, Character.class, Float.class, Void.class,
-                        int.class, long.class, double.class, boolean.class, byte.class,
-                        short.class, char.class, float.class, void.class,
-                        Object.class, String.class, ZonedDateTime.class, List.class, Map.class, Set.class);
-        assertThat(typeAliases.getAliasesMappedByType().get(String.class))
-                .isEqualTo(TypeAlias.of("String", String.class));
+    private MapEntry<String, TypeAlias> getEntryWithNameKey(String typeName, Class<?> type) {
+        return entry(typeName, TypeAlias.of(typeName, type));
+    }
+
+    private MapEntry<Type, TypeAlias> getEntryWithTypeKey(String typeName, Class<?> type) {
+        return entry(type, TypeAlias.of(typeName, type));
     }
 }
