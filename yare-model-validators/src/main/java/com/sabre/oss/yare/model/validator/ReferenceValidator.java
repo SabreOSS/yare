@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.model.validator;
 
+import com.google.common.collect.Streams;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
@@ -34,12 +35,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
+    private static final String CONTEXT = "ctx";
+
     private final ChainedTypeExtractor chainedTypeExtractor;
     private final PlaceholderExtractor placeholderExtractor;
 
@@ -55,6 +57,7 @@ public class ReferenceValidator extends BaseValidator {
     public ValidationResults validate(Rule rule) {
         ValidationResults results = new ValidationResults();
         Map<String, Type> localReferences = initReferences(rule);
+        checkNamesValidity(rule, results);
         checkReferencesInPredicate(rule, results, localReferences);
         checkReferencesInActions(rule, results, localReferences);
         return results;
@@ -72,6 +75,12 @@ public class ReferenceValidator extends BaseValidator {
         return localReferences;
     }
 
+    private void checkNamesValidity(Rule rule, ValidationResults results) {
+        List<String> names = resolveNames(rule);
+        checkNamesAreNotDuplicated(names, results);
+        checkReservedNamesAreNotUsed(names, results);
+    }
+
     private void checkReferencesInPredicate(Rule rule, ValidationResults results, Map<String, Type> localReferences) {
         Expression predicate = rule.getPredicate();
         if (predicate != null) {
@@ -86,6 +95,33 @@ public class ReferenceValidator extends BaseValidator {
             for (Expression.Action action : rule.getActions()) {
                 checkExpression(action, results, localReferences);
             }
+        }
+    }
+
+    private List<String> resolveNames(Rule rule) {
+        return Streams.concat(
+                rule.getAttributes().stream()
+                        .map(Attribute::getName),
+                rule.getFacts().stream()
+                        .map(Fact::getIdentifier)
+        ).collect(Collectors.toList());
+    }
+
+    private void checkNamesAreNotDuplicated(List<String> names, ValidationResults results) {
+        Set<String> duplicatedNames = names.stream()
+                .filter(i -> Collections.frequency(names, i) > 1)
+                .collect(Collectors.toSet());
+        if (!duplicatedNames.isEmpty()) {
+            append(results, ValidationResult.error("rule.ref.duplicated-names",
+                    "Naming Error: There are duplicated names -> " + duplicatedNames));
+
+        }
+    }
+
+    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
+        if (names.contains(CONTEXT)) {
+            append(results, ValidationResult.error("rule.ref.reserved-names",
+                    String.format("Naming Error: Reserved names are used -> [%s]", CONTEXT)));
         }
     }
 

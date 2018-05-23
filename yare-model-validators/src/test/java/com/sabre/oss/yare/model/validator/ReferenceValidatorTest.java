@@ -606,6 +606,90 @@ class ReferenceValidatorTest {
         );
     }
 
+    @Test
+    void shouldFailOnDuplicatedNames() {
+        // given
+        Rule rule = new Rule(new LinkedHashSet<>(
+                        Arrays.asList(
+                                new Attribute("duplicatedName1", null, null),
+                                new Attribute("duplicatedName2", null, null))),
+                        Arrays.asList(
+                                new Fact("duplicatedName1", null),
+                                new Fact("duplicatedName2", null)
+                        ),
+                        valueOf(null, Boolean.class, true),
+                        Collections.emptyList()
+                );
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [duplicatedName1, duplicatedName2]")
+        );
+    }
+
+    @Test
+    void shouldFailOnDuplicatedFactNames() {
+        // given
+        Rule rule = new Rule(Collections.emptySet(),
+                Arrays.asList(
+                        new Fact("duplicatedFactName", String.class),
+                        new Fact("duplicatedFactName", Integer.class)
+                ),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [duplicatedFactName]")
+        );
+    }
+
+    @Test
+    void shouldFailOnDuplicatedAttributeNames() {
+        // given
+        Rule rule = new Rule(
+                new LinkedHashSet<>(
+                        Arrays.asList(
+                                new Attribute("duplicatedAttributeName", String.class, null),
+                                new Attribute("duplicatedAttributeName", Integer.class, null)
+                        )
+                ),
+                Collections.emptyList(),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.duplicated-names", "Naming Error: There are duplicated names -> [duplicatedAttributeName]")
+        );
+    }
+
+    @Test
+    void shoudlFailWhenReservedCtxNameIsUsed() {
+        // given
+        Rule rule = new Rule(Collections.emptySet(),
+                Collections.singletonList(new Fact("ctx", null)),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.reserved-names", "Naming Error: Reserved names are used -> [ctx]")
+        );
+    }
+
     private Rule ruleWithPredicate(Expression expression) {
         return new Rule(Collections.emptySet(), Collections.emptyList(),
                 expression,
