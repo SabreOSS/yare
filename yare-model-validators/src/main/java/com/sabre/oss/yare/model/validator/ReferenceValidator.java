@@ -75,6 +75,12 @@ public class ReferenceValidator extends BaseValidator {
         return localReferences;
     }
 
+    private void checkNamesValidity(Rule rule, ValidationResults results) {
+        List<String> names = resolveNames(rule);
+        checkNamesAreNotDuplicated(names, results);
+        checkReservedNamesAreNotUsed(names, results);
+    }
+
     private void checkReferencesInPredicate(Rule rule, ValidationResults results, Map<String, Type> localReferences) {
         Expression predicate = rule.getPredicate();
         if (predicate != null) {
@@ -89,6 +95,33 @@ public class ReferenceValidator extends BaseValidator {
             for (Expression.Action action : rule.getActions()) {
                 checkExpression(action, results, localReferences);
             }
+        }
+    }
+
+    private List<String> resolveNames(Rule rule) {
+        return Streams.concat(
+                rule.getAttributes().stream()
+                        .map(Attribute::getName),
+                rule.getFacts().stream()
+                        .map(Fact::getIdentifier)
+        ).collect(Collectors.toList());
+    }
+
+    private void checkNamesAreNotDuplicated(List<String> names, ValidationResults results) {
+        Set<String> duplicatedNames = names.stream()
+                .filter(i -> Collections.frequency(names, i) > 1)
+                .collect(Collectors.toSet());
+        if (!duplicatedNames.isEmpty()) {
+            append(results, ValidationResult.error("rule.ref.duplicated-names",
+                    "Naming Error: There are duplicated names -> " + duplicatedNames));
+
+        }
+    }
+
+    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
+        if (names.contains(CONTEXT)) {
+            append(results, ValidationResult.error("rule.ref.reserved-names",
+                    String.format("Naming Error: Reserved names are used -> [%s]", CONTEXT)));
         }
     }
 
@@ -123,12 +156,6 @@ public class ReferenceValidator extends BaseValidator {
         }
     }
 
-    private void checkNamesValidity(Rule rule, ValidationResults results) {
-        List<String> names = resolveNames(rule);
-        checkNamesAreNotDuplicated(names, results);
-        checkReservedNamesAreNotUsed(names, results);
-    }
-
     private boolean hasEmptyPathSegment(String path) {
         String[] pathParts = path.split("\\.", -1);
         return Stream.of(pathParts).anyMatch(StringUtils::isEmpty);
@@ -156,33 +183,6 @@ public class ReferenceValidator extends BaseValidator {
                         String.format("Reference Error: field has more than one collection marker -> %s.%s", reference, path)
                 ));
             }
-        }
-    }
-
-    private List<String> resolveNames(Rule rule) {
-        return Streams.concat(
-                rule.getAttributes().stream()
-                        .map(Attribute::getName),
-                rule.getFacts().stream()
-                        .map(Fact::getIdentifier)
-        ).collect(Collectors.toList());
-    }
-
-    private void checkNamesAreNotDuplicated(List<String> names, ValidationResults results) {
-        Set<String> duplicatedNames = names.stream()
-                .filter(i -> Collections.frequency(names, i) > 1)
-                .collect(Collectors.toSet());
-        if (!duplicatedNames.isEmpty()) {
-            append(results, ValidationResult.error("rule.ref.duplicated-names",
-                    "Naming Error: There are duplicated names -> " + duplicatedNames));
-
-        }
-    }
-
-    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
-        if (names.contains(CONTEXT)) {
-            append(results, ValidationResult.error("rule.ref.reserved-names",
-                    "Naming Error: Reserved names are used -> [ctx]"));
         }
     }
 

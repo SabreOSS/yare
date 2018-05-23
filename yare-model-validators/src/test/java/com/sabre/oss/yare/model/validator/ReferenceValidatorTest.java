@@ -674,7 +674,7 @@ class ReferenceValidatorTest {
     }
 
     @Test
-    void shouldFailOnCtxName() {
+    void shoudlFailWhenReservedCtxNameIsUsed() {
         // given
         Rule rule = new Rule(Collections.emptySet(),
                 Collections.singletonList(new Fact("ctx", null)),
