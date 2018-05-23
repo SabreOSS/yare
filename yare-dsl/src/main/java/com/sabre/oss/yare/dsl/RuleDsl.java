@@ -116,6 +116,19 @@ public final class RuleDsl {
     }
 
     /**
+     * Creates Collection&lt;T&gt; Class instance. It can be used for nested {@link #values(Class, Operand[])}.
+     *
+     * @param type class describing type of collection items
+     * @param <T>  type of items in collection
+     * @return collection class
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Class<Collection<T>> collectionTypeOf(Class<T> type) {
+        Collection<T> collection = Collections.emptyList();
+        return (Class<Collection<T>>) collection.getClass();
+    }
+
+    /**
      * Creates reference to a field.
      *
      * @param field combined (with dot) instance identifier and the path to a field

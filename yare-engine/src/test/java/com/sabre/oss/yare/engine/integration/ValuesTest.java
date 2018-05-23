@@ -49,7 +49,7 @@ public class ValuesTest {
                 .predicate(
                         value(true)
                 )
-                .action("return",
+                .action("appendString",
                         param("context", value("${ctx}")),
                         param("values", values(String.class,
                                 value("${fact.name}"),
@@ -91,7 +91,7 @@ public class ValuesTest {
                                 )
                         )
                 )
-                .action("return",
+                .action("appendString",
                         param("context", value("${ctx}")),
                         param("values", values(String.class, "matched"))
                 )
@@ -103,10 +103,43 @@ public class ValuesTest {
         assertThat(result).containsExactly("matched");
     }
 
+    @Test
+    void shouldResolveNestedValues() {
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Should resolve values in action")
+                .fact("fact", Fact.class)
+                .predicate(
+                        value(true)
+                )
+                .action("appendNestedCollections",
+                        param("context", value("${ctx}")),
+                        param("values", values(collectionTypeOf(String.class),
+                                values(String.class,
+                                        value("${fact.field}"),
+                                        function("stringFunction")),
+                                values(String.class,
+                                        value("${fact.name}"),
+                                        value("constantValue"))
+                                )
+                        )
+                )
+                .build();
+        List<Fact> facts = Collections.singletonList(new Fact("first", "second"));
+
+        ArrayList<String> result = execute(facts, rule);
+
+        assertThat(result).containsExactly(
+                "second",
+                getString(),
+                "first",
+                "constantValue");
+    }
+
     private ArrayList<String> execute(List<Fact> facts, Rule rule) {
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> Collections.singletonList(rule))
-                .withActionMapping("return", method(this, a -> a.append(null, null)))
+                .withActionMapping("appendString", method(this, a -> a.appendString(null, null)))
+                .withActionMapping("appendNestedCollections", method(this, a -> a.appendNestedCollections(null, null)))
                 .withFunctionMapping("stringFunction", method(this, ValuesTest::getString))
                 .build();
 
@@ -115,12 +148,18 @@ public class ValuesTest {
         return session.execute(new ArrayList<>(), facts);
     }
 
-    public String getString() {
-        return "function value";
+    public void appendString(List<String> context, List<String> values) {
+        context.addAll(values);
     }
 
-    public void append(List<String> context, List<String> values) {
-        context.addAll(values);
+    public void appendNestedCollections(List<String> context, List<List<String>> nestedCollections) {
+        for (List<String> c : nestedCollections) {
+            context.addAll(c);
+        }
+    }
+
+    public String getString() {
+        return "function value";
     }
 
     public static final class Fact {
