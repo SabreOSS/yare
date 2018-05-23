@@ -33,14 +33,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExpressionConverter {
+class ExpressionConverter {
     private final TypeConverter typeConverter;
 
-    public ExpressionConverter(TypeConverter typeConverter) {
+    ExpressionConverter(TypeConverter typeConverter) {
         this.typeConverter = typeConverter;
     }
 
-    public PredicateSer map(Expression expression) {
+    PredicateSer map(Expression expression) {
         if (expression != null) {
             PredicateSer predicateSer = new PredicateSer();
 
@@ -65,8 +65,13 @@ public class ExpressionConverter {
         return null;
     }
 
+    Collection<ParameterSer> extractParameter(List<Expression> arguments) {
+        return arguments.stream()
+                .map(this::convertParameter)
+                .collect(Collectors.toList());
+    }
 
-    public Object extractExpression(Expression expression) {
+    private Object extractExpression(Expression expression) {
         Expression.Value value = expression.as(Expression.Value.class);
         if (value != null) {
             String type = typeConverter.toString(Type.class, value.getType());
@@ -84,13 +89,12 @@ public class ExpressionConverter {
 
         Expression.Values values = expression.as(Expression.Values.class);
         if (values != null) {
-            Collection<ValueSer> valueList = values.getValues().stream()
+            Collection<Object> valueList = values.getValues().stream()
                     .map(this::extractExpression)
-                    .map(ValueSer.class::cast)
                     .collect(Collectors.toList());
             return new ValuesSer()
                     .withType(typeConverter.toString(Type.class, values.getType()))
-                    .withValue(valueList);
+                    .withOperand(valueList);
         }
 
         Expression.Invocation invocation = expression.as(Expression.Invocation.class);
@@ -125,12 +129,6 @@ public class ExpressionConverter {
         }
 
         return null;
-    }
-
-    public Collection<ParameterSer> extractParameter(List<Expression> arguments) {
-        return arguments.stream()
-                .map(this::convertParameter)
-                .collect(Collectors.toList());
     }
 
     private ParameterSer convertParameter(Expression expression) {

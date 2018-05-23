@@ -89,7 +89,7 @@ class NodeConverter {
     private Converter<ValuesSer> createValuesConverter() {
         return (name, input) -> {
             Type globalItemType = typeConverter.fromString(Type.class, input.getType());
-            return valuesOf(name, globalItemType, convert(input.getValue()));
+            return valuesOf(name, globalItemType, convert(input.getOperand()));
         };
     }
 
