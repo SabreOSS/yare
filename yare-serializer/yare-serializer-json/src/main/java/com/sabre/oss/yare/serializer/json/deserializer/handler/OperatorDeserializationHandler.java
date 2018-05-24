@@ -27,11 +27,11 @@ package com.sabre.oss.yare.serializer.json.deserializer.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Operator;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 class OperatorDeserializationHandler extends DeserializationHandler {
@@ -39,22 +39,32 @@ class OperatorDeserializationHandler extends DeserializationHandler {
     protected boolean isApplicable(JsonNode jsonNode) {
         String fieldName = jsonNode.fieldNames().next();
         JsonNode operatorNode = jsonNode.get(fieldName);
-        return operatorNode instanceof ArrayNode;
+        return operatorNode.isArray();
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        String operatorType = jsonNode.fieldNames().next();
-        ArrayNode operatorNode = (ArrayNode) jsonNode.get(operatorType);
-        List<Operand> operands = getOperands(operatorNode, objectMapper);
-        return new Operator().withType(operatorType).withOperands(operands);
+    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper)
+            throws JsonProcessingException {
+        String operatorType = getOperatorType(jsonNode);
+        JsonNode operandsNode = jsonNode.get(operatorType);
+        List<Operand> operands = getOperands(operandsNode, objectMapper);
+        return new Operator()
+                .withType(operatorType)
+                .withOperands(operands);
     }
 
-    private List<Operand> getOperands(ArrayNode operandsNode, ObjectMapper objectMapper) throws JsonProcessingException {
+    private String getOperatorType(JsonNode jsonNode) {
+        return jsonNode.fieldNames().next();
+    }
+
+    private List<Operand> getOperands(JsonNode jsonNode, ObjectMapper objectMapper)
+            throws JsonProcessingException {
+        Iterator<JsonNode> operandNodes = jsonNode.iterator();
         List<Operand> operands = new ArrayList<>();
-        for (JsonNode operandNode : (Iterable<JsonNode>) operandsNode::elements) {
-            Operand operand = objectMapper.treeToValue(operandNode, Operand.class);
-            operands.add(operand);
+        while (operandNodes.hasNext()) {
+            JsonNode node = operandNodes.next();
+            Operand o = objectMapper.treeToValue(node, Operand.class);
+            operands.add(o);
         }
         return operands;
     }

@@ -27,34 +27,47 @@ package com.sabre.oss.yare.serializer.json.deserializer.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 class FunctionDeserializationHandler extends DeserializationHandler {
+    private static final String FUNCTION_PROPERTY_NAME = "function";
+    private static final String FUNCTION_NAME_PROPERTY_NAME = "name";
+    private static final String FUNCTION_PARAMETERS_PROPERTY_NAME = "parameters";
+
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
-        return jsonNode.has("function");
+        return jsonNode.has(FUNCTION_PROPERTY_NAME);
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        JsonNode functionNode = jsonNode.get("function");
-        String name = functionNode.get("name").textValue();
-        List<Parameter> parameters = getParameters(functionNode, objectMapper);
-        return new Function().withName(name).withParameters(parameters);
+    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper)
+            throws JsonProcessingException {
+        JsonNode functionNode = jsonNode.get(FUNCTION_PROPERTY_NAME);
+        String functionName = getName(functionNode);
+        List<Parameter> functionParameters = getParameters(functionNode, objectMapper);
+        return new Function()
+                .withName(functionName)
+                .withParameters(functionParameters);
     }
 
-    private List<Parameter> getParameters(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        ArrayNode parametersNode = (ArrayNode) jsonNode.get("parameters");
+    private String getName(JsonNode jsonNode) {
+        return jsonNode.get(FUNCTION_NAME_PROPERTY_NAME).textValue();
+    }
+
+    private List<Parameter> getParameters(JsonNode jsonNode, ObjectMapper objectMapper)
+            throws JsonProcessingException {
+        Iterator<JsonNode> parametersNodes = jsonNode.get(FUNCTION_PARAMETERS_PROPERTY_NAME).iterator();
         List<Parameter> parameters = new ArrayList<>();
-        for (JsonNode parameterNode : (Iterable<JsonNode>) parametersNode::elements) {
-            Parameter parameter = objectMapper.treeToValue(parameterNode, Parameter.class);
-            parameters.add(parameter);
+        while (parametersNodes.hasNext()) {
+            JsonNode node = parametersNodes.next();
+            Parameter p = objectMapper.treeToValue(node, Parameter.class);
+            parameters.add(p);
         }
         return parameters;
     }
