@@ -221,7 +221,7 @@ final class ArgumentFactory {
 
         @Override
         public String toString() {
-            return "value(\"" + Objects.toString(value, "null") + "\")";
+            return "values(\"" + Objects.toString(value, "null") + "\")";
         }
     }
 }

@@ -49,7 +49,7 @@ public class ValuesTest {
                 .predicate(
                         value(true)
                 )
-                .action("appendString",
+                .action("appendStrings",
                         param("context", value("${ctx}")),
                         param("values", values(String.class,
                                 value("${fact.name}"),
@@ -91,7 +91,7 @@ public class ValuesTest {
                                 )
                         )
                 )
-                .action("appendString",
+                .action("appendStrings",
                         param("context", value("${ctx}")),
                         param("values", values(String.class, "matched"))
                 )
@@ -138,7 +138,7 @@ public class ValuesTest {
     private ArrayList<String> execute(List<Fact> facts, Rule rule) {
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> Collections.singletonList(rule))
-                .withActionMapping("appendString", method(this, a -> a.appendString(null, null)))
+                .withActionMapping("appendStrings", method(this, a -> a.appendStrings(null, null)))
                 .withActionMapping("appendNestedCollections", method(this, a -> a.appendNestedCollections(null, null)))
                 .withFunctionMapping("stringFunction", method(this, ValuesTest::getString))
                 .build();
@@ -148,7 +148,7 @@ public class ValuesTest {
         return session.execute(new ArrayList<>(), facts);
     }
 
-    public void appendString(List<String> context, List<String> values) {
+    public void appendStrings(List<String> context, List<String> values) {
         context.addAll(values);
     }
 
