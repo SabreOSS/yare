@@ -67,7 +67,7 @@ class ValueDeserializationHandler extends DeserializationHandler {
             return Thread.currentThread().getContextClassLoader().loadClass(type);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException(
-                    String.format("Could not resolve type of %s", type));
+                    String.format("Could not resolve type from string: %s", type));
         }
     }
 }
