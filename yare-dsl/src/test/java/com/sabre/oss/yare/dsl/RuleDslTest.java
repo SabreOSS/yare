@@ -26,10 +26,8 @@ package com.sabre.oss.yare.dsl;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
 import com.sabre.oss.yare.common.converter.TypeConverter;
-import com.sabre.oss.yare.core.model.Attribute;
+import com.sabre.oss.yare.core.model.*;
 import com.sabre.oss.yare.core.model.Expression;
-import com.sabre.oss.yare.core.model.Fact;
-import com.sabre.oss.yare.core.model.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -199,6 +197,25 @@ class RuleDslTest {
                 Arguments.of(String.class, new String[]{"1", "2"}),
                 Arguments.of(Bean.class, new Bean[]{new Bean(), new Bean(), null})
         );
+    }
+
+    @Test
+    void shouldEscapePlaceholdersInValuesMethodWithConstants() {
+        // given
+        CollectionOperand<String> values = values(String.class,
+                "${placeholder}",
+                "\\${placeholder}"
+        );
+
+        // when
+        Expression expression = values.getExpression(null, null);
+
+        // then
+        assertThat(expression).isInstanceOfSatisfying(Expression.Values.class, v ->
+                assertThat(v.getValues()).containsExactly(
+                        ExpressionFactory.valueOf(null, "\\${placeholder}"),
+                        ExpressionFactory.valueOf(null, "\\\\${placeholder}")
+                ));
     }
 
     @ParameterizedTest

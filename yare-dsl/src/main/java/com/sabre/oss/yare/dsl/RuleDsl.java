@@ -30,6 +30,7 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
 import com.sabre.oss.yare.model.validator.DefaultRuleValidator;
 import com.sabre.oss.yare.model.validator.ValidationResult;
 import com.sabre.oss.yare.model.validator.ValidationResults;
@@ -75,6 +76,7 @@ public final class RuleDsl {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RuleDsl.class);
     private static final Validator validator = DefaultRuleValidator.getRuleValidator();
     private static final TypeConverter converter = DefaultTypeConverters.getDefaultTypeConverter();
+    private static final PlaceholderExtractor placeholderExtractor = new PlaceholderExtractor();
 
     private RuleDsl() {
     }
@@ -334,6 +336,7 @@ public final class RuleDsl {
     public static <T> CollectionOperand<T> values(Class<T> type, T... values) {
         return (name, builder) -> {
             List<com.sabre.oss.yare.core.model.Expression> expressions = Stream.of(values)
+                    .map(RuleDsl::escapeStrings)
                     .map(v -> ExpressionFactory.valueOf(null, type, v))
                     .collect(Collectors.toList());
             return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
@@ -556,6 +559,10 @@ public final class RuleDsl {
     private static <T> Type extractParametrizedType(Class<T> type) {
         String parametrizedType = String.format("java.util.List<%s>", converter.toString(Type.class, type));
         return converter.fromString(Type.class, parametrizedType);
+    }
+
+    private static <T> Object escapeStrings(T value) {
+        return value instanceof String ? placeholderExtractor.escape((String) value) : value;
     }
 
     public static final class RuleBuilder {

@@ -54,6 +54,16 @@ public class PlaceholderExtractor {
         return Optional.empty();
     }
 
+    public String escape(String value) {
+        boolean isPlaceholder = placeholderPattern.matcher(value).matches();
+        boolean isEscapedPlaceholder = escapedPlaceholderPattern.matcher(value).matches();
+
+        if (isPlaceholder || isEscapedPlaceholder) {
+            return "\\" + value;
+        }
+        return value;
+    }
+
     private boolean isReferenceCandidate(Expression.Value value) {
         return value != null && String.class.equals(value.getType()) && value.getValue() != null;
     }
