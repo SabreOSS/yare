@@ -26,7 +26,6 @@ package com.sabre.oss.yare.model.validator;
 
 import com.google.common.collect.ImmutableList;
 import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
-import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
 
 public final class DefaultRuleValidator {
     private static final Validator ruleValidator = createRuleValidator(false);
@@ -48,7 +47,7 @@ public final class DefaultRuleValidator {
                 ImmutableList.of(
                         new AttributeValidator(fastFail),
                         new FactValidator(fastFail),
-                        new ReferenceValidator(fastFail, new ChainedTypeExtractor(), new PlaceholderExtractor()),
+                        new ReferenceValidator(fastFail, new ChainedTypeExtractor()),
                         new ActionValidator(fastFail)));
     }
 }

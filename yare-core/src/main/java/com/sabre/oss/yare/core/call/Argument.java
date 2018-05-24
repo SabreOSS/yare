@@ -56,6 +56,10 @@ public interface Argument {
         return ArgumentFactory.valueOf(name, type, value);
     }
 
+    static Values valuesOf(String name, Type type, List<Argument> values) {
+        return ArgumentFactory.valuesOf(name, type, values);
+    }
+
     String getName();
 
     Type getType();
@@ -70,6 +74,11 @@ public interface Argument {
     interface Value extends Argument {
 
         Object getValue();
+    }
+
+    interface Values extends Argument {
+
+        List<Argument> getArguments();
     }
 
     interface Reference extends Argument {

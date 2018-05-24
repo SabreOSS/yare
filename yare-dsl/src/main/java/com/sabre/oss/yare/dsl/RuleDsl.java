@@ -30,6 +30,7 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
+import com.sabre.oss.yare.core.reference.PlaceholderUtils;
 import com.sabre.oss.yare.model.validator.DefaultRuleValidator;
 import com.sabre.oss.yare.model.validator.ValidationResult;
 import com.sabre.oss.yare.model.validator.ValidationResults;
@@ -113,6 +114,19 @@ public final class RuleDsl {
      */
     public static <T> CollectionOperand<T> castToCollection(Operand<?> operand, Class<T> itemType) {
         return operand::getExpression;
+    }
+
+    /**
+     * Creates Collection&lt;T&gt; Class instance. It can be used for nested {@link #values(Class, Operand[])}.
+     *
+     * @param type class describing type of collection items
+     * @param <T>  type of items in collection
+     * @return collection class
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Class<Collection<T>> collectionTypeOf(Class<T> type) {
+        Collection<T> collection = Collections.emptyList();
+        return (Class<Collection<T>>) collection.getClass();
     }
 
     /**
@@ -292,7 +306,7 @@ public final class RuleDsl {
     }
 
     /**
-     * Creates an operand representing a collection of constant values.
+     * Creates an operand representing a collection of expressions.
      *
      * @param type   class describing collection item type
      * @param values values of the collection
@@ -302,13 +316,10 @@ public final class RuleDsl {
     @SafeVarargs
     public static <T> CollectionOperand<T> values(Class<T> type, Operand<T>... values) {
         return (name, builder) -> {
-            List<Object> extracted = Stream.of(values)
+            List<com.sabre.oss.yare.core.model.Expression> expressions = Stream.of(values)
                     .map(v -> v.getExpression(null, builder))
-                    .filter(com.sabre.oss.yare.core.model.Expression.Value.class::isInstance)
-                    .map(com.sabre.oss.yare.core.model.Expression.Value.class::cast)
-                    .map(com.sabre.oss.yare.core.model.Expression.Value::getValue)
                     .collect(Collectors.toList());
-            return ExpressionFactory.valueOf(name, extractParametrizedType(type), extracted);
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
         };
     }
 
@@ -322,7 +333,13 @@ public final class RuleDsl {
      */
     @SafeVarargs
     public static <T> CollectionOperand<T> values(Class<T> type, T... values) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, extractParametrizedType(type), Arrays.asList(values));
+        return (name, builder) -> {
+            List<com.sabre.oss.yare.core.model.Expression> expressions = Stream.of(values)
+                    .map(RuleDsl::escapeStrings)
+                    .map(v -> ExpressionFactory.valueOf(null, type, v))
+                    .collect(Collectors.toList());
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
+        };
     }
 
     /**
@@ -541,6 +558,10 @@ public final class RuleDsl {
     private static <T> Type extractParametrizedType(Class<T> type) {
         String parametrizedType = String.format("java.util.List<%s>", converter.toString(Type.class, type));
         return converter.fromString(Type.class, parametrizedType);
+    }
+
+    private static <T> Object escapeStrings(T value) {
+        return value instanceof String ? PlaceholderUtils.escape((String) value) : value;
     }
 
     public static final class RuleBuilder {

@@ -27,6 +27,9 @@ package com.sabre.oss.yare.engine.executor.runtime.value;
 import com.sabre.oss.yare.core.call.ProcessingContext;
 import com.sabre.oss.yare.core.invocation.Invocation;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 public final class ValueProviderFactory {
 
     private ValueProviderFactory() {
@@ -58,5 +61,9 @@ public final class ValueProviderFactory {
 
     public static ValueProvider createFromInvocation(Invocation<ProcessingContext, Object> invocation) {
         return new InvocationBasedValueProvider(invocation);
+    }
+
+    public static ValueProvider createFromValues(Type type, List<ValueProvider> values) {
+        return new ValuesValueProvider(type, values);
     }
 }

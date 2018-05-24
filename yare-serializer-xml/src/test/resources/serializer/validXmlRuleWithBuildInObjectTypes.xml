@@ -82,11 +82,18 @@
         <yare:Parameter name="ParameterName1">
             <yare:Values type="String">
                 <yare:Value>anyValueA</yare:Value>
+                <yare:Value>${fact.stringField}</yare:Value>
+                <yare:Function name="function" returnType="String"/>
             </yare:Values>
         </yare:Parameter>
         <yare:Parameter name="ParameterName2">
-            <yare:Values type="String">
-                <yare:Value>anyValueB</yare:Value>
+            <yare:Values type="List">
+                <yare:Values type="String">
+                    <yare:Value>anyValueB</yare:Value>
+                </yare:Values>
+                <yare:Values type="String">
+                    <yare:Value>anyValueC</yare:Value>
+                </yare:Values>
             </yare:Values>
         </yare:Parameter>
     </yare:Action>

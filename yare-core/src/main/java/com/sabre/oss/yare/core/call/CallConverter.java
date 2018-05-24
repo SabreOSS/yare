@@ -61,6 +61,13 @@ public class CallConverter {
             Expression.Value value = (Expression.Value) param;
             return valueConverter.create(rule, value);
         }
+        if (param instanceof Expression.Values) {
+            Expression.Values values = (Expression.Values) param;
+            List<Argument> arguments = values.getValues().stream()
+                    .map(v -> convertExpression(rule, v))
+                    .collect(Collectors.toList());
+            return Argument.valuesOf(values.getName(), values.getType(), arguments);
+        }
         if (param instanceof Expression.Invocation) {
             Expression.Invocation invocation = (Expression.Invocation) param;
             return convert(rule, invocation);

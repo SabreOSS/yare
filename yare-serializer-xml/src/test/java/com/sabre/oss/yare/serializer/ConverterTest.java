@@ -117,12 +117,23 @@ abstract class ConverterTest {
                                 .withName("ParameterName1")
                                 .withValues(new ValuesSer()
                                         .withType("java.lang.String")
-                                        .withValue(new ValueSer().withValue("anyValueA"))))
+                                        .withOperand(
+                                                new ValueSer().withValue("anyValueA"),
+                                                new ValueSer().withValue("${fact.stringField}"),
+                                                new FunctionSer()
+                                                        .withName("function")
+                                                        .withReturnType("String"))))
                         .withParameter(new ParameterSer()
                                 .withName("ParameterName2")
                                 .withValues(new ValuesSer()
-                                        .withType("java.lang.String")
-                                        .withValue(new ValueSer().withValue("anyValueB")))))
+                                        .withType("List")
+                                        .withOperand(
+                                                new ValuesSer()
+                                                        .withType("String")
+                                                        .withOperand(new ValueSer().withValue("anyValueB")),
+                                                new ValuesSer()
+                                                        .withType("String")
+                                                        .withOperand(new ValueSer().withValue("anyValueC"))))))
                 .withAction(new ActionSer()
                         .withName("ActionName1")
                         .withParameter(new ParameterSer()

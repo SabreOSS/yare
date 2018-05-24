@@ -24,10 +24,8 @@
 
 package com.sabre.oss.yare.serializer.xml.mapper.converter.rule;
 
-import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.model.PredicateSer;
-import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter.Context;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +33,7 @@ import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 
-class PredicateConverter implements ContextualConverter<PredicateSer, Expression> {
+class PredicateConverter {
     private static final List<Function<PredicateSer, ?>> getters = asList(
             PredicateSer::getValue,
             PredicateSer::getFunction,
@@ -44,14 +42,13 @@ class PredicateConverter implements ContextualConverter<PredicateSer, Expression
             PredicateSer::getOr,
             PredicateSer::getNot
     );
-    private final BooleanExpressionConverter booleanExpressionConverter;
+    private final NodeConverter nodeConverter;
 
-    PredicateConverter(ParameterConverter parameterConverter, TypeConverter typeConverter) {
-        this.booleanExpressionConverter = new BooleanExpressionConverter(parameterConverter, typeConverter);
+    PredicateConverter(NodeConverter nodeConverter) {
+        this.nodeConverter = nodeConverter;
     }
 
-    @Override
-    public Expression convert(Context ctx, PredicateSer predicate) {
+    Expression convert(PredicateSer predicate) {
         if (predicate != null) {
             Object toConvert = getters.stream()
                     .map(f -> f.apply(predicate))
@@ -59,7 +56,7 @@ class PredicateConverter implements ContextualConverter<PredicateSer, Expression
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("Predicate seems to be not defined properly"));
 
-            return booleanExpressionConverter.convert(ctx, toConvert);
+            return nodeConverter.convert(null, toConvert);
         }
 
         return null;

@@ -33,14 +33,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExpressionConverter {
+class ExpressionConverter {
     private final TypeConverter typeConverter;
 
-    public ExpressionConverter(TypeConverter typeConverter) {
+    ExpressionConverter(TypeConverter typeConverter) {
         this.typeConverter = typeConverter;
     }
 
-    public PredicateSer map(Expression expression) {
+    PredicateSer map(Expression expression) {
         if (expression != null) {
             PredicateSer predicateSer = new PredicateSer();
 
@@ -65,21 +65,17 @@ public class ExpressionConverter {
         return null;
     }
 
+    Collection<ParameterSer> extractParameter(List<Expression> arguments) {
+        return arguments.stream()
+                .map(this::convertParameter)
+                .collect(Collectors.toList());
+    }
 
-    public Object extractExpression(Expression expression) {
+    private Object extractExpression(Expression expression) {
         Expression.Value value = expression.as(Expression.Value.class);
         if (value != null) {
             String type = typeConverter.toString(Type.class, value.getType());
             if (value.getValue() != null) {
-                if (Collection.class.isAssignableFrom(value.getValue().getClass())) {
-                    Collection<ValueSer> collect = ((Collection<?>) value.getValue()).stream()
-                            .map(v -> typeConverter.toString(value.getType(), v))
-                            .map(v -> new ValueSer().withValue(v))
-                            .collect(Collectors.toList());
-                    return new ValuesSer()
-                            .withType(type)
-                            .withValue(collect);
-                }
                 if (typeConverter.isApplicable(value.getType())) {
                     return new ValueSer()
                             .withType(String.class.equals(value.getType()) ? null : type)
@@ -89,6 +85,16 @@ public class ExpressionConverter {
             return new CustomValueSer()
                     .withType(type)
                     .withAny(value.getValue());
+        }
+
+        Expression.Values values = expression.as(Expression.Values.class);
+        if (values != null) {
+            Collection<Object> valueList = values.getValues().stream()
+                    .map(this::extractExpression)
+                    .collect(Collectors.toList());
+            return new ValuesSer()
+                    .withType(typeConverter.toString(Type.class, values.getType()))
+                    .withOperand(valueList);
         }
 
         Expression.Invocation invocation = expression.as(Expression.Invocation.class);
@@ -125,12 +131,6 @@ public class ExpressionConverter {
         return null;
     }
 
-    public Collection<ParameterSer> extractParameter(List<Expression> arguments) {
-        return arguments.stream()
-                .map(this::convertParameter)
-                .collect(Collectors.toList());
-    }
-
     private ParameterSer convertParameter(Expression expression) {
         ParameterSer parameterSer = new ParameterSer();
 
@@ -154,6 +154,10 @@ public class ExpressionConverter {
         Expression.Value value = expression.as(Expression.Value.class);
         if (value != null) {
             return value.getName();
+        }
+        Expression.Values values = expression.as(Expression.Values.class);
+        if (values != null) {
+            return values.getName();
         }
         Expression.Invocation invocation = expression.as(Expression.Invocation.class);
         if (invocation != null) {

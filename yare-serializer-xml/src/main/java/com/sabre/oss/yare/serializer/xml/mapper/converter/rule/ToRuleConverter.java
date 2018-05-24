@@ -45,23 +45,22 @@ public class ToRuleConverter implements Mapper<RuleSer, Rule> {
     private final ActionConverter actionConverter;
 
     public ToRuleConverter(TypeConverter typeConverter) {
-        ParameterConverter parameterConverter = new ParameterConverter(typeConverter);
+        NodeConverter nodeConverter = new NodeConverter(typeConverter);
         this.attributeConverter = new AttributeConverter(typeConverter);
         this.factConverter = new FactConverter(typeConverter);
-        this.predicateConverter = new PredicateConverter(parameterConverter, typeConverter);
-        this.actionConverter = new ActionConverter(parameterConverter);
+        this.predicateConverter = new PredicateConverter(nodeConverter);
+        this.actionConverter = new ActionConverter(nodeConverter);
     }
 
     @Override
     public Rule map(RuleSer rule) {
         Set<Attribute> attributes = prepareAttributes(rule);
         List<Fact> facts = prepareFacts(rule);
-        Context ctx = new Context(attributes, facts);
         return new Rule(
                 attributes,
                 facts,
-                predicateConverter.convert(ctx, rule.getPredicate()),
-                actionConverter.convert(ctx, rule.getAction()));
+                predicateConverter.convert(rule.getPredicate()),
+                actionConverter.convert(rule.getAction()));
     }
 
     private Set<Attribute> prepareAttributes(RuleSer rule) {
@@ -76,23 +75,5 @@ public class ToRuleConverter implements Mapper<RuleSer, Rule> {
         return rule.getFact().stream()
                 .map(factConverter::map)
                 .collect(Collectors.toList());
-    }
-
-    static final class Context {
-        private final Set<Attribute> attributes;
-        private final List<Fact> facts;
-
-        Context(Set<Attribute> attributes, List<Fact> facts) {
-            this.attributes = attributes;
-            this.facts = facts;
-        }
-
-        Set<Attribute> getAttributes() {
-            return attributes;
-        }
-
-        List<Fact> getFacts() {
-            return facts;
-        }
     }
 }

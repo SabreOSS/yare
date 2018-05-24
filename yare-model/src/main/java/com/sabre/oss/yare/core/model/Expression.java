@@ -64,6 +64,16 @@ public interface Expression {
         Object getValue();
     }
 
+    interface Values extends Expression {
+
+        /**
+         * Return expressions list.
+         *
+         * @return values;
+         */
+        List<Expression> getValues();
+    }
+
     interface Invocation extends Expression {
 
         /**

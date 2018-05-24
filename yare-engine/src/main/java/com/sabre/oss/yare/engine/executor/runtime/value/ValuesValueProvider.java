@@ -22,21 +22,32 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.xml.mapper.converter.rule;
+package com.sabre.oss.yare.engine.executor.runtime.value;
 
-import com.sabre.oss.yare.core.model.Expression;
-import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter.Context;
+import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface ContextualConverter<I, O extends Expression> {
+public final class ValuesValueProvider extends ValueProvider {
+    private final Type type;
+    private final List<ValueProvider> values;
 
-    O convert(Context ctx, I input);
+    public ValuesValueProvider(Type type, List<ValueProvider> values) {
+        this.type = type;
+        this.values = values;
+    }
 
-    default List<O> convert(Context ctx, List<I> input) {
-        return input.stream()
-                .map(i -> convert(ctx, i))
+    @Override
+    public Object get(PredicateContext context) {
+        return values.stream()
+                .map(p -> p.get(context))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }
