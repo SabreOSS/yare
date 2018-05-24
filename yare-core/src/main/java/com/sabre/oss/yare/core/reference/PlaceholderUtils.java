@@ -30,11 +30,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PlaceholderExtractor {
+public final class PlaceholderUtils {
     private static final Pattern placeholderPattern = Pattern.compile("^\\$\\{(.*)}$");
     private static final Pattern escapedPlaceholderPattern = Pattern.compile("^(\\\\)+\\$\\{.*}$");
 
-    public Optional<String> extractPlaceholder(Expression.Value value) {
+    private PlaceholderUtils() {
+    }
+
+    public static Optional<String> extract(Expression.Value value) {
         if (isReferenceCandidate(value)) {
             Matcher matcher = placeholderPattern.matcher(value.getValue().toString());
             if (matcher.find()) {
@@ -44,7 +47,7 @@ public class PlaceholderExtractor {
         return Optional.empty();
     }
 
-    public Optional<Object> unescapePlaceholder(Expression.Value value) {
+    public static Optional<Object> unescape(Expression.Value value) {
         if (isReferenceCandidate(value)) {
             Matcher matcher = escapedPlaceholderPattern.matcher(value.getValue().toString());
             if (matcher.find()) {
@@ -54,7 +57,7 @@ public class PlaceholderExtractor {
         return Optional.empty();
     }
 
-    public String escape(String value) {
+    public static String escape(String value) {
         boolean isPlaceholder = placeholderPattern.matcher(value).matches();
         boolean isEscapedPlaceholder = escapedPlaceholderPattern.matcher(value).matches();
 
@@ -64,7 +67,7 @@ public class PlaceholderExtractor {
         return value;
     }
 
-    private boolean isReferenceCandidate(Expression.Value value) {
+    private static boolean isReferenceCandidate(Expression.Value value) {
         return value != null && String.class.equals(value.getType()) && value.getValue() != null;
     }
 }

@@ -29,7 +29,7 @@ import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.core.reference.ChainedTypeExtractor;
-import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
+import com.sabre.oss.yare.core.reference.PlaceholderUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -41,14 +41,11 @@ import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
     private final ChainedTypeExtractor chainedTypeExtractor;
-    private final PlaceholderExtractor placeholderExtractor;
 
     public ReferenceValidator(boolean failFast,
-                              ChainedTypeExtractor chainedTypeExtractor,
-                              PlaceholderExtractor placeholderExtractor) {
+                              ChainedTypeExtractor chainedTypeExtractor) {
         super(failFast);
         this.chainedTypeExtractor = chainedTypeExtractor;
-        this.placeholderExtractor = placeholderExtractor;
     }
 
     @Override
@@ -97,7 +94,7 @@ public class ReferenceValidator extends BaseValidator {
             }
         }
         Expression.Value value = expression.as(Expression.Value.class);
-        placeholderExtractor.extractPlaceholder(value)
+        PlaceholderUtils.extract(value)
                 .ifPresent(s -> checkReference(s, results, localReferences));
     }
 

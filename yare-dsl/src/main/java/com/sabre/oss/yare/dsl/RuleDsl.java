@@ -30,7 +30,7 @@ import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.ExpressionFactory;
 import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
-import com.sabre.oss.yare.core.reference.PlaceholderExtractor;
+import com.sabre.oss.yare.core.reference.PlaceholderUtils;
 import com.sabre.oss.yare.model.validator.DefaultRuleValidator;
 import com.sabre.oss.yare.model.validator.ValidationResult;
 import com.sabre.oss.yare.model.validator.ValidationResults;
@@ -76,7 +76,6 @@ public final class RuleDsl {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RuleDsl.class);
     private static final Validator validator = DefaultRuleValidator.getRuleValidator();
     private static final TypeConverter converter = DefaultTypeConverters.getDefaultTypeConverter();
-    private static final PlaceholderExtractor placeholderExtractor = new PlaceholderExtractor();
 
     private RuleDsl() {
     }
@@ -562,7 +561,7 @@ public final class RuleDsl {
     }
 
     private static <T> Object escapeStrings(T value) {
-        return value instanceof String ? placeholderExtractor.escape((String) value) : value;
+        return value instanceof String ? PlaceholderUtils.escape((String) value) : value;
     }
 
     public static final class RuleBuilder {
