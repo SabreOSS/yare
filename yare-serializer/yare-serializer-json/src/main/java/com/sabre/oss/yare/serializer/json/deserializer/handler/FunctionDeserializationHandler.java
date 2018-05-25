@@ -37,8 +37,8 @@ import java.util.List;
 
 class FunctionDeserializationHandler extends DeserializationHandler {
     private static final String FUNCTION_PROPERTY_NAME = "function";
-    private static final String FUNCTION_NAME_PROPERTY_NAME = "name";
-    private static final String FUNCTION_PARAMETERS_PROPERTY_NAME = "parameters";
+    private static final String NAME_PROPERTY_NAME = "name";
+    private static final String PARAMETERS_PROPERTY_NAME = "parameters";
 
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
@@ -57,12 +57,12 @@ class FunctionDeserializationHandler extends DeserializationHandler {
     }
 
     private String getName(JsonNode jsonNode) {
-        return jsonNode.get(FUNCTION_NAME_PROPERTY_NAME).textValue();
+        return jsonNode.get(NAME_PROPERTY_NAME).textValue();
     }
 
     private List<Parameter> getParameters(JsonNode jsonNode, ObjectMapper objectMapper)
             throws JsonProcessingException {
-        Iterator<JsonNode> parametersNodes = jsonNode.get(FUNCTION_PARAMETERS_PROPERTY_NAME).iterator();
+        Iterator<JsonNode> parametersNodes = jsonNode.get(PARAMETERS_PROPERTY_NAME).iterator();
         List<Parameter> parameters = new ArrayList<>();
         while (parametersNodes.hasNext()) {
             JsonNode node = parametersNodes.next();

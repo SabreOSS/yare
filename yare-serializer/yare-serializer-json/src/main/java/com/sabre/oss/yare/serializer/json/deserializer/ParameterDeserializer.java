@@ -36,7 +36,7 @@ import com.sabre.oss.yare.serializer.json.model.Parameter;
 import java.io.IOException;
 
 public class ParameterDeserializer extends JsonDeserializer<Parameter> {
-    private static final String PARAMETER_NAME_PROPERTY_NAME = "name";
+    private static final String NAME_PROPERTY_NAME = "name";
     @Override
     public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctxt)
             throws IOException {
@@ -50,7 +50,7 @@ public class ParameterDeserializer extends JsonDeserializer<Parameter> {
     }
 
     private String getName(JsonNode jsonNode) {
-        return jsonNode.get(PARAMETER_NAME_PROPERTY_NAME).textValue();
+        return jsonNode.get(NAME_PROPERTY_NAME).textValue();
     }
 
     private Expression getExpression(JsonNode jsonNode, ObjectMapper objectMapper)
