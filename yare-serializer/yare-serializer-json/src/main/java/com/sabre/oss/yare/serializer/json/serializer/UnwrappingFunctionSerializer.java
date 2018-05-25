@@ -32,12 +32,16 @@ import com.sabre.oss.yare.serializer.json.model.Function;
 import java.io.IOException;
 
 public class UnwrappingFunctionSerializer extends JsonSerializer<Function> {
+    private static final String FUNCTION_PROPERTY_NAME = "function";
+    private static final String NAME_PROPERTY_NAME = "name";
+    private static final String PARAMETERS_PROPERTY_NAME = "parameters";
+
     @Override
     public void serialize(Function value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeFieldName("function");
+        gen.writeFieldName(FUNCTION_PROPERTY_NAME);
         gen.writeStartObject();
-        gen.writeObjectField("name", value.getName());
-        gen.writeObjectField("parameters", value.getParameters());
+        gen.writeObjectField(NAME_PROPERTY_NAME, value.getName());
+        gen.writeObjectField(PARAMETERS_PROPERTY_NAME, value.getParameters());
         gen.writeEndObject();
     }
 

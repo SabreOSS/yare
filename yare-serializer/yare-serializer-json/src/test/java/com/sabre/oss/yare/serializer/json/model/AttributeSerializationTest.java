@@ -91,7 +91,7 @@ class AttributeSerializationTest {
     private static Attribute createCustomTypeAttributeModel() {
         return new Attribute()
                 .withName("attribute-name")
-                .withValue(new TestClass().withProperty("test-property"))
+                .withValue(new TestClass().withProperty("testclass-property"))
                 .withType(TestClass.class.getName());
     }
 
@@ -100,7 +100,7 @@ class AttributeSerializationTest {
                 "{" +
                 "  \"name\" : \"attribute-name\"," +
                 "  \"value\" : {" +
-                "    \"property\" : \"test-property\"" +
+                "    \"property\" : \"testclass-property\"" +
                 "  }," +
                 "  \"type\" : \"com.sabre.oss.yare.serializer.json.model.AttributeSerializationTest$TestClass\"" +
                 "}";

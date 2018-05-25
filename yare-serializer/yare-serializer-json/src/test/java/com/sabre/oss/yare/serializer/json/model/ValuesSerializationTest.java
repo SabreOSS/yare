@@ -67,28 +67,47 @@ class ValuesSerializationTest {
     private Values getValuesModel() {
         return new Values()
                 .withValues(
-                        new Value().withValue("test-string"),
-                        new Value().withValue(10).withType(Integer.class.getName()),
-                        new Value().withValue(new TestClass().withProperty("test-property")).withType(TestClass.class.getName())
+                        new Value().withValue("value-value"),
+                        new Values()
+                                .withType("values-type-1")
+                                .withValues(
+                                        new Value().withValue(new TestClass().withProperty("testclass-property")).withType(TestClass.class.getName())
+                                ),
+                        new Function()
+                                .withName("function-name")
+                                .withParameters(
+                                        new Parameter()
+                                                .withName("parameter-name")
+                                                .withExpression(new Value().withValue(10).withType(Integer.class.getName()))
+                                )
                 )
-                .withType("test-type");
+                .withType("values-type-2");
     }
 
     private String getValuesJson() {
         return "" +
                 "{" +
                 "  \"values\" : [ {" +
-                "    \"value\" : \"test-string\"" +
+                "    \"value\" : \"value-value\"" +
                 "  }, {" +
-                "    \"value\" : 10," +
-                "    \"type\" : \"java.lang.Integer\"" +
+                "    \"values\" : [ {" +
+                "      \"value\" : {" +
+                "        \"property\" : \"testclass-property\"" +
+                "      }," +
+                "      \"type\" : \"com.sabre.oss.yare.serializer.json.model.ValuesSerializationTest$TestClass\"" +
+                "    } ]," +
+                "    \"type\" : \"values-type-1\"" +
                 "  }, {" +
-                "    \"value\" : {" +
-                "      \"property\" : \"test-property\"" +
-                "    }," +
-                "    \"type\" : \"com.sabre.oss.yare.serializer.json.model.ValuesSerializationTest$TestClass\"" +
+                "    \"function\" : {" +
+                "      \"name\" : \"function-name\"," +
+                "      \"parameters\" : [ {" +
+                "        \"name\" : \"parameter-name\"," +
+                "        \"value\" : 10," +
+                "        \"type\" : \"java.lang.Integer\"" +
+                "      } ]" +
+                "    }" +
                 "  } ]," +
-                "  \"type\" : \"test-type\"" +
+                "  \"type\" : \"values-type-2\"" +
                 "}";
     }
 

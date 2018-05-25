@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OperandSerializationTest {
+class ParameterSerializationTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -49,52 +49,56 @@ class OperandSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlySerializeOperand(Operand operand, String expected) throws JsonProcessingException {
-        String serialized = objectMapper.writeValueAsString(operand);
+    void shouldProperlySerializeParameter(Parameter parameter, String expected) throws JsonProcessingException {
+        String serialized = objectMapper.writeValueAsString(parameter);
 
         assertThatJson(serialized).isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlyDeserializeOperand(Operand expected, String json) throws IOException {
-        Operand operand = objectMapper.readValue(json, Operand.class);
+    void shouldProperlyDeserializeOperand(Parameter expected, String json) throws IOException {
+        Parameter parameter = objectMapper.readValue(json, Parameter.class);
 
-        assertThat(operand).isEqualTo(expected);
+        assertThat(parameter).isEqualTo(expected);
     }
 
     private static Stream<Arguments> conversionParams() {
         return Stream.of(
-                Arguments.of(createValueOperandModel(), createValueOperandJson()),
-                Arguments.of(createValuesOperandModel(), createValuesOperandJson()),
-                Arguments.of(createFunctionOperandModel(), createFunctionOperandJson()),
-                Arguments.of(createOperatorOperandModel(), createOperatorOperandJson())
+                Arguments.of(createValueParameterModel(), createValueParameterJson()),
+                Arguments.of(createValuesParameterModel(), createValuesParameterJson()),
+                Arguments.of(createFunctionParameterModel(), createFunctionParameterJson())
         );
     }
 
-    private static Operand createValueOperandModel() {
-        return new Value()
-                .withValue("value-value");
+    private static Parameter createValueParameterModel() {
+        return new Parameter()
+                .withName("parameter-name")
+                .withExpression(new Value().withValue("value-value"));
     }
 
-    private static String createValueOperandJson() {
+    private static String createValueParameterJson() {
         return "" +
                 "{" +
-                "  \"value\" : \"value-value\"" +
+                "  \"name\": \"parameter-name\"," +
+                "  \"value\": \"value-value\"" +
                 "}";
     }
 
-    private static Operand createValuesOperandModel() {
-        return new Values()
-                .withValues(Collections.singletonList(
-                        new Value().withValue("value-value")
-                ))
-                .withType("values-type");
+    private static Parameter createValuesParameterModel() {
+        return new Parameter()
+                .withName("parameter-name")
+                .withExpression(new Values()
+                        .withValues(Collections.singletonList(
+                                new Value().withValue("value-value").withType("java.lang.String")
+                        ))
+                        .withType("values-type"));
     }
 
-    private static String createValuesOperandJson() {
+    private static String createValuesParameterJson() {
         return "" +
                 "{" +
+                "  \"name\": \"parameter-name\"," +
                 "  \"values\": [" +
                 "    {" +
                 "      \"value\": \"value-value\"" +
@@ -104,45 +108,31 @@ class OperandSerializationTest {
                 "}";
     }
 
-    private static Operand createFunctionOperandModel() {
-        return new Function()
-                .withName("function-name")
-                .withParameters(Collections.singletonList(
-                        new Parameter().withName("parameter-name")
-                                .withExpression(new Value().withValue("value-value"))
-                        )
-                );
+    private static Parameter createFunctionParameterModel() {
+        return new Parameter()
+                .withName("parameter-name-1")
+                .withExpression(new Function()
+                        .withName("function-name")
+                        .withParameters(Collections.singletonList(
+                                new Parameter().withName("parameter-name-2")
+                                        .withExpression(new Value().withValue("value-value"))
+                                )
+                        ));
     }
 
-    private static String createFunctionOperandJson() {
+    private static String createFunctionParameterJson() {
         return "" +
                 "{" +
+                "  \"name\": \"parameter-name-1\"," +
                 "  \"function\": {" +
                 "    \"name\": \"function-name\"," +
                 "    \"parameters\": [" +
                 "      {" +
-                "        \"name\": \"parameter-name\"," +
+                "        \"name\": \"parameter-name-2\"," +
                 "        \"value\": \"value-value\"" +
                 "      }" +
                 "    ]" +
                 "  }" +
-                "}";
-    }
-
-    private static Operand createOperatorOperandModel() {
-        return new Operator()
-                .withType("operator-type")
-                .withOperands(Collections.singletonList(new Value().withValue("value-value")));
-    }
-
-    private static String createOperatorOperandJson() {
-        return "" +
-                "{" +
-                "  \"operator-type\": [" +
-                "    {" +
-                "      \"value\": \"value-value\"" +
-                "    }" +
-                "  ]" +
                 "}";
     }
 }

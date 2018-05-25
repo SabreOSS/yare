@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.serializer.json.model;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +47,10 @@ public class Rule {
         return this;
     }
 
+    public Rule withAttributes(Attribute... attributes) {
+        return withAttributes(Arrays.asList(attributes));
+    }
+
     public List<Fact> getFacts() {
         return facts;
     }
@@ -57,6 +62,10 @@ public class Rule {
     public Rule withFacts(List<Fact> facts) {
         this.facts = facts;
         return this;
+    }
+
+    public Rule withFacts(Fact... facts) {
+        return withFacts(Arrays.asList(facts));
     }
 
     public Operand getPredicate() {
@@ -83,6 +92,10 @@ public class Rule {
     public Rule withActions(List<Action> actions) {
         this.actions = actions;
         return this;
+    }
+
+    public Rule withActions(Action... actions) {
+        return withActions(Arrays.asList(actions));
     }
 
     @Override

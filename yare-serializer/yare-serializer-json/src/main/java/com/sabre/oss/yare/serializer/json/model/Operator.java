@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sabre.oss.yare.serializer.json.serializer.OperatorSerializer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,6 +60,10 @@ public class Operator implements Operand {
     public Operator withOperands(List<Operand> operands) {
         this.operands = operands;
         return this;
+    }
+
+    public Operator withOperands(Operand... operands) {
+        return withOperands(Arrays.asList(operands));
     }
 
     @Override

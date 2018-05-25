@@ -35,7 +35,7 @@ import java.io.IOException;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ActionSerializationTest {
+class FunctionSerializationTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -44,28 +44,28 @@ class ActionSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeAction() throws JsonProcessingException {
-        Action action = getActionModel();
+    void shouldProperlySerializeFunction() throws JsonProcessingException {
+        Function function = getFunctionModel();
 
-        String serialized = objectMapper.writeValueAsString(action);
+        String serialized = objectMapper.writeValueAsString(function);
 
-        String expected = getActionJson();
+        String expected = getFunctionJson();
         assertThatJson(serialized).isEqualTo(expected);
     }
 
     @Test
-    void shouldProperlyDeserializeAction() throws IOException {
-        String json = getActionJson();
+    void shouldProperlyDeserializeFunction() throws IOException {
+        String json = getFunctionJson();
 
-        Action action = objectMapper.readValue(json, Action.class);
+        Function function = objectMapper.readValue(json, Function.class);
 
-        Action expected = getActionModel();
-        assertThat(action).isEqualTo(expected);
+        Function expected = getFunctionModel();
+        assertThat(function).isEqualTo(expected);
     }
 
-    private Action getActionModel() {
-        return new Action()
-                .withName("action-name")
+    private Function getFunctionModel() {
+        return new Function()
+                .withName("function-name-1")
                 .withParameters(
                         new Parameter()
                                 .withName("param-name-1")
@@ -83,35 +83,37 @@ class ActionSerializationTest {
                         new Parameter()
                                 .withName("param-name-3")
                                 .withExpression(new Function()
-                                        .withName("function-name")
+                                        .withName("function-name-2")
                                         .withParameters())
                 );
     }
 
-    private String getActionJson() {
+    private String getFunctionJson() {
         return "" +
                 "{" +
-                "  \"name\" : \"action-name\"," +
-                "  \"parameters\" : [ {" +
-                "    \"name\" : \"param-name-1\"," +
-                "    \"value\" : 10," +
-                "    \"type\" : \"java.lang.Integer\"" +
-                "  }, {" +
-                "    \"name\" : \"param-name-2\"," +
-                "    \"values\" : [ {" +
-                "      \"value\" : \"value-value\"" +
-                "    }, {" +
+                "  \"function\" : {" +
+                "    \"name\" : \"function-name-1\"," +
+                "    \"parameters\" : [ {" +
+                "      \"name\" : \"param-name-1\"," +
                 "      \"value\" : 10," +
                 "      \"type\" : \"java.lang.Integer\"" +
-                "    } ]," +
-                "    \"type\" : \"values-type\"" +
-                "  }, {" +
-                "    \"name\" : \"param-name-3\"," +
-                "    \"function\" : {" +
-                "      \"name\" : \"function-name\"," +
-                "      \"parameters\" : [ ]" +
-                "    }" +
-                "  } ]" +
+                "    }, {" +
+                "      \"name\" : \"param-name-2\"," +
+                "      \"values\" : [ {" +
+                "        \"value\" : \"value-value\"" +
+                "      }, {" +
+                "        \"value\" : 10," +
+                "        \"type\" : \"java.lang.Integer\"" +
+                "      } ]," +
+                "      \"type\" : \"values-type\"" +
+                "    }, {" +
+                "      \"name\" : \"param-name-3\"," +
+                "      \"function\" : {" +
+                "        \"name\" : \"function-name-2\"," +
+                "        \"parameters\" : [ ]" +
+                "      }" +
+                "    } ]" +
+                "  }" +
                 "}";
     }
 }

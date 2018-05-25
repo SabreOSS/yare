@@ -35,7 +35,7 @@ import java.io.IOException;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ActionSerializationTest {
+class OperatorSerializationTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -44,73 +44,65 @@ class ActionSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeAction() throws JsonProcessingException {
-        Action action = getActionModel();
+    void shouldProperlySerializeOperator() throws JsonProcessingException {
+        Operator operator = getOperatorModel();
 
-        String serialized = objectMapper.writeValueAsString(action);
+        String serialized = objectMapper.writeValueAsString(operator);
 
-        String expected = getActionJson();
+        String expected = getOperatorJson();
         assertThatJson(serialized).isEqualTo(expected);
     }
 
     @Test
-    void shouldProperlyDeserializeAction() throws IOException {
-        String json = getActionJson();
+    void shouldProperlyDeserializeOperator() throws IOException {
+        String json = getOperatorJson();
 
-        Action action = objectMapper.readValue(json, Action.class);
+        Operator operator = objectMapper.readValue(json, Operator.class);
 
-        Action expected = getActionModel();
-        assertThat(action).isEqualTo(expected);
+        Operator expected = getOperatorModel();
+        assertThat(operator).isEqualTo(expected);
     }
 
-    private Action getActionModel() {
-        return new Action()
-                .withName("action-name")
-                .withParameters(
-                        new Parameter()
-                                .withName("param-name-1")
-                                .withExpression(new Value()
-                                        .withValue(10)
-                                        .withType(Integer.class.getName())),
-                        new Parameter()
-                                .withName("param-name-2")
-                                .withExpression(new Values()
-                                        .withType("values-type")
-                                        .withValues(
-                                                new Value().withValue("value-value"),
-                                                new Value().withValue(10).withType(Integer.class.getName())
-                                        )),
-                        new Parameter()
-                                .withName("param-name-3")
-                                .withExpression(new Function()
-                                        .withName("function-name")
-                                        .withParameters())
+    private Operator getOperatorModel() {
+        return new Operator()
+                .withType("operator-type-1")
+                .withOperands(
+                        new Value().withValue("value-type"),
+                        new Values()
+                                .withType("values-type")
+                                .withValues(
+                                        new Value().withValue("value-value"),
+                                        new Value().withValue(10L).withType(Long.class.getName())
+                                ),
+                        new Function()
+                                .withName("function-name")
+                                .withParameters(),
+                        new Operator()
+                                .withType("operator-type-2")
+                                .withOperands()
                 );
     }
 
-    private String getActionJson() {
+    private String getOperatorJson() {
         return "" +
                 "{" +
-                "  \"name\" : \"action-name\"," +
-                "  \"parameters\" : [ {" +
-                "    \"name\" : \"param-name-1\"," +
-                "    \"value\" : 10," +
-                "    \"type\" : \"java.lang.Integer\"" +
+                "  \"operator-type-1\" : [ {" +
+                "    \"value\" : \"value-type\"" +
                 "  }, {" +
-                "    \"name\" : \"param-name-2\"," +
                 "    \"values\" : [ {" +
                 "      \"value\" : \"value-value\"" +
                 "    }, {" +
                 "      \"value\" : 10," +
-                "      \"type\" : \"java.lang.Integer\"" +
+                "      \"type\" : \"java.lang.Long\"" +
                 "    } ]," +
                 "    \"type\" : \"values-type\"" +
                 "  }, {" +
-                "    \"name\" : \"param-name-3\"," +
                 "    \"function\" : {" +
                 "      \"name\" : \"function-name\"," +
                 "      \"parameters\" : [ ]" +
                 "    }" +
+                "  }, {" +
+                "    \"operator-type-2\" : [ ]" +
                 "  } ]" +
                 "}";
     }

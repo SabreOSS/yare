@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OperandSerializationTest {
+class ExpressionSerializationTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -49,42 +49,41 @@ class OperandSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlySerializeOperand(Operand operand, String expected) throws JsonProcessingException {
-        String serialized = objectMapper.writeValueAsString(operand);
+    void shouldProperlySerializeExpression(Expression expression, String expected) throws JsonProcessingException {
+        String serialized = objectMapper.writeValueAsString(expression);
 
         assertThatJson(serialized).isEqualTo(expected);
     }
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlyDeserializeOperand(Operand expected, String json) throws IOException {
-        Operand operand = objectMapper.readValue(json, Operand.class);
+    void shouldProperlyDeserializeExpression(Expression expected, String json) throws IOException {
+        Expression expression = objectMapper.readValue(json, Expression.class);
 
-        assertThat(operand).isEqualTo(expected);
+        assertThat(expression).isEqualTo(expected);
     }
 
     private static Stream<Arguments> conversionParams() {
         return Stream.of(
-                Arguments.of(createValueOperandModel(), createValueOperandJson()),
-                Arguments.of(createValuesOperandModel(), createValuesOperandJson()),
-                Arguments.of(createFunctionOperandModel(), createFunctionOperandJson()),
-                Arguments.of(createOperatorOperandModel(), createOperatorOperandJson())
+                Arguments.of(createValueExpressionModel(), createValueExpressionJson()),
+                Arguments.of(createValuesExpressionModel(), createValuesExpressionJson()),
+                Arguments.of(createFunctionExpressionModel(), createFunctionExpressionJson())
         );
     }
 
-    private static Operand createValueOperandModel() {
+    private static Expression createValueExpressionModel() {
         return new Value()
                 .withValue("value-value");
     }
 
-    private static String createValueOperandJson() {
+    private static String createValueExpressionJson() {
         return "" +
                 "{" +
                 "  \"value\" : \"value-value\"" +
                 "}";
     }
 
-    private static Operand createValuesOperandModel() {
+    private static Expression createValuesExpressionModel() {
         return new Values()
                 .withValues(Collections.singletonList(
                         new Value().withValue("value-value")
@@ -92,7 +91,7 @@ class OperandSerializationTest {
                 .withType("values-type");
     }
 
-    private static String createValuesOperandJson() {
+    private static String createValuesExpressionJson() {
         return "" +
                 "{" +
                 "  \"values\": [" +
@@ -104,7 +103,7 @@ class OperandSerializationTest {
                 "}";
     }
 
-    private static Operand createFunctionOperandModel() {
+    private static Expression createFunctionExpressionModel() {
         return new Function()
                 .withName("function-name")
                 .withParameters(Collections.singletonList(
@@ -114,7 +113,7 @@ class OperandSerializationTest {
                 );
     }
 
-    private static String createFunctionOperandJson() {
+    private static String createFunctionExpressionJson() {
         return "" +
                 "{" +
                 "  \"function\": {" +
@@ -126,23 +125,6 @@ class OperandSerializationTest {
                 "      }" +
                 "    ]" +
                 "  }" +
-                "}";
-    }
-
-    private static Operand createOperatorOperandModel() {
-        return new Operator()
-                .withType("operator-type")
-                .withOperands(Collections.singletonList(new Value().withValue("value-value")));
-    }
-
-    private static String createOperatorOperandJson() {
-        return "" +
-                "{" +
-                "  \"operator-type\": [" +
-                "    {" +
-                "      \"value\": \"value-value\"" +
-                "    }" +
-                "  ]" +
                 "}";
     }
 }
