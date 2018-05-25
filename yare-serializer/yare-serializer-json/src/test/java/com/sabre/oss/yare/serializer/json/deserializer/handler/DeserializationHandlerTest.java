@@ -28,34 +28,34 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DeserializationHandlerTest {
     @Test
-    void shouldHandleJsonWithApplicableHandler()
-            throws JsonProcessingException {
-        //given
+    void shouldHandleJsonWithApplicableHandler() throws JsonProcessingException {
+        // given
         JsonNode node = mock(JsonNode.class);
         Operand expected = mock(Operand.class);
 
         DeserializationHandler handler =
                 mockDeserializationHandler(true, expected);
 
-        //when
+        // when
         Operand result = handler.handle(node, null);
 
-        //then
+        // then
         assertThat(result).isEqualTo(expected);
     }
 
     @Test
-    void shouldHandleJsonWithFirstApplicableHandler()
-            throws JsonProcessingException {
-        //given
+    void shouldHandleJsonWithFirstApplicableHandler() throws JsonProcessingException {
+        // given
         JsonNode node = mock(JsonNode.class);
         Operand expected = mock(Operand.class);
 
@@ -63,17 +63,16 @@ class DeserializationHandlerTest {
                 mockNotApplicableDeserializationHandler()
                         .withNext(mockApplicableDeserializationHandler(expected));
 
-        //when
+        // when
         Operand result = handler.handle(node, null);
 
-        //then
+        // then
         assertThat(result).isEqualTo(expected);
     }
 
     @Test
-    void shouldThrownAnExceptionWhenApplicableHandlerCannotBeFound()
-            throws JsonProcessingException {
-        //given
+    void shouldThrownAnExceptionWhenApplicableHandlerCannotBeFound() throws JsonProcessingException {
+        // given
         JsonNode node = mock(JsonNode.class);
         when(node.toString()).thenReturn("{ TEST NODE }");
 
@@ -81,30 +80,25 @@ class DeserializationHandlerTest {
                 mockNotApplicableDeserializationHandler()
                         .withNext(mockNotApplicableDeserializationHandler());
 
-        //when / then
+        // when / then
         String expectedMessage = "Given node: { TEST NODE } could not be deserialized to any known operand model";
         assertThatThrownBy(() -> handler.handle(node, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
     }
 
-    private DeserializationHandler mockNotApplicableDeserializationHandler()
-            throws JsonProcessingException {
+    private DeserializationHandler mockNotApplicableDeserializationHandler() throws JsonProcessingException {
         return mockDeserializationHandler(false, null);
     }
 
-    private DeserializationHandler mockApplicableDeserializationHandler(Operand producedResult)
-            throws JsonProcessingException {
+    private DeserializationHandler mockApplicableDeserializationHandler(Operand producedResult) throws JsonProcessingException {
         return mockDeserializationHandler(true, producedResult);
     }
 
-    private DeserializationHandler mockDeserializationHandler(Boolean isApplicable, Operand producedResult)
-            throws JsonProcessingException {
-        DeserializationHandler handler = mock(DeserializationHandler.class, CALLS_REAL_METHODS);
-        when(handler.isApplicable(any()))
-                .thenReturn(isApplicable);
-        when(handler.deserialize(any(), any()))
-                .thenReturn(producedResult);
+    private DeserializationHandler mockDeserializationHandler(Boolean isApplicable, Operand producedResult) throws JsonProcessingException {
+        DeserializationHandler handler = mock(DeserializationHandler.class, Mockito.CALLS_REAL_METHODS);
+        when(handler.isApplicable(any())).thenReturn(isApplicable);
+        when(handler.deserialize(any(), any())).thenReturn(producedResult);
         return handler;
     }
 }

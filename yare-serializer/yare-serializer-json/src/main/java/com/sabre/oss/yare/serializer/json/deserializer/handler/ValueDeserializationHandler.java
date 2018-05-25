@@ -31,8 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
 
-import java.util.Optional;
-
 class ValueDeserializationHandler extends DeserializationHandler {
     private static final String VALUE_PROPERTY_NAME = "value";
     private static final String TYPE_PROPERTY_NAME = "type";
@@ -43,8 +41,7 @@ class ValueDeserializationHandler extends DeserializationHandler {
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
+    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         String type = getType(jsonNode);
         Object value = getValue(jsonNode, type, objectMapper);
         return new Value()
@@ -53,25 +50,18 @@ class ValueDeserializationHandler extends DeserializationHandler {
     }
 
     private String getType(JsonNode jsonNode) {
-        return jsonNode.has(TYPE_PROPERTY_NAME) ?
-                jsonNode.get(TYPE_PROPERTY_NAME).textValue() : String.class.getName();
+        return jsonNode.has(TYPE_PROPERTY_NAME)
+                ? jsonNode.get(TYPE_PROPERTY_NAME).textValue()
+                : String.class.getName();
     }
 
-    private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper)
-            throws JsonProcessingException {
+    private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
         TreeNode valueNode = jsonNode.get(VALUE_PROPERTY_NAME);
-        Class<?> resolvedType = resolveType(type)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Unable to deserialize %s, cannot find %s class", valueNode.toString(), type)));
-        return objectMapper.treeToValue(valueNode, resolvedType);
-    }
-
-    private Optional<Class<?>> resolveType(String type) {
         try {
-            Class<?> c = Thread.currentThread().getContextClassLoader().loadClass(type);
-            return Optional.of(c);
+            Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
+            return objectMapper.treeToValue(valueNode, resolvedType);
         } catch (ClassNotFoundException e) {
-            return Optional.empty();
+            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", valueNode.toString(), type), e);
         }
     }
 }
