@@ -31,6 +31,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
 
+import java.util.Optional;
+
 class ValueDeserializationHandler extends DeserializationHandler {
     private static final String VALUE_PROPERTY_NAME = "value";
     private static final String VALUE_TYPE_PROPERTY_NAME = "type";
@@ -58,16 +60,18 @@ class ValueDeserializationHandler extends DeserializationHandler {
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper)
             throws JsonProcessingException {
         TreeNode valueNode = jsonNode.get(VALUE_PROPERTY_NAME);
-        Class<?> resolvedType = resolveType(type);
+        Class<?> resolvedType = resolveType(type)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Unable to deserialize %s, cannot find %s class", valueNode.toString(), type)));
         return objectMapper.treeToValue(valueNode, resolvedType);
     }
 
-    private Class<?> resolveType(String type) {
+    private Optional<Class<?>> resolveType(String type) {
         try {
-            return Thread.currentThread().getContextClassLoader().loadClass(type);
+            Class<?> c = Thread.currentThread().getContextClassLoader().loadClass(type);
+            return Optional.of(c);
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(
-                    String.format("Could not resolve type from string: %s", type));
+            return Optional.empty();
         }
     }
 }
