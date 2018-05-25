@@ -35,7 +35,7 @@ import java.util.Optional;
 
 class ValueDeserializationHandler extends DeserializationHandler {
     private static final String VALUE_PROPERTY_NAME = "value";
-    private static final String VALUE_TYPE_PROPERTY_NAME = "type";
+    private static final String TYPE_PROPERTY_NAME = "type";
 
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
@@ -53,8 +53,8 @@ class ValueDeserializationHandler extends DeserializationHandler {
     }
 
     private String getType(JsonNode jsonNode) {
-        return jsonNode.has(VALUE_TYPE_PROPERTY_NAME) ?
-                jsonNode.get(VALUE_TYPE_PROPERTY_NAME).textValue() : String.class.getName();
+        return jsonNode.has(TYPE_PROPERTY_NAME) ?
+                jsonNode.get(TYPE_PROPERTY_NAME).textValue() : String.class.getName();
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper)

@@ -37,9 +37,9 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class AttributeDeserializer extends JsonDeserializer<Attribute> {
-    private static final String ATTRIBUTE_NAME_PROPERTY_NAME = "name";
-    private static final String ATTRIBUTE_TYPE_PROPERTY_NAME = "type";
-    private static final String ATTRIBUTE_VALUE_PROPERTY_NAME = "value";
+    private static final String NAME_PROPERTY_NAME = "name";
+    private static final String TYPE_PROPERTY_NAME = "type";
+    private static final String VALUE_PROPERTY_NAME = "value";
 
     @Override
     public Attribute deserialize(JsonParser jsonParser, DeserializationContext ctx)
@@ -56,16 +56,16 @@ public class AttributeDeserializer extends JsonDeserializer<Attribute> {
     }
 
     private String getName(JsonNode jsonNode) {
-        return jsonNode.get(ATTRIBUTE_NAME_PROPERTY_NAME).textValue();
+        return jsonNode.get(NAME_PROPERTY_NAME).textValue();
     }
 
     private String getType(JsonNode jsonNode) {
-        return jsonNode.get(ATTRIBUTE_TYPE_PROPERTY_NAME).textValue();
+        return jsonNode.get(TYPE_PROPERTY_NAME).textValue();
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper)
             throws JsonProcessingException {
-        TreeNode valueNode = jsonNode.get(ATTRIBUTE_VALUE_PROPERTY_NAME);
+        TreeNode valueNode = jsonNode.get(VALUE_PROPERTY_NAME);
         Class<?> resolvedType = resolveType(type)
                 .orElseThrow(() -> new IllegalArgumentException(
                         String.format("Unable to deserialize %s, cannot find %s class", valueNode.toString(), type)));

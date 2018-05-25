@@ -37,7 +37,7 @@ import java.util.List;
 
 class ValuesDeserializationHandler extends DeserializationHandler {
     private static final String VALUES_PROPERTY_NAME = "values";
-    private static final String VALUES_TYPE_PROPERTY_NAME = "type";
+    private static final String TYPE_PROPERTY_NAME = "type";
 
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
@@ -56,8 +56,8 @@ class ValuesDeserializationHandler extends DeserializationHandler {
     }
 
     private String getType(JsonNode jsonNode) {
-        return jsonNode.has(VALUES_TYPE_PROPERTY_NAME) ?
-                jsonNode.get(VALUES_TYPE_PROPERTY_NAME).textValue() : null;
+        return jsonNode.has(TYPE_PROPERTY_NAME) ?
+                jsonNode.get(TYPE_PROPERTY_NAME).textValue() : null;
     }
 
     private List<Expression> getValues(JsonNode jsonNode, ObjectMapper objectMapper)
