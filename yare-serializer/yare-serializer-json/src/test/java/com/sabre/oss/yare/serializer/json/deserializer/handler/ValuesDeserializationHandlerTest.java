@@ -25,23 +25,29 @@
 package com.sabre.oss.yare.serializer.json.deserializer.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sabre.oss.yare.serializer.json.model.Operand;
-import com.sabre.oss.yare.serializer.json.model.Value;
-import com.sabre.oss.yare.serializer.json.model.Values;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.model.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
-    private ValuesDeserializationHandler handler = new ValuesDeserializationHandler();
+class ValuesDeserializationHandlerTest {
+    private ObjectMapper mapper;
+    private DeserializationHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new ValuesDeserializationHandler();
+    }
 
     @Test
-    void shouldBeApplicableForJsonWithValuesAndTypeProperties()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldBeApplicableForJsonWithValuesAndTypeProperties() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"values\": [" +
                 "    \"TEST_VALUE\"" +
@@ -49,51 +55,32 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
                 "  \"type\": \"java.lang.String\"" +
                 "}");
 
-        //when
+        // when
         Boolean applicable = handler.isApplicable(node);
 
-        //then
+        // then
         assertThat(applicable).isTrue();
     }
 
     @Test
-    void shouldNotBeApplicableForJsonWithoutValuesProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldNotBeApplicableForJsonWithoutValuesProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
-                "  \"unknown\": \"TEST_VALUE\"" +
-                "}");
-
-        //when
-        Boolean applicable = handler.isApplicable(node);
-
-        //then
-        assertThat(applicable).isFalse();
-    }
-
-    @Test
-    void shouldNotBeApplicableForJsonWithNonArrayValuesProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
-                "{" +
-                "  \"values\": \"TEST_VALUE\"," +
                 "  \"type\": \"java.lang.String\"" +
                 "}");
 
-        //when
+        // when
         Boolean applicable = handler.isApplicable(node);
 
-        //then
+        // then
         assertThat(applicable).isFalse();
     }
 
     @Test
-    void shouldResolveTypeAsNullWhenTypeIsNotSpecified()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldNotBeApplicableForJsonWithoutTypeProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"values\": [" +
                 "    {" +
@@ -103,24 +90,33 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
                 "  ]" +
                 "}");
 
-        //when
-        Operand result = handler.deserialize(node, mapper);
+        // when
+        Boolean applicable = handler.isApplicable(node);
 
-        //then
-        assertThat(result).isInstanceOf(Values.class);
-
-        Values resultValues = (Values) result;
-        assertThat(resultValues.getValues()).containsExactlyInAnyOrder(
-                integerValueExpression(100)
-        );
-        assertThat(resultValues.getType()).isNull();
+        // then
+        assertThat(applicable).isFalse();
     }
 
     @Test
-    void shouldResolveValuesAsExpressions()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldNotBeApplicableForJsonWithNonArrayValuesProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"values\": \"TEST_VALUE\"," +
+                "  \"type\": \"java.lang.String\"" +
+                "}");
+
+        // when
+        Boolean applicable = handler.isApplicable(node);
+
+        // then
+        assertThat(applicable).isFalse();
+    }
+
+    @Test
+    void shouldResolveValueExpressionWithinValues() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"values\": [" +
                 "    {" +
@@ -128,30 +124,150 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
                 "      \"type\": \"java.lang.Integer\"" +
                 "    }," +
                 "    {" +
-                "      \"value\": \"200\"," +
-                "      \"type\": \"java.lang.Integer\"" +
+                "      \"value\": \"VALUE_1\"" +
                 "    }" +
                 "  ]," +
-                "  \"type\": \"java.lang.Integer\"" +
+                "  \"type\": \"java.lang.Object\"" +
                 "}");
 
-        //when
+        // when
         Operand result = handler.deserialize(node, mapper);
 
-        //then
-        assertThat(result).isInstanceOf(Values.class);
-
-        Values resultValues = (Values) result;
-        assertThat(resultValues.getValues()).containsExactlyInAnyOrder(
-                integerValueExpression(100),
-                integerValueExpression(200)
-        );
-        assertThat(resultValues.getType()).isEqualTo(Integer.class.getName());
+        // then
+        assertThat(result).isInstanceOfSatisfying(
+                Values.class, v -> {
+                    assertThat(v.getValues()).containsExactlyInAnyOrder(
+                            createValueExpression(100),
+                            createValueExpression("VALUE_1")
+                    );
+                    assertThat(v.getType()).isEqualTo(Object.class.getName());
+                });
     }
 
-    private Value integerValueExpression(Integer i) {
+    @Test
+    void shouldResolveValuesExpressionWithinValues() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"values\": [" +
+                "    {" +
+                "      \"values\": [" +
+                "        {" +
+                "          \"value\": \"100\"," +
+                "          \"type\": \"java.lang.Integer\"" +
+                "        }," +
+                "        {" +
+                "          \"value\": \"200\"," +
+                "          \"type\": \"java.lang.Integer\"" +
+                "        }" +
+                "      ]," +
+                "      \"type\": \"java.lang.Integer\"" +
+                "    }," +
+                "    {" +
+                "      \"values\": [" +
+                "        {" +
+                "          \"value\": \"VALUE_1\"" +
+                "        }," +
+                "        {" +
+                "          \"value\": \"VALUE_2\"" +
+                "        }" +
+                "      ]," +
+                "      \"type\": \"java.lang.String\"" +
+                "    }" +
+                "  ]," +
+                "  \"type\": \"java.lang.Object\"" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(
+                Values.class, v -> {
+                    assertThat(v.getValues()).containsExactlyInAnyOrder(
+                            createValuesExpression(100, 200),
+                            createValuesExpression("VALUE_1", "VALUE_2")
+                    );
+                    assertThat(v.getType()).isEqualTo(Object.class.getName());
+                });
+    }
+
+    @Test
+    void shouldResolveFunctionExpressionWithinValues() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"values\": [" +
+                "    {" +
+                "      \"function\": {" +
+                "        \"name\": \"FUNCTION_NAME_1\"," +
+                "        \"parameters\": [" +
+                "          {" +
+                "            \"name\": \"PARAMETER_NAME_1\"," +
+                "            \"value\": \"true\"," +
+                "            \"type\": \"java.lang.Boolean\"" +
+                "          }" +
+                "        ]" +
+                "      }" +
+                "    }," +
+                "    {" +
+                "      \"function\": {" +
+                "        \"name\": \"FUNCTION_NAME_2\"," +
+                "        \"parameters\": [" +
+                "          {" +
+                "            \"name\": \"PARAMETER_NAME_2\"," +
+                "            \"value\": \"false\"," +
+                "            \"type\": \"java.lang.Boolean\"" +
+                "          }" +
+                "        ]" +
+                "      }" +
+                "    }" +
+                "  ]," +
+                "  \"type\": \"java.lang.Object\"" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(
+                Values.class, v -> {
+                    assertThat(v.getValues()).containsExactlyInAnyOrder(
+                            createFunctionExpression("FUNCTION_NAME_1",
+                                    createParameter("PARAMETER_NAME_1", true)
+                            ),
+                            createFunctionExpression("FUNCTION_NAME_2",
+                                    createParameter("PARAMETER_NAME_2", false)
+                            )
+                    );
+                    assertThat(v.getType()).isEqualTo(Object.class.getName());
+                });
+    }
+
+    private Value createValueExpression(Object o) {
         return new Value()
-                .withValue(i)
-                .withType(Integer.class.getName());
+                .withValue(o)
+                .withType(o.getClass().getName());
+    }
+
+    private Values createValuesExpression(Object o1, Object o2) {
+        return new Values()
+                .withValues(
+                        createValueExpression(o1),
+                        createValueExpression(o2)
+                )
+                .withType(o1.getClass().getName());
+    }
+
+    private Function createFunctionExpression(String name, Parameter p) {
+        return new Function()
+                .withName(name)
+                .withParameters(p);
+    }
+
+    private Parameter createParameter(String name, Object o) {
+        return new Parameter()
+                .withName(name)
+                .withExpression(createValueExpression(o));
     }
 }

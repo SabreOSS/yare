@@ -46,22 +46,16 @@ class FunctionDeserializationHandler extends DeserializationHandler {
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
+    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         JsonNode functionNode = jsonNode.get(FUNCTION_PROPERTY_NAME);
-        String functionName = getName(functionNode);
+        String functionName = functionNode.get(NAME_PROPERTY_NAME).textValue();
         List<Parameter> functionParameters = getParameters(functionNode, objectMapper);
         return new Function()
                 .withName(functionName)
                 .withParameters(functionParameters);
     }
 
-    private String getName(JsonNode jsonNode) {
-        return jsonNode.get(NAME_PROPERTY_NAME).textValue();
-    }
-
-    private List<Parameter> getParameters(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
+    private List<Parameter> getParameters(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         Iterator<JsonNode> parametersNodes = jsonNode.get(PARAMETERS_PROPERTY_NAME).iterator();
         List<Parameter> parameters = new ArrayList<>();
         while (parametersNodes.hasNext()) {

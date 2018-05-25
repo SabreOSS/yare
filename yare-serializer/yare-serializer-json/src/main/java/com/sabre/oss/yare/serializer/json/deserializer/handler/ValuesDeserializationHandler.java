@@ -42,26 +42,20 @@ class ValuesDeserializationHandler extends DeserializationHandler {
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
         return jsonNode.has(VALUES_PROPERTY_NAME)
-                && jsonNode.get(VALUES_PROPERTY_NAME).isArray();
+                && jsonNode.get(VALUES_PROPERTY_NAME).isArray()
+                && jsonNode.has(TYPE_PROPERTY_NAME);
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
-        String type = getType(jsonNode);
+    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        String type = jsonNode.get(TYPE_PROPERTY_NAME).textValue();
         List<Expression> values = getValues(jsonNode, objectMapper);
         return new Values()
                 .withType(type)
                 .withValues(values);
     }
 
-    private String getType(JsonNode jsonNode) {
-        return jsonNode.has(TYPE_PROPERTY_NAME) ?
-                jsonNode.get(TYPE_PROPERTY_NAME).textValue() : null;
-    }
-
-    private List<Expression> getValues(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
+    private List<Expression> getValues(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         Iterator<JsonNode> valueNodes = jsonNode.get(VALUES_PROPERTY_NAME).iterator();
         List<Expression> expressions = new ArrayList<>();
         while (valueNodes.hasNext()) {

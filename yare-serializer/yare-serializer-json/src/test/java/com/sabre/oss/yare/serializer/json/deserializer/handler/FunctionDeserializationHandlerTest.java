@@ -25,60 +25,66 @@
 package com.sabre.oss.yare.serializer.json.deserializer.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 import com.sabre.oss.yare.serializer.json.model.Value;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class FunctionDeserializationHandlerTest extends DeserializationHandlerTestBase {
-    private FunctionDeserializationHandler handler = new FunctionDeserializationHandler();
+class FunctionDeserializationHandlerTest {
+    private ObjectMapper mapper;
+    private DeserializationHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new FunctionDeserializationHandler();
+    }
 
     @Test
-    void shouldBeApplicableForJsonWithFunctionProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldBeApplicableForJsonWithFunctionProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"function\" : {" +
                 "    \"name\": \"FUNCTION_NAME\"" +
                 "  }" +
                 "}");
 
-        //when
+        // when
         Boolean applicable = handler.isApplicable(node);
 
-        //then
+        // then
         assertThat(applicable).isTrue();
     }
 
     @Test
-    void shouldNotBeApplicableForJsonWithoutFunctionProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldNotBeApplicableForJsonWithoutFunctionProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"unknown\" : {" +
                 "    \"name\": \"NAME\"" +
                 "  }" +
                 "}");
 
-        //when
+        // when
         Boolean applicable = handler.isApplicable(node);
 
-        //then
+        // then
         assertThat(applicable).isFalse();
     }
 
     @Test
-    void shouldResolveFunctionProperly()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldResolveFunctionProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"function\" : {" +
                 "    \"name\": \"FUNCTION_NAME\"," +
@@ -97,25 +103,29 @@ class FunctionDeserializationHandlerTest extends DeserializationHandlerTestBase 
                 "  }" +
                 "}");
 
-        //when
+        // when
         Operand result = handler.deserialize(node, mapper);
 
-        //then
-        assertThat(result).isInstanceOf(Function.class);
-
-        Function resultFunction = (Function) result;
-        assertThat(resultFunction.getName()).isEqualTo("FUNCTION_NAME");
-        assertThat(resultFunction.getParameters()).containsExactlyInAnyOrder(
-                booleanValueParameter("PARAM_NAME_1", false),
-                booleanValueParameter("PARAM_NAME_2", true)
-        );
+        // then
+        assertThat(result).isInstanceOfSatisfying(
+                Function.class, f -> {
+                    assertThat(f.getName()).isEqualTo("FUNCTION_NAME");
+                    assertThat(f.getParameters()).containsExactlyInAnyOrder(
+                            createParameter("PARAM_NAME_1", false),
+                            createParameter("PARAM_NAME_2", true)
+                    );
+                });
     }
 
-    private Parameter booleanValueParameter(String name, Boolean b) {
+    private Parameter createParameter(String name, Object o) {
         return new Parameter()
                 .withName(name)
-                .withExpression(new Value()
-                        .withValue(b)
-                        .withType(Boolean.class.getName()));
+                .withExpression(createValueExpression(o));
+    }
+
+    private Value createValueExpression(Object o) {
+        return new Value()
+                .withValue(o)
+                .withType(o.getClass().getName());
     }
 }

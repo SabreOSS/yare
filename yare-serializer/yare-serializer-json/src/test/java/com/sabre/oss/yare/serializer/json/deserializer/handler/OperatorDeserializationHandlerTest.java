@@ -25,23 +25,31 @@
 package com.sabre.oss.yare.serializer.json.deserializer.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Operator;
 import com.sabre.oss.yare.serializer.json.model.Value;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OperatorDeserializationHandlerTest extends DeserializationHandlerTestBase {
-    private OperatorDeserializationHandler handler = new OperatorDeserializationHandler();
+class OperatorDeserializationHandlerTest {
+    private ObjectMapper mapper;
+    private DeserializationHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new OperatorDeserializationHandler();
+    }
 
     @Test
-    void shouldBeApplicableForJsonWithAnyArrayProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldBeApplicableForJsonWithAnyArrayProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"or\" : [" +
                 "    {" +
@@ -50,36 +58,46 @@ class OperatorDeserializationHandlerTest extends DeserializationHandlerTestBase 
                 "  ]" +
                 "}");
 
-        //when
+        // when
         Boolean applicable = handler.isApplicable(node);
 
-        //then
+        // then
         assertThat(applicable).isTrue();
     }
 
     @Test
-    void shouldNotBeApplicableForJsonWithoutArrayProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldNotBeApplicableForJsonWithoutArrayProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"or\" : {" +
                 "    \"value\": \"true\"" +
                 "  }" +
                 "}");
 
-        //when
+        // when
         Boolean applicable = handler.isApplicable(node);
 
-        //then
+        // then
         assertThat(applicable).isFalse();
     }
 
     @Test
-    void shouldResolveOperatorProperly()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode("" +
+    void shouldNotBeApplicableForJsonWithNoProperties() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("{}");
+
+        // when
+        Boolean applicable = handler.isApplicable(node);
+
+        // then
+        assertThat(applicable).isFalse();
+    }
+
+    @Test
+    void shouldResolveOperatorProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
                 "{" +
                 "  \"or\" : [" +
                 "    {" +
@@ -87,29 +105,29 @@ class OperatorDeserializationHandlerTest extends DeserializationHandlerTestBase 
                 "      \"type\": \"java.lang.Boolean\"" +
                 "    }," +
                 "    {" +
-                "      \"value\": \"false\"," +
-                "      \"type\": \"java.lang.Boolean\"" +
+                "      \"value\": \"100\"," +
+                "      \"type\": \"java.lang.Integer\"" +
                 "    }" +
                 "  ]" +
                 "}");
 
-        //when
+        // when
         Operand result = handler.deserialize(node, mapper);
 
-        //then
-        assertThat(result).isInstanceOf(Operator.class);
-
-        Operator resultOperator = (Operator) result;
-        assertThat(resultOperator.getType()).isEqualTo("or");
-        assertThat(resultOperator.getOperands()).containsExactlyInAnyOrder(
-                booleanValueExpression(true),
-                booleanValueExpression(false)
-        );
+        // then
+        assertThat(result).isInstanceOfSatisfying(
+                Operator.class, o -> {
+                    assertThat(o.getType()).isEqualTo("or");
+                    assertThat(o.getOperands()).containsExactlyInAnyOrder(
+                            createValueExpression(true),
+                            createValueExpression(100)
+                    );
+                });
     }
 
-    private Value booleanValueExpression(Boolean b) {
+    private Value createValueExpression(Object o) {
         return new Value()
-                .withValue(b)
-                .withType(Boolean.class.getName());
+                .withValue(o)
+                .withType(o.getClass().getName());
     }
 }

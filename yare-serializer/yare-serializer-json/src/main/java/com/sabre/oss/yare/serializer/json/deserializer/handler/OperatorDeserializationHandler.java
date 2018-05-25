@@ -37,15 +37,17 @@ import java.util.List;
 class OperatorDeserializationHandler extends DeserializationHandler {
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
+        if (!jsonNode.fieldNames().hasNext()) {
+            return false;
+        }
         String fieldName = jsonNode.fieldNames().next();
         JsonNode operatorNode = jsonNode.get(fieldName);
         return operatorNode.isArray();
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
-        String operatorType = getOperatorType(jsonNode);
+    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        String operatorType = jsonNode.fieldNames().next();
         JsonNode operandsNode = jsonNode.get(operatorType);
         List<Operand> operands = getOperands(operandsNode, objectMapper);
         return new Operator()
@@ -53,12 +55,7 @@ class OperatorDeserializationHandler extends DeserializationHandler {
                 .withOperands(operands);
     }
 
-    private String getOperatorType(JsonNode jsonNode) {
-        return jsonNode.fieldNames().next();
-    }
-
-    private List<Operand> getOperands(JsonNode jsonNode, ObjectMapper objectMapper)
-            throws JsonProcessingException {
+    private List<Operand> getOperands(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         Iterator<JsonNode> operandNodes = jsonNode.iterator();
         List<Operand> operands = new ArrayList<>();
         while (operandNodes.hasNext()) {
