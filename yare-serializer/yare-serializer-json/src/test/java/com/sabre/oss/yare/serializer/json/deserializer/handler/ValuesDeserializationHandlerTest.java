@@ -106,11 +106,11 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
         //then
         assertThat(result).isInstanceOf(Values.class);
 
-        Values resultValue = (Values) result;
-        assertThat(resultValue.getValues()).containsExactlyInAnyOrder(
+        Values resultValues = (Values) result;
+        assertThat(resultValues.getValues()).containsExactlyInAnyOrder(
                 integerValueExpression(100)
         );
-        assertThat(resultValue.getType()).isNull();
+        assertThat(resultValues.getType()).isNull();
     }
 
     @Test
@@ -118,10 +118,10 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
             throws IOException {
         //given
         JsonNode node = toJsonNode(
-                "{\"values\": [ " +
-                        "{\"value\": \"100\", \"type\": \"java.lang.Integer\"}, " +
+                "{\"values\": [" +
+                        "{\"value\": \"100\", \"type\": \"java.lang.Integer\"}," +
                         "{\"value\": \"200\", \"type\": \"java.lang.Integer\"}" +
-                        " ], \"type\": \"java.lang.Integer\"}");
+                        "], \"type\": \"java.lang.Integer\"}");
 
         //when
         Operand result = handler.deserialize(node, mapper);
@@ -129,12 +129,12 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
         //then
         assertThat(result).isInstanceOf(Values.class);
 
-        Values resultValue = (Values) result;
-        assertThat(resultValue.getValues()).containsExactlyInAnyOrder(
+        Values resultValues = (Values) result;
+        assertThat(resultValues.getValues()).containsExactlyInAnyOrder(
                 integerValueExpression(100),
                 integerValueExpression(200)
         );
-        assertThat(resultValue.getType()).isEqualTo(Integer.class.getName());
+        assertThat(resultValues.getType()).isEqualTo(Integer.class.getName());
     }
 
     private Value integerValueExpression(Integer i) {
