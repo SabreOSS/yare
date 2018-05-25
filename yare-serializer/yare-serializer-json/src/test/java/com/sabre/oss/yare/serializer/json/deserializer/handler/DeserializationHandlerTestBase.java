@@ -22,21 +22,17 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.utils;
+package com.sabre.oss.yare.serializer.json.deserializer.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-public final class JsonNodeHelper {
-    private final ObjectMapper mapper;
+abstract class DeserializationHandlerTestBase {
+    final ObjectMapper mapper = new ObjectMapper();
 
-    public JsonNodeHelper(ObjectMapper mapper) {
-        this.mapper = mapper;
-    }
-
-    public JsonNode toJsonNode(String s)
+    JsonNode toJsonNode(String s)
             throws IOException {
         return mapper.readTree(s);
     }
