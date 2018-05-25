@@ -24,39 +24,19 @@
 
 package com.sabre.oss.yare.engine.executor.runtime.value;
 
-import com.sabre.oss.yare.core.call.ProcessingContext;
-import com.sabre.oss.yare.core.invocation.Invocation;
+import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
+import org.apache.commons.lang3.Validate;
 
-public final class ValueProviderFactory {
+public final class ReferenceValueProvider extends ValueProvider {
 
-    private ValueProviderFactory() {
+    private final String reference;
+
+    public ReferenceValueProvider(String reference) {
+        this.reference = Validate.notEmpty(reference, "reference must not be empty");
     }
 
-    public static ValueProvider constantTrue() {
-        return createFromConstant(Boolean.TRUE);
-    }
-
-    public static ValueProvider constantFalse() {
-        return createFromConstant(Boolean.FALSE);
-    }
-
-    public static ValueProvider constantNull() {
-        return createFromConstant(null);
-    }
-
-    public static ValueProvider createFromConstant(Object value) {
-        return new ConstantValueProvider(value);
-    }
-
-    public static ValueProvider createFromPath(Class<?> referenceType, String reference, Class<?> type, String path) {
-        return path == null ? new ReferenceValueProvider(reference) : FieldReferringClassFactory.create(referenceType, reference, path);
-    }
-
-    public static ValueProvider createFromMapKey(String reference, String key) {
-        return new MapValueProvider(reference, key);
-    }
-
-    public static ValueProvider createFromInvocation(Invocation<ProcessingContext, Object> invocation) {
-        return new InvocationBasedValueProvider(invocation);
+    @Override
+    public Object get(PredicateContext context) {
+        return context.resolve(reference);
     }
 }

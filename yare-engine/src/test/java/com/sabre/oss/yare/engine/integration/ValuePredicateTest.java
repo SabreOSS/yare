@@ -162,6 +162,59 @@ public class ValuePredicateTest {
         );
     }
 
+    @Test
+    void shouldUseEscapedPlaceholdersDirectlyForAttribute() {
+        // given
+        String matchingName = "someMatchingNameValue";
+        NamedFact namedFact = new NamedFact(matchingName, true);
+
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", NamedFact.class)
+                .attribute("attributeRefName", new AttributeWithValue(matchingName))
+                .attribute("attributeIsValid", Boolean.TRUE)
+                .predicate(
+                        and(
+                                equal(
+                                        value("${fact.name}"),
+                                        value("${attributeRefName.value}")
+                                ),
+                                equal(
+                                        value("${fact.isValid}"),
+                                        value("${attributeIsValid}")
+                                ),
+                                equal(
+                                        value("${fact}"),
+                                        value(namedFact)
+                                )
+                        )
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("fact", value("${fact}"))
+                )
+                .build();
+
+        List<NamedFact> facts = Arrays.asList(
+                namedFact,
+                new NamedFact("notMatchingName", true),
+                new NamedFact("anyName", true));
+
+        RulesEngine engine = new RulesEngineBuilder()
+                .withRulesRepository(uri -> Collections.singletonList(rule))
+                .withActionMapping("collect", method(this, a -> a.collect(null, null)))
+                .build();
+        RuleSession session = engine.createSession("uri");
+
+        // when
+        ArrayList<String> result = session.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(result).containsExactly(
+                matchingName
+        );
+    }
+
     public void collect(List<String> context, NamedFact fact) {
         context.add(fact.name);
     }
@@ -175,6 +228,14 @@ public class ValuePredicateTest {
             this.name = name;
             this.isValid = isValid;
             this.boxedIsValid = isValid;
+        }
+    }
+
+    public static final class AttributeWithValue {
+        public String value;
+
+        public AttributeWithValue(String value) {
+            this.value = value;
         }
     }
 }
