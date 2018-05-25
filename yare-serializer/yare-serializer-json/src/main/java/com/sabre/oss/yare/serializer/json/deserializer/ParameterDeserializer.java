@@ -36,12 +36,25 @@ import com.sabre.oss.yare.serializer.json.model.Parameter;
 import java.io.IOException;
 
 public class ParameterDeserializer extends JsonDeserializer<Parameter> {
+    private static final String PARAMETER_NAME_PROPERTY_NAME = "name";
     @Override
-    public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode jsonNode = jsonParser.getCodec().readTree(jsonParser);
+    public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctxt)
+            throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
-        String name = jsonNode.get("name").textValue();
-        Expression expression = objectMapper.treeToValue(jsonNode, Expression.class);
-        return new Parameter().withName(name).withExpression(expression);
+        JsonNode jsonNode = objectMapper.readTree(jsonParser);
+        String name = getName(jsonNode);
+        Expression expression = getExpression(jsonNode, objectMapper);
+        return new Parameter()
+                .withName(name)
+                .withExpression(expression);
+    }
+
+    private String getName(JsonNode jsonNode) {
+        return jsonNode.get(PARAMETER_NAME_PROPERTY_NAME).textValue();
+    }
+
+    private Expression getExpression(JsonNode jsonNode, ObjectMapper objectMapper)
+            throws JsonProcessingException {
+        return objectMapper.treeToValue(jsonNode, Expression.class);
     }
 }
