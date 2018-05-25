@@ -25,7 +25,6 @@
 package com.sabre.oss.yare.serializer.json.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,12 +35,15 @@ import com.sabre.oss.yare.serializer.json.model.Parameter;
 import java.io.IOException;
 
 public class ParameterDeserializer extends JsonDeserializer<Parameter> {
+    private static final String NAME_PROPERTY_NAME = "name";
     @Override
-    public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode jsonNode = jsonParser.getCodec().readTree(jsonParser);
+    public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
-        String name = jsonNode.get("name").textValue();
+        JsonNode jsonNode = objectMapper.readTree(jsonParser);
+        String name = jsonNode.get(NAME_PROPERTY_NAME).textValue();
         Expression expression = objectMapper.treeToValue(jsonNode, Expression.class);
-        return new Parameter().withName(name).withExpression(expression);
+        return new Parameter()
+                .withName(name)
+                .withExpression(expression);
     }
 }

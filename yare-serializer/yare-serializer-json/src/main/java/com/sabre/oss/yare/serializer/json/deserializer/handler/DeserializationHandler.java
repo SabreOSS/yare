@@ -32,7 +32,7 @@ import com.sabre.oss.yare.serializer.json.model.Operand;
 public abstract class DeserializationHandler {
     private DeserializationHandler next;
 
-    public DeserializationHandler withNext(DeserializationHandler next) {
+    DeserializationHandler withNext(DeserializationHandler next) {
         this.next = next;
         return this;
     }
@@ -44,7 +44,7 @@ public abstract class DeserializationHandler {
         if (next != null) {
             return next.handle(jsonNode, objectMapper);
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException(String.format("Given node: %s could not be deserialized to any known operand model", jsonNode));
     }
 
     protected abstract boolean isApplicable(JsonNode jsonNode);

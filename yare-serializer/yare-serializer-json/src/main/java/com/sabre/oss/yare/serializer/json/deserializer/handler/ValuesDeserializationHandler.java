@@ -27,33 +27,41 @@ package com.sabre.oss.yare.serializer.json.deserializer.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.sabre.oss.yare.serializer.json.model.Expression;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Values;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 class ValuesDeserializationHandler extends DeserializationHandler {
+    private static final String VALUES_PROPERTY_NAME = "values";
+    private static final String TYPE_PROPERTY_NAME = "type";
+
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
-        return jsonNode.has("values") && jsonNode.has("type");
+        return jsonNode.has(VALUES_PROPERTY_NAME)
+                && jsonNode.get(VALUES_PROPERTY_NAME).isArray()
+                && jsonNode.has(TYPE_PROPERTY_NAME);
     }
 
     @Override
     protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        String type = jsonNode.has("type") ? jsonNode.get("type").textValue() : null;
+        String type = jsonNode.get(TYPE_PROPERTY_NAME).textValue();
         List<Expression> values = getValues(jsonNode, objectMapper);
-        return new Values().withValues(values).withType(type);
+        return new Values()
+                .withType(type)
+                .withValues(values);
     }
 
     private List<Expression> getValues(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        ArrayNode valuesNode = (ArrayNode) jsonNode.get("values");
+        Iterator<JsonNode> valueNodes = jsonNode.get(VALUES_PROPERTY_NAME).iterator();
         List<Expression> expressions = new ArrayList<>();
-        for (JsonNode expressionNode : (Iterable<JsonNode>) valuesNode::elements) {
-            Expression expression = objectMapper.treeToValue(expressionNode, Expression.class);
-            expressions.add(expression);
+        while (valueNodes.hasNext()) {
+            JsonNode node = valueNodes.next();
+            Expression e = objectMapper.treeToValue(node, Expression.class);
+            expressions.add(e);
         }
         return expressions;
     }

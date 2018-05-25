@@ -25,26 +25,38 @@
 package com.sabre.oss.yare.serializer.json.deserializer.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
 
 class ValueDeserializationHandler extends DeserializationHandler {
+    private static final String VALUE_PROPERTY_NAME = "value";
+    private static final String TYPE_PROPERTY_NAME = "type";
+
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
-        return jsonNode.has("value");
+        return jsonNode.has(VALUE_PROPERTY_NAME);
     }
 
     @Override
     protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        String type = jsonNode.has("type") ? jsonNode.get("type").textValue() : String.class.getName();
+        String type = getType(jsonNode);
         Object value = getValue(jsonNode, type, objectMapper);
-        return new Value().withValue(value).withType(type);
+        return new Value()
+                .withValue(value)
+                .withType(type);
+    }
+
+    private String getType(JsonNode jsonNode) {
+        return jsonNode.has(TYPE_PROPERTY_NAME)
+                ? jsonNode.get(TYPE_PROPERTY_NAME).textValue()
+                : String.class.getName();
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
-        JsonNode valueNode = jsonNode.get("value");
+        TreeNode valueNode = jsonNode.get(VALUE_PROPERTY_NAME);
         try {
             Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
             return objectMapper.treeToValue(valueNode, resolvedType);

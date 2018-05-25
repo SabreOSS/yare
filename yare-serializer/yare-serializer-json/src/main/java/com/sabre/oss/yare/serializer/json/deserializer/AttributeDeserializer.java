@@ -26,6 +26,7 @@ package com.sabre.oss.yare.serializer.json.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,18 +36,25 @@ import com.sabre.oss.yare.serializer.json.model.Attribute;
 import java.io.IOException;
 
 public class AttributeDeserializer extends JsonDeserializer<Attribute> {
+    private static final String NAME_PROPERTY_NAME = "name";
+    private static final String TYPE_PROPERTY_NAME = "type";
+    private static final String VALUE_PROPERTY_NAME = "value";
+
     @Override
-    public Attribute deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException, JsonProcessingException {
-        JsonNode attributeNode = jsonParser.getCodec().readTree(jsonParser);
+    public Attribute deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
-        String name = attributeNode.get("name").textValue();
-        String type = attributeNode.get("type").textValue();
+        JsonNode attributeNode = objectMapper.readTree(jsonParser);
+        String name = attributeNode.get(NAME_PROPERTY_NAME).textValue();
+        String type = attributeNode.get(TYPE_PROPERTY_NAME).textValue();
         Object value = getValue(attributeNode, type, objectMapper);
-        return new Attribute().withName(name).withType(type).withValue(value);
+        return new Attribute()
+                .withName(name)
+                .withType(type)
+                .withValue(value);
     }
 
-    private Object getValue(JsonNode attributeNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
-        JsonNode valueNode = attributeNode.get("value");
+    private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
+        TreeNode valueNode = jsonNode.get(VALUE_PROPERTY_NAME);
         try {
             Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
             return objectMapper.treeToValue(valueNode, resolvedType);

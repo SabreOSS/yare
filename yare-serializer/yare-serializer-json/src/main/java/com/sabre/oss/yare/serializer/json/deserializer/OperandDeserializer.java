@@ -38,8 +38,8 @@ import java.io.IOException;
 public class OperandDeserializer extends JsonDeserializer<Operand> {
     @Override
     public Operand deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
-        JsonNode jsonNode = jsonParser.getCodec().readTree(jsonParser);
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
+        JsonNode jsonNode = objectMapper.readTree(jsonParser);
         DeserializationHandler defaultHandler = DefaultDeserializationHandlers.getDefaultHandler();
         return defaultHandler.handle(jsonNode, objectMapper);
     }
