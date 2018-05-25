@@ -41,8 +41,13 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldBeApplicableForJsonWithValuesAndTypeProperties()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"values\": [\"TEST_VALUE\"], \"type\": \"java.lang.String\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"values\": [" +
+                "    \"TEST_VALUE\"" +
+                "  ]," +
+                "  \"type\": \"java.lang.String\"" +
+                "}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -55,22 +60,10 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldNotBeApplicableForJsonWithoutValuesProperty()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"type\": \"java.lang.String\"}");
-
-        //when
-        Boolean applicable = handler.isApplicable(node);
-
-        //then
-        assertThat(applicable).isFalse();
-    }
-
-    @Test
-    void shouldNotBeApplicableForJsonWithoutTypeProperty()
-            throws IOException {
-        //given
-        JsonNode node = toJsonNode(
-                "{\"values\": [\"TEST_VALUE\"]}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"unknown\": \"TEST_VALUE\"" +
+                "}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -83,8 +76,11 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldNotBeApplicableForJsonWithNonArrayValuesProperty()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"values\": \"TEST_VALUE\", \"type\": \"java.lang.String\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"values\": \"TEST_VALUE\"," +
+                "  \"type\": \"java.lang.String\"" +
+                "}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -97,8 +93,15 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldResolveTypeAsNullWhenTypeIsNotSpecified()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"values\": [{\"value\": \"100\", \"type\": \"java.lang.Integer\"}]}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"values\": [" +
+                "    {" +
+                "      \"value\": \"100\"," +
+                "      \"type\": \"java.lang.Integer\"" +
+                "    }" +
+                "  ]" +
+                "}");
 
         //when
         Operand result = handler.deserialize(node, mapper);
@@ -117,11 +120,20 @@ class ValuesDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldResolveValuesAsExpressions()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"values\": [" +
-                        "{\"value\": \"100\", \"type\": \"java.lang.Integer\"}," +
-                        "{\"value\": \"200\", \"type\": \"java.lang.Integer\"}" +
-                        "], \"type\": \"java.lang.Integer\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"values\": [" +
+                "    {" +
+                "      \"value\": \"100\"," +
+                "      \"type\": \"java.lang.Integer\"" +
+                "    }," +
+                "    {" +
+                "      \"value\": \"200\"," +
+                "      \"type\": \"java.lang.Integer\"" +
+                "    }" +
+                "  ]," +
+                "  \"type\": \"java.lang.Integer\"" +
+                "}");
 
         //when
         Operand result = handler.deserialize(node, mapper);

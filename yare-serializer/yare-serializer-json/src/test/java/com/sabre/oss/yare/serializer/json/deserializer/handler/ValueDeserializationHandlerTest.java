@@ -41,8 +41,10 @@ class ValueDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldBeApplicableForJsonWithValueProperty()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"value\": \"TEST_VALUE\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"value\": \"TEST_VALUE\"" +
+                "}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -68,8 +70,11 @@ class ValueDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldResolveValueAccordingToTheGivenType()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"value\": \"100\", \"type\": \"java.lang.Integer\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"value\": \"100\"," +
+                "  \"type\": \"java.lang.Integer\"" +
+                "}");
 
         //when
         Operand result = handler.deserialize(node, mapper);
@@ -86,8 +91,10 @@ class ValueDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldResolveValueAsStringWhenTypeIsNotSpecified()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"value\": \"100\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"value\": \"100\"" +
+                "}");
 
         //when
         Operand result = handler.deserialize(node, mapper);
@@ -104,8 +111,11 @@ class ValueDeserializationHandlerTest extends DeserializationHandlerTestBase {
     void shouldThrowExceptionIfTypeCannotBeResolved()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"value\": \"100\", \"type\": \"java.lang.Unknown\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"value\": \"100\"," +
+                "  \"type\": \"java.lang.Unknown\"" +
+                "}");
 
         //when / then
         String expectedMessage = "Could not resolve type from string: java.lang.Unknown";
