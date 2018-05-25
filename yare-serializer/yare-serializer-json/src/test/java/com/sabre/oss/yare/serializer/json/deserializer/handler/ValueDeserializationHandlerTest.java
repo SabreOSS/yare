@@ -25,10 +25,8 @@
 package com.sabre.oss.yare.serializer.json.deserializer.handler;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
-import com.sabre.oss.yare.serializer.json.utils.JsonNodeHelper;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -36,16 +34,14 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ValueDeserializationHandlerTest {
+class ValueDeserializationHandlerTest extends DeserializationHandlerTestBase {
     private ValueDeserializationHandler handler = new ValueDeserializationHandler();
-    private ObjectMapper mapper = new ObjectMapper();
-    private JsonNodeHelper jsonNodeHelper = new JsonNodeHelper(mapper);
 
     @Test
     void shouldBeApplicableForJsonWithValueProperty()
             throws IOException {
         //given
-        JsonNode node = jsonNodeHelper.toJsonNode(
+        JsonNode node = toJsonNode(
                 "{\"value\": \"TEST_VALUE\"}");
 
         //when
@@ -59,7 +55,7 @@ class ValueDeserializationHandlerTest {
     void shouldNotBeApplicableForJsonWithoutValueProperty()
             throws IOException {
         //given
-        JsonNode node = jsonNodeHelper.toJsonNode("{}");
+        JsonNode node = toJsonNode("{}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -72,7 +68,7 @@ class ValueDeserializationHandlerTest {
     void shouldResolveValueAccordingToTheGivenType()
             throws IOException {
         //given
-        JsonNode node = jsonNodeHelper.toJsonNode(
+        JsonNode node = toJsonNode(
                 "{\"value\": \"100\", \"type\": \"java.lang.Integer\"}");
 
         //when
@@ -90,7 +86,7 @@ class ValueDeserializationHandlerTest {
     void shouldResolveValueAsStringWhenTypeIsNotSpecified()
             throws IOException {
         //given
-        JsonNode node = jsonNodeHelper.toJsonNode(
+        JsonNode node = toJsonNode(
                 "{\"value\": \"100\"}");
 
         //when
@@ -108,7 +104,7 @@ class ValueDeserializationHandlerTest {
     void shouldThrowExceptionIfTypeCannotBeResolved()
             throws IOException {
         //given
-        JsonNode node = jsonNodeHelper.toJsonNode(
+        JsonNode node = toJsonNode(
                 "{\"value\": \"100\", \"type\": \"java.lang.Unknown\"}");
 
         //when / then
@@ -116,6 +112,5 @@ class ValueDeserializationHandlerTest {
         assertThatThrownBy(() -> handler.deserialize(node, mapper))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
-
     }
 }
