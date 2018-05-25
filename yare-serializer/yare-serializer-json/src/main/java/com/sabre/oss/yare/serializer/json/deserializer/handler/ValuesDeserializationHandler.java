@@ -42,7 +42,6 @@ class ValuesDeserializationHandler extends DeserializationHandler {
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
         return jsonNode.has(VALUES_PROPERTY_NAME)
-                && jsonNode.has(VALUES_TYPE_PROPERTY_NAME)
                 && jsonNode.get(VALUES_PROPERTY_NAME).isArray();
     }
 

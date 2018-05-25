@@ -41,8 +41,14 @@ class OperatorDeserializationHandlerTest extends DeserializationHandlerTestBase 
     void shouldBeApplicableForJsonWithAnyArrayProperty()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"or\": [\"TEST_VALUE\"]}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"or\" : [" +
+                "    {" +
+                "      \"value\": \"true\"" +
+                "    }" +
+                "  ]" +
+                "}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -55,8 +61,12 @@ class OperatorDeserializationHandlerTest extends DeserializationHandlerTestBase 
     void shouldNotBeApplicableForJsonWithoutArrayProperty()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"value\": \"TEST_VALUE\"}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"or\" : {" +
+                "    \"value\": \"true\"" +
+                "  }" +
+                "}");
 
         //when
         Boolean applicable = handler.isApplicable(node);
@@ -69,11 +79,19 @@ class OperatorDeserializationHandlerTest extends DeserializationHandlerTestBase 
     void shouldResolveOperatorProperly()
             throws IOException {
         //given
-        JsonNode node = toJsonNode(
-                "{\"or\": [" +
-                        "{\"value\": \"true\", \"type\": \"java.lang.Boolean\"}," +
-                        "{\"value\": \"false\", \"type\": \"java.lang.Boolean\"}]" +
-                        "}");
+        JsonNode node = toJsonNode("" +
+                "{" +
+                "  \"or\" : [" +
+                "    {" +
+                "      \"value\": \"true\"," +
+                "      \"type\": \"java.lang.Boolean\"" +
+                "    }," +
+                "    {" +
+                "      \"value\": \"false\"," +
+                "      \"type\": \"java.lang.Boolean\"" +
+                "    }" +
+                "  ]" +
+                "}");
 
         //when
         Operand result = handler.deserialize(node, mapper);
