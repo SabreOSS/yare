@@ -118,7 +118,7 @@ class ValueDeserializationHandlerTest extends DeserializationHandlerTestBase {
                 "}");
 
         //when / then
-        String expectedMessage = "Could not resolve type from string: java.lang.Unknown";
+        String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";
         assertThatThrownBy(() -> handler.deserialize(node, mapper))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
