@@ -29,19 +29,90 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.sabre.oss.yare.common.converter.aliases.TypeAliases.ALIAS_CONFIGURATION_RESOURCE_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 class TypeAliasesTest {
-    private TypeAliases typeAliases = new TypeAliases();
 
     @Test
     void shouldInitializeMapOfAliasesByNameProperly() {
-        //given /when /then
+        //given
+        TypeAliases typeAliases = new TypeAliases();
+        // /when /then
+        assertThat(typeAliases.getAliasesMappedByName().entrySet())
+                .containsExactlyInAnyOrder(
+                        getEntryWithNameKey("Object", Object.class),
+                        getEntryWithNameKey("String", String.class),
+                        getEntryWithNameKey("Integer", Integer.class),
+                        getEntryWithNameKey("Long", Long.class),
+                        getEntryWithNameKey("Double", Double.class),
+                        getEntryWithNameKey("Boolean", Boolean.class),
+                        getEntryWithNameKey("Byte", Byte.class),
+                        getEntryWithNameKey("Short", Short.class),
+                        getEntryWithNameKey("Character", Character.class),
+                        getEntryWithNameKey("Float", Float.class),
+                        getEntryWithNameKey("Void", Void.class),
+                        getEntryWithNameKey("int", int.class),
+                        getEntryWithNameKey("long", long.class),
+                        getEntryWithNameKey("double", double.class),
+                        getEntryWithNameKey("boolean", boolean.class),
+                        getEntryWithNameKey("byte", byte.class),
+                        getEntryWithNameKey("short", short.class),
+                        getEntryWithNameKey("char", char.class),
+                        getEntryWithNameKey("float", float.class),
+                        getEntryWithNameKey("void", void.class),
+                        getEntryWithNameKey("ZonedDateTime", ZonedDateTime.class),
+                        getEntryWithNameKey("List", List.class),
+                        getEntryWithNameKey("Map", Map.class),
+                        getEntryWithNameKey("Set", HashSet.class),
+                        getEntryWithNameKey("CustomType", CustomType.class));
+    }
+
+    @Test
+    void shouldInitializeMapOfAliasesByTypeProperly() {
+        //given
+        TypeAliases typeAliases = new TypeAliases();
+        // /when /then
+        assertThat(typeAliases.getAliasesMappedByType().entrySet())
+                .containsExactlyInAnyOrder(
+                        getEntryWithTypeKey("Object", Object.class),
+                        getEntryWithTypeKey("String", String.class),
+                        getEntryWithTypeKey("Integer", Integer.class),
+                        getEntryWithTypeKey("Long", Long.class),
+                        getEntryWithTypeKey("Double", Double.class),
+                        getEntryWithTypeKey("Boolean", Boolean.class),
+                        getEntryWithTypeKey("Byte", Byte.class),
+                        getEntryWithTypeKey("Short", Short.class),
+                        getEntryWithTypeKey("Character", Character.class),
+                        getEntryWithTypeKey("Float", Float.class),
+                        getEntryWithTypeKey("Void", Void.class),
+                        getEntryWithTypeKey("int", int.class),
+                        getEntryWithTypeKey("long", long.class),
+                        getEntryWithTypeKey("double", double.class),
+                        getEntryWithTypeKey("boolean", boolean.class),
+                        getEntryWithTypeKey("byte", byte.class),
+                        getEntryWithTypeKey("short", short.class),
+                        getEntryWithTypeKey("char", char.class),
+                        getEntryWithTypeKey("float", float.class),
+                        getEntryWithTypeKey("void", void.class),
+                        getEntryWithTypeKey("ZonedDateTime", ZonedDateTime.class),
+                        getEntryWithTypeKey("List", List.class),
+                        getEntryWithTypeKey("Map", Map.class),
+                        getEntryWithTypeKey("Set", HashSet.class),
+                        getEntryWithTypeKey("CustomType", CustomType.class));
+    }
+
+    @Test
+    void shouldInitializeMapOfAliasesByNameProperlyWhenNoCustomOverridingFileExists() {
+        //given
+        TypeAliases typeAliases = new TypeAliases(ALIAS_CONFIGURATION_RESOURCE_FILE, "notExisting-typeAliases-custom.properties");
+        // /when /then
         assertThat(typeAliases.getAliasesMappedByName().entrySet())
                 .containsExactlyInAnyOrder(
                         getEntryWithNameKey("Object", Object.class),
@@ -71,8 +142,10 @@ class TypeAliasesTest {
     }
 
     @Test
-    void shouldInitializeMapOfAliasesByTypeProperly() {
-        //given /when /then
+    void shouldInitializeMapOfAliasesByTypeProperlyWhenNoCustomOverridingFileExists() {
+        //given
+        TypeAliases typeAliases = new TypeAliases(ALIAS_CONFIGURATION_RESOURCE_FILE, "notExisting-typeAliases-custom.properties");
+        // /when /then
         assertThat(typeAliases.getAliasesMappedByType().entrySet())
                 .containsExactlyInAnyOrder(
                         getEntryWithTypeKey("Object", Object.class),
