@@ -27,30 +27,53 @@ package com.sabre.oss.yare.examples;
 import com.google.common.collect.ImmutableMap;
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
+import com.sabre.oss.yare.core.RulesEngineBuilder;
 import com.sabre.oss.yare.core.model.Rule;
-import com.sabre.oss.yare.examples.facts.Car;
+import com.sabre.oss.yare.dsl.RuleDsl;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import static com.sabre.oss.yare.dsl.RuleDsl.*;
+import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CarMatchingTest {
+    private static final String COLLECT = "collect";
+    private static final String PRICE_DIFFERENCE = "priceDifference";
     private static final String CAR_RULE_SET = "carRuleSet";
 
     @Test
     void shouldMatchWhenPriceOverLowestByGiven() {
         //given
         BigDecimal howMuchOverLowestPrice = new BigDecimal(50);
-        List<Rule> rule = RulesBuilder.createRuleMatchingWithPriceOverLowest(howMuchOverLowestPrice);
-        List<Car> testCar = Collections.singletonList(
-                new Car().withTotalRate(new BigDecimal(200))
+        List<Rule> rule = Collections.singletonList(
+                RuleDsl.ruleBuilder()
+                        .name("Should match car with total rate greater than given over lowest price")
+                        .fact("car", Car.class)
+                        .predicate(
+                                greater(
+                                        function(PRICE_DIFFERENCE, BigDecimal.class,
+                                                param("carRate", value("${car.totalRate}"))),
+                                        value(howMuchOverLowestPrice)
+                                )
+                        )
+                        .action(COLLECT,
+                                param("context", value("${ctx}")),
+                                param("fact", value("${car}")))
+                        .build()
+        );
+        List<Car> testCar = Arrays.asList(
+                new Car().withTotalRate(new BigDecimal(200)),
+                new Car().withTotalRate(new BigDecimal(145))
         );
 
-        RulesEngine rulesEngine = RulesEngineBuilder.createRulesEngine(ImmutableMap.of(CAR_RULE_SET, rule));
+        RulesEngine rulesEngine = new RulesEngineBuilder()
+                .withRulesRepository(((Map<String, List<Rule>>) ImmutableMap.of(CAR_RULE_SET, rule))::get)
+                .withActionMapping(COLLECT, method(new TestAction(), (action) -> action.collect(null, null)))
+                .withFunctionMapping(PRICE_DIFFERENCE, method(new TestFunction(), f -> f.priceDifference(null)))
+                .build();
         RuleSession ruleSession = rulesEngine.createSession(CAR_RULE_SET);
 
         //when
@@ -62,22 +85,49 @@ class CarMatchingTest {
         );
     }
 
-    @Test
-    void shouldNotMatchWhenPriceBelowLowestByGiven() {
-        //given
-        BigDecimal howMuchOverLowestPrice = new BigDecimal(50);
-        List<Rule> rule = RulesBuilder.createRuleMatchingWithPriceOverLowest(howMuchOverLowestPrice);
-        List<Car> testCar = Collections.singletonList(
-                new Car().withTotalRate(new BigDecimal(145))
-        );
+    public static class TestAction {
 
-        RulesEngine rulesEngine = RulesEngineBuilder.createRulesEngine(ImmutableMap.of(CAR_RULE_SET, rule));
-        RuleSession ruleSession = rulesEngine.createSession(CAR_RULE_SET);
+        public void collect(List<Object> results, Object fact) {
+            results.add(fact);
+        }
 
-        //when
-        List<Car> matchingCar = ruleSession.execute(new ArrayList<>(), testCar);
+    }
 
-        //then
-        assertThat(matchingCar).isEmpty();
+    public static class TestFunction {
+
+        TestFunction() {
+        }
+
+        public BigDecimal priceDifference(BigDecimal carRate) {
+            BigDecimal lowestPrice = new BigDecimal(100);
+            return carRate.subtract(lowestPrice);
+        }
+    }
+
+    public class Car {
+        public BigDecimal totalRate;
+
+
+        public Car withTotalRate(BigDecimal totalRate) {
+            this.totalRate = totalRate;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Car car = (Car) o;
+            return Objects.equals(totalRate, car.totalRate);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(totalRate);
+        }
     }
 }
