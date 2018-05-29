@@ -25,14 +25,13 @@
 package com.sabre.oss.yare.engine.executor.runtime.value;
 
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
-import org.apache.commons.lang3.Validate;
 
 public final class ReferenceValueProvider extends ValueProvider {
 
     private final String reference;
 
     public ReferenceValueProvider(String reference) {
-        this.reference = Validate.notEmpty(reference, "reference must not be empty");
+        this.reference = reference;
     }
 
     @Override

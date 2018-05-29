@@ -132,10 +132,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
     }
 
     private Map<String, Object> createAttributeMap(Rule rule) {
-        Map<String, Object> attributeMap = new HashMap<>();
-        attributeMap.putAll(rule.getAttributes().stream()
-                .collect(Collectors.toMap(Attribute::getName, Attribute::getValue)));
-        return attributeMap;
+        return rule.getAttributes().stream().collect(Collectors.toMap(Attribute::getName, Attribute::getValue));
     }
 
     private Invocation<ProcessingContext, Void> prepareConsequence(Rule rule) {

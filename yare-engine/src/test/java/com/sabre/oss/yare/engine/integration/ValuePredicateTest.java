@@ -33,12 +33,14 @@ import com.sabre.oss.yare.dsl.Expression;
 import com.sabre.oss.yare.dsl.RuleDsl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
@@ -162,61 +164,315 @@ public class ValuePredicateTest {
         );
     }
 
-    @Test
-    void shouldUseEscapedPlaceholdersDirectlyForAttribute() {
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveAttributeReferenceInPredicate(boolean expected) {
         // given
-        String matchingName = "someMatchingNameValue";
-        NamedFact namedFact = new NamedFact(matchingName, true);
-
         Rule rule = RuleDsl.ruleBuilder()
                 .name("Rule match based on attribute value and fact matching")
-                .fact("fact", NamedFact.class)
-                .attribute("attributeRefName", new AttributeWithValue(matchingName))
-                .attribute("attributeIsValid", Boolean.TRUE)
+                .fact("fact", Object.class)
+                .attribute("expected", expected)
                 .predicate(
-                        and(
-                                equal(
-                                        value("${fact.name}"),
-                                        value("${attributeRefName.value}")
-                                ),
-                                equal(
-                                        value("${fact.isValid}"),
-                                        value("${attributeIsValid}")
-                                ),
-                                equal(
-                                        value("${fact}"),
-                                        value(namedFact)
-                                )
-                        )
+                        value("${expected}")
                 )
-                .action("collect",
+                .action("setBoolean",
                         param("context", value("${ctx}")),
-                        param("fact", value("${fact}"))
+                        param("value", value(true))
                 )
                 .build();
-
-        List<NamedFact> facts = Arrays.asList(
-                namedFact,
-                new NamedFact("notMatchingName", true),
-                new NamedFact("anyName", true));
-
-        RulesEngine engine = new RulesEngineBuilder()
-                .withRulesRepository(uri -> Collections.singletonList(rule))
-                .withActionMapping("collect", method(this, a -> a.collect(null, null)))
-                .build();
-        RuleSession session = engine.createSession("uri");
 
         // when
-        ArrayList<String> result = session.execute(new ArrayList<>(), facts);
+        AtomicBoolean result = createSession(rule, new AtomicBoolean(false));
 
         // then
-        assertThat(result).containsExactly(
-                matchingName
-        );
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveAttributeReferenceInOperator(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Object.class)
+                .attribute("expected", expected)
+                .predicate(
+                        isTrue(value("${expected}"))
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveAttributeReferenceInFunction(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Object.class)
+                .attribute("expected", expected)
+                .predicate(
+                        value(true)
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value("${expected}"))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new AtomicBoolean(!expected));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveAttributeFieldReferenceInPredicate(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Object.class)
+                .attribute("expected", new BooleanWrapper(expected))
+                .predicate(
+                        value("${expected.value}")
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveAttributeFieldReferenceInOperator(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Object.class)
+                .attribute("expected", new BooleanWrapper(expected))
+                .predicate(
+                        isTrue(value("${expected.value}"))
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveAttributeFieldReferenceInFunction(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Object.class)
+                .attribute("expected", new BooleanWrapper(expected))
+                .predicate(
+                        value(true)
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value("${expected.value}"))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new AtomicBoolean(!expected));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    private AtomicBoolean createSession(Rule rule, AtomicBoolean context) {
+        List<Object> facts = Collections.singletonList(new Object());
+        return new RulesEngineBuilder()
+                .withRulesRepository(uri -> Collections.singletonList(rule))
+                .withActionMapping("setBoolean", method(this, a -> a.setBoolean(null, null)))
+                .build()
+                .createSession("uri")
+                .execute(context, facts);
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveFactReferenceInPredicate(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Boolean.class)
+                .predicate(
+                        value("${fact}")
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, expected, new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveFactReferenceInOperator(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Boolean.class)
+                .predicate(
+                        isTrue(value("${fact}"))
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, expected, new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveFactReferenceInFunction(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", Boolean.class)
+                .predicate(
+                        value(true)
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value("${fact}"))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, expected, new AtomicBoolean(!expected));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveFactFieldReferenceInPredicate(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", BooleanWrapper.class)
+                .predicate(
+                        value("${fact.value}")
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new BooleanWrapper(expected), new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveFactFieldReferenceInOperator(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", BooleanWrapper.class)
+                .predicate(
+                        isTrue(value("${fact.value}"))
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value(true))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new BooleanWrapper(expected), new AtomicBoolean(false));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldResolveFactFieldReferenceInFunction(boolean expected) {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule match based on attribute value and fact matching")
+                .fact("fact", BooleanWrapper.class)
+                .predicate(
+                        value(true)
+                )
+                .action("setBoolean",
+                        param("context", value("${ctx}")),
+                        param("value", value("${fact.value}"))
+                )
+                .build();
+
+        // when
+        AtomicBoolean result = createSession(rule, new BooleanWrapper(expected), new AtomicBoolean(!expected));
+
+        // then
+        assertThat(result.get()).isEqualTo(expected);
+    }
+
+    private AtomicBoolean createSession(Rule rule, Object fact, AtomicBoolean context) {
+        List<Object> facts = Collections.singletonList(fact);
+        return new RulesEngineBuilder()
+                .withRulesRepository(uri -> Collections.singletonList(rule))
+                .withActionMapping("setBoolean", method(this, a -> a.setBoolean(null, null)))
+                .build()
+                .createSession("uri")
+                .execute(context, facts);
     }
 
     public void collect(List<String> context, NamedFact fact) {
         context.add(fact.name);
+    }
+
+    public void setBoolean(AtomicBoolean context, Boolean value) {
+        context.set(value);
     }
 
     public static final class NamedFact {
@@ -231,10 +487,10 @@ public class ValuePredicateTest {
         }
     }
 
-    public static final class AttributeWithValue {
-        public String value;
+    public static final class BooleanWrapper {
+        public final boolean value;
 
-        public AttributeWithValue(String value) {
+        public BooleanWrapper(boolean value) {
             this.value = value;
         }
     }

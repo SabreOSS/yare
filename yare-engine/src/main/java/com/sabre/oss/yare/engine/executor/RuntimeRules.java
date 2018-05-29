@@ -53,12 +53,12 @@ public class RuntimeRules {
         private final String ruleId;
         private final Predicate predicate;
         private final Invocation<ProcessingContext, Void> consequence;
-        private final Map<String, Object> attributeMap;
+        private final Map<String, Object> attributes;
         private final long order;
 
-        private ExecutableRule(String ruleId, Map<String, Object> attributeMap, Predicate predicate, Invocation<ProcessingContext, Void> consequence, long order) {
+        private ExecutableRule(String ruleId, Map<String, Object> attributes, Predicate predicate, Invocation<ProcessingContext, Void> consequence, long order) {
             this.ruleId = ruleId;
-            this.attributeMap = attributeMap;
+            this.attributes = attributes;
             this.predicate = predicate;
             this.consequence = consequence;
             this.order = order;
@@ -76,8 +76,8 @@ public class RuntimeRules {
             return predicate;
         }
 
-        public Map<String, Object> getAttributeMap() {
-            return attributeMap;
+        public Map<String, Object> getAttributes() {
+            return attributes;
         }
 
         public Invocation<ProcessingContext, Void> getConsequence() {
