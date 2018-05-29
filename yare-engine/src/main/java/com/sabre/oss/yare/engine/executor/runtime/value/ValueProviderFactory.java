@@ -52,7 +52,7 @@ public final class ValueProviderFactory {
     }
 
     public static ValueProvider createFromPath(Class<?> referenceType, String reference, Class<?> type, String path) {
-        return FieldReferringClassFactory.create(referenceType, reference, path);
+        return path == null ? new ReferenceValueProvider(reference) : FieldReferringClassFactory.create(referenceType, reference, path);
     }
 
     public static ValueProvider createFromMapKey(String reference, String key) {
