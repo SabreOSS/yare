@@ -44,7 +44,7 @@ class OperatorSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeOperator() throws JsonProcessingException {
+    void shouldSerializeOperator() throws JsonProcessingException {
         Operator operator = getOperatorModel();
 
         String serialized = objectMapper.writeValueAsString(operator);
@@ -54,7 +54,7 @@ class OperatorSerializationTest {
     }
 
     @Test
-    void shouldProperlyDeserializeOperator() throws IOException {
+    void shouldDeserializeOperator() throws IOException {
         String json = getOperatorJson();
 
         Operator operator = objectMapper.readValue(json, Operator.class);

@@ -22,58 +22,43 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.model;
+package com.sabre.oss.yare.serializer.json.mapper.rule;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
+import com.sabre.oss.yare.core.model.Fact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class FactSerializationTest {
-    private ObjectMapper objectMapper;
+class FactConverterTest {
+    private FactConverter factConverter;
 
     @BeforeEach
     void setUp() {
-        this.objectMapper = RuleToJsonConverter.getObjectMapper();
+        factConverter = new FactConverter(DefaultTypeConverters.getDefaultTypeConverter());
     }
 
     @Test
-    void shouldSerializeFact() throws JsonProcessingException {
-        Fact fact = getFactModel();
+    void shouldConvertToFact() {
+        com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
+                .withName("fact-name")
+                .withType("java.lang.String");
 
-        String serialized = objectMapper.writeValueAsString(fact);
+        Fact fact = factConverter.convert(toConvert);
 
-        String expected = getFactJson();
-        assertThatJson(serialized).isEqualTo(expected);
-    }
-
-    @Test
-    void shouldDeserializeFact() throws IOException {
-        String json = getFactJson();
-
-        Fact fact = objectMapper.readValue(json, Fact.class);
-
-        Fact expected = getFactModel();
+        Fact expected = new Fact("fact-name", String.class);
         assertThat(fact).isEqualTo(expected);
     }
 
-    private Fact getFactModel() {
-        return new Fact()
+    @Test
+    void shouldThrowExceptionWhenUnknownTypeUsed() {
+        com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
                 .withName("fact-name")
-                .withType("fact-type");
-    }
+                .withType("unknown");
 
-    private String getFactJson() {
-        return "" +
-                "{" +
-                "  \"name\": \"fact-name\"," +
-                "  \"type\": \"fact-type\"" +
-                "}";
+        assertThatThrownBy(() -> factConverter.convert(toConvert))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 }

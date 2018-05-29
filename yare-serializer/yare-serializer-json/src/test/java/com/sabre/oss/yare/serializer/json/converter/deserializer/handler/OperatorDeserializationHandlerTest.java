@@ -95,7 +95,7 @@ class OperatorDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveOperatorProperly() throws IOException {
+    void shouldResolveOperator() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +

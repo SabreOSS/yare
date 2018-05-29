@@ -44,7 +44,7 @@ class FunctionSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeFunction() throws JsonProcessingException {
+    void shouldSerializeFunction() throws JsonProcessingException {
         Function function = getFunctionModel();
 
         String serialized = objectMapper.writeValueAsString(function);
@@ -54,7 +54,7 @@ class FunctionSerializationTest {
     }
 
     @Test
-    void shouldProperlyDeserializeFunction() throws IOException {
+    void shouldDeserializeFunction() throws IOException {
         String json = getFunctionJson();
 
         Function function = objectMapper.readValue(json, Function.class);

@@ -28,11 +28,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
+import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.model.converter.RuleConversionException;
 import com.sabre.oss.yare.model.converter.RuleConverter;
+import com.sabre.oss.yare.serializer.json.mapper.rule.ToRuleConverter;
+
+import java.io.IOException;
 
 public class RuleToJsonConverter implements RuleConverter {
+    private final TypeConverter defaultTypeConverter = DefaultTypeConverters.getDefaultTypeConverter();
+    private final ToRuleConverter toRuleConverter = new ToRuleConverter(defaultTypeConverter);
     private final ObjectMapper objectMapper;
 
     public RuleToJsonConverter() {
@@ -53,13 +60,24 @@ public class RuleToJsonConverter implements RuleConverter {
         return objectMapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String marshal(Rule rule) throws RuleConversionException {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Rule unmarshal(String value) throws RuleConversionException {
-        return null;
+        try {
+            com.sabre.oss.yare.serializer.json.model.Rule rule = objectMapper.readValue(value, com.sabre.oss.yare.serializer.json.model.Rule.class);
+            return toRuleConverter.convert(rule);
+        } catch (IOException e) {
+            throw new RuleConversionException(String.format("Rule cannot be converted to Object:\n%s", value), e);
+        }
     }
 }

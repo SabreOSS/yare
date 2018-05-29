@@ -82,7 +82,7 @@ class FunctionDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveFunctionProperly() throws IOException {
+    void shouldResolveFunction() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +
