@@ -42,9 +42,11 @@
     <xsd:element name="Attribute" type="rul:Attribute"/>
 
     <xsd:complexType name="Attribute">
-        <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="value" type="xsd:string"/>
-        <xsd:attribute name="type" type="xsd:string"/>
+        <xsd:choice>
+            <xsd:element ref="rul:CustomValue"/>
+            <xsd:element ref="rul:Value"/>
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:element name="Fact" type="rul:Fact"/>

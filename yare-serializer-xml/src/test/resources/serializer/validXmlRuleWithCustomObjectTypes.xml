@@ -25,7 +25,19 @@
 
 <yare:Rule xmlns:custom="http://example.sabre.com/custom/schema"
            xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1">
-    <yare:Attribute name="ruleName" value="ruleOperatingOnCustomObjectTypes" type="String"/>
+    <yare:Attribute name="ruleName">
+        <yare:Value type="String">ruleOperatingOnCustomObjectTypes</yare:Value>
+    </yare:Attribute>
+    <yare:Attribute name="customObject">
+        <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.Isbn">
+            <custom:Isbn>
+                <code>000000000001</code>
+            </custom:Isbn>
+        </yare:CustomValue>
+    </yare:Attribute>
+    <yare:Attribute name="null">
+        <yare:Value type="String">@null</yare:Value>
+    </yare:Attribute>
     <yare:Fact name="fact" type="Object"/>
     <yare:Predicate>
         <yare:Or>

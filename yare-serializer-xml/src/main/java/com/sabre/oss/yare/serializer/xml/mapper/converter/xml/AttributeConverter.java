@@ -24,27 +24,76 @@
 
 package com.sabre.oss.yare.serializer.xml.mapper.converter.xml;
 
+import com.sabre.oss.yare.common.converter.StringTypeConverter;
 import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.common.mapper.Mapper;
 import com.sabre.oss.yare.core.model.Attribute;
+import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.model.AttributeSer;
+import com.sabre.oss.yare.serializer.model.CustomValueSer;
+import com.sabre.oss.yare.serializer.model.ValueSer;
 
 import java.lang.reflect.Type;
-
-import static java.util.Objects.requireNonNull;
 
 class AttributeConverter implements Mapper<Attribute, AttributeSer> {
     private final TypeConverter typeConverter;
 
     AttributeConverter(TypeConverter typeConverter) {
-        this.typeConverter = requireNonNull(typeConverter, "typeConverter cannot be null");
+        this.typeConverter = typeConverter;
     }
 
     @Override
     public AttributeSer map(Attribute attribute) {
-        return new AttributeSer()
-                .withName(attribute.getName())
-                .withType(typeConverter.toString(Type.class, attribute.getType()))
-                .withValue(typeConverter.toString(attribute.getType(), attribute.getValue()));
+        AttributeSer attributeSer = new AttributeSer()
+                .withName(attribute.getName());
+
+        Object value = attribute.getValue();
+        Type type = attribute.getType();
+
+        if (type == null) {
+            return convertUndefinedType(attributeSer, value);
+        }
+
+        if (isSimpleValue(type)) {
+            return convertSimpleValue(type, attributeSer, value);
+        }
+
+        return convertCustomValue(type, attributeSer, value);
+    }
+
+    private AttributeSer convertUndefinedType(AttributeSer attributeSer, Object value) {
+        String type = Expression.Undefined.class.getName();
+        if (value == null) {
+            attributeSer.withValue(new ValueSer()
+                    .withType(type)
+                    .withValue(StringTypeConverter.NULL_LITERAL));
+        } else if (isSimpleValue(value.getClass())) {
+            attributeSer.withValue(new ValueSer()
+                    .withType(type)
+                    .withValue(typeConverter.toString(value.getClass(), value)));
+        } else {
+            attributeSer.withCustomValue(new CustomValueSer()
+                    .withType(type)
+                    .withAny(value));
+        }
+        return attributeSer;
+    }
+
+    private boolean isSimpleValue(Type type) {
+        return typeConverter.isApplicable(type);
+    }
+
+    private AttributeSer convertSimpleValue(Type type, AttributeSer attributeSer, Object value) {
+        return attributeSer
+                .withValue(new ValueSer()
+                        .withType(typeConverter.toString(Type.class, type))
+                        .withValue(typeConverter.toString(type, value)));
+    }
+
+    private AttributeSer convertCustomValue(Type type, AttributeSer attributeSer, Object value) {
+        return attributeSer
+                .withCustomValue(new CustomValueSer()
+                        .withType(typeConverter.toString(Type.class, type))
+                        .withAny(value));
     }
 }

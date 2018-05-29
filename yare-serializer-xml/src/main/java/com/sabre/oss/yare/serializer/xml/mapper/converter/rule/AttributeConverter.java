@@ -24,25 +24,71 @@
 
 package com.sabre.oss.yare.serializer.xml.mapper.converter.rule;
 
+import com.sabre.oss.yare.common.converter.StringTypeConverter;
 import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.common.mapper.Mapper;
 import com.sabre.oss.yare.core.model.Attribute;
+import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.model.AttributeSer;
+import com.sabre.oss.yare.serializer.model.CustomValueSer;
+import com.sabre.oss.yare.serializer.model.ValueSer;
 
 import java.lang.reflect.Type;
-
-import static java.util.Objects.requireNonNull;
 
 class AttributeConverter implements Mapper<AttributeSer, Attribute> {
     private final TypeConverter typeConverter;
 
     AttributeConverter(TypeConverter typeConverter) {
-        this.typeConverter = requireNonNull(typeConverter, "typeConverter cannot be null");
+        this.typeConverter = typeConverter;
     }
 
     @Override
     public Attribute map(AttributeSer attribute) {
-        Type type = typeConverter.fromString(Type.class, attribute.getType());
-        return new Attribute(attribute.getName(), type, typeConverter.fromString(type, attribute.getValue()));
+        String name = attribute.getName();
+        ValueSer value = attribute.getValue();
+
+        if (value != null) {
+            checkNonNull(value.getValue(), "Value.value cannot be null");
+            return convertValue(name, value);
+        }
+
+        CustomValueSer customValue = attribute.getCustomValue();
+        if (customValue != null) {
+            checkNonNull(customValue.getAny(), "CustomValue.any cannot be null");
+            return convertCustomValue(name, customValue);
+        }
+
+        throw new IllegalStateException("Attribute value or customValue must be set");
+    }
+
+    private void checkNonNull(Object o, String message) {
+        if (o == null) {
+            throw new IllegalStateException(message);
+        }
+    }
+
+    private Attribute convertValue(String name, ValueSer value) {
+        Type type = getType(value.getType());
+        String v = value.getValue();
+
+        Object attributeValue = null;
+        if (!isNullLiteral(v)) {
+            attributeValue = type == Expression.Undefined.class ? v : typeConverter.fromString(type, v);
+        }
+
+        return new Attribute(name, type, attributeValue);
+    }
+
+    private Attribute convertCustomValue(String name, CustomValueSer customValue) {
+        Type type = getType(customValue.getType());
+        return new Attribute(name, type, customValue.getAny());
+    }
+
+    private Type getType(String type) {
+        return type == null ? Expression.Undefined.class : typeConverter.fromString(Type.class, type);
+    }
+
+    private boolean isNullLiteral(String value) {
+        return value.equals(StringTypeConverter.NULL_LITERAL);
     }
 }
