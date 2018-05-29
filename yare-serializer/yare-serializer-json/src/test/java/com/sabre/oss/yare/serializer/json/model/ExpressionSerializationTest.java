@@ -49,7 +49,7 @@ class ExpressionSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlySerializeExpression(Expression expression, String expected) throws JsonProcessingException {
+    void shouldSerializeExpression(Expression expression, String expected) throws JsonProcessingException {
         String serialized = objectMapper.writeValueAsString(expression);
 
         assertThatJson(serialized).isEqualTo(expected);
@@ -57,7 +57,7 @@ class ExpressionSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlyDeserializeExpression(Expression expected, String json) throws IOException {
+    void shouldDeserializeExpression(Expression expected, String json) throws IOException {
         Expression expression = objectMapper.readValue(json, Expression.class);
 
         assertThat(expression).isEqualTo(expected);

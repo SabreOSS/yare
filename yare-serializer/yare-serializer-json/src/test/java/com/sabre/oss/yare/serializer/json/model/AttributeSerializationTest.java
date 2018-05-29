@@ -51,7 +51,7 @@ class AttributeSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlySerializeAttribute(Attribute attribute, String expected) throws JsonProcessingException {
+    void shouldSerializeAttribute(Attribute attribute, String expected) throws JsonProcessingException {
         String serialized = objectMapper.writeValueAsString(attribute);
 
         assertThatJson(serialized).isEqualTo(expected);
@@ -59,7 +59,7 @@ class AttributeSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlyDeserializeAttribute(Attribute expected, String json) throws IOException {
+    void shouldDeserializeAttribute(Attribute expected, String json) throws IOException {
         Attribute attribute = objectMapper.readValue(json, Attribute.class);
 
         assertThat(attribute).isEqualTo(expected);

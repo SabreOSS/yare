@@ -45,7 +45,7 @@ class ValuesSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeValues() throws JsonProcessingException {
+    void shouldSerializeValues() throws JsonProcessingException {
         Values values = getValuesModel();
 
         String serialized = objectMapper.writeValueAsString(values);
@@ -55,7 +55,7 @@ class ValuesSerializationTest {
     }
 
     @Test
-    void shouldProperlyDeserializeValues() throws IOException {
+    void shouldDeserializeValues() throws IOException {
         String json = getValuesJson();
 
         Values values = objectMapper.readValue(json, Values.class);

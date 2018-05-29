@@ -44,7 +44,7 @@ class ActionSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeAction() throws JsonProcessingException {
+    void shouldSerializeAction() throws JsonProcessingException {
         Action action = getActionModel();
 
         String serialized = objectMapper.writeValueAsString(action);
@@ -54,7 +54,7 @@ class ActionSerializationTest {
     }
 
     @Test
-    void shouldProperlyDeserializeAction() throws IOException {
+    void shouldDeserializeAction() throws IOException {
         String json = getActionJson();
 
         Action action = objectMapper.readValue(json, Action.class);

@@ -49,7 +49,7 @@ class ParameterSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlySerializeParameter(Parameter parameter, String expected) throws JsonProcessingException {
+    void shouldSerializeParameter(Parameter parameter, String expected) throws JsonProcessingException {
         String serialized = objectMapper.writeValueAsString(parameter);
 
         assertThatJson(serialized).isEqualTo(expected);
@@ -57,7 +57,7 @@ class ParameterSerializationTest {
 
     @ParameterizedTest
     @MethodSource("conversionParams")
-    void shouldProperlyDeserializeOperand(Parameter expected, String json) throws IOException {
+    void shouldDeserializeOperand(Parameter expected, String json) throws IOException {
         Parameter parameter = objectMapper.readValue(json, Parameter.class);
 
         assertThat(parameter).isEqualTo(expected);

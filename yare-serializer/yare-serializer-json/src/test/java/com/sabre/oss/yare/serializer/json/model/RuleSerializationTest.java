@@ -45,7 +45,7 @@ class RuleSerializationTest {
     }
 
     @Test
-    void shouldProperlySerializeRule() throws JsonProcessingException {
+    void shouldSerializeRule() throws JsonProcessingException {
         Rule rule = getRuleModel();
 
         String serialized = objectMapper.writeValueAsString(rule);
@@ -55,7 +55,7 @@ class RuleSerializationTest {
     }
 
     @Test
-    void shouldProperlyDeserializeRule() throws IOException {
+    void shouldDeserializeRule() throws IOException {
         String json = getRuleJson();
 
         Rule rule = objectMapper.readValue(json, Rule.class);
