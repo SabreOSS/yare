@@ -26,20 +26,26 @@ package com.sabre.oss.yare.serializer.xml.mapper.converter.rule;
 
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.model.ActionSer;
-import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter.Context;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.sabre.oss.yare.core.model.ExpressionFactory.actionOf;
-import static java.util.Objects.requireNonNull;
 
-class ActionConverter implements ContextualConverter<ActionSer, Expression.Action> {
-    private final ParameterConverter parameterConverter;
+class ActionConverter {
+    private final NodeConverter nodeConverter;
 
-    ActionConverter(ParameterConverter parameterConverter) {
-        this.parameterConverter = requireNonNull(parameterConverter, "parameterConverter cannot be null");
+    ActionConverter(NodeConverter nodeConverter) {
+        this.nodeConverter = nodeConverter;
     }
 
-    @Override
-    public Expression.Action convert(Context ctx, ActionSer action) {
-        return actionOf(action.getName(), action.getName(), parameterConverter.convert(ctx, action.getParameter()));
+    List<Expression.Action> convert(List<ActionSer> action) {
+        return action.stream()
+                .map(this::convert)
+                .collect(Collectors.toList());
+    }
+
+    private Expression.Action convert(ActionSer action) {
+        return actionOf(action.getName(), action.getName(), nodeConverter.convert(action.getParameter()));
     }
 }

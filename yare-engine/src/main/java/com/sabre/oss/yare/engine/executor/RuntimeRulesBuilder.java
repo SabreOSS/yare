@@ -107,6 +107,12 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
             Expression.Value value = (Expression.Value) expression;
             return valueProviderConverter.create(context.getRule(), value);
         }
+        if (expression instanceof Expression.Values) {
+            List<ValueProvider> values = ((Expression.Values) expression).getValues().stream()
+                    .map(v -> createValueProvider(context, v))
+                    .collect(Collectors.toList());
+            return ValueProviderFactory.createFromValues(expression.getType(), values);
+        }
         if (expression instanceof Expression.Function) {
             Expression.Function function = (Expression.Function) expression;
             Invocation<ProcessingContext, Object> invocation = functionFactory.create(context.getRule(), function);

@@ -34,7 +34,6 @@ import java.util.Optional;
 
 public class ValueConverter<R> {
     private static final ChainedTypeExtractor chainedTypeExtractor = new ChainedTypeExtractor();
-    private static final PlaceholderExtractor placeholderExtractor = new PlaceholderExtractor();
     private static final String CONTEXT_PATH = "ctx";
 
     private final ReferenceFactory<? extends R> referenceFactory;
@@ -50,13 +49,13 @@ public class ValueConverter<R> {
         if (reference.isPresent()) {
             return reference.get();
         }
-        Object v = placeholderExtractor.unescapePlaceholder(value)
+        Object v = PlaceholderUtils.unescape(value)
                 .orElse(value.getValue());
         return valueFactory.create(value.getName(), value.getType(), v);
     }
 
     private Optional<R> tryCreateReference(Rule rule, Expression.Value value) {
-        return placeholderExtractor.extractPlaceholder(value)
+        return PlaceholderUtils.extract(value)
                 .map(s -> createReference(rule, value.getName(), s));
     }
 
