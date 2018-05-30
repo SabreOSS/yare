@@ -68,6 +68,13 @@ class AttributeConverterTest {
     }
 
     @Test
+    void shouldConvertNullAttribute() {
+        Attribute attribute = attributeConverter.convert(null);
+
+        assertThat(attribute).isNull();
+    }
+
+    @Test
     void shouldThrowExceptionWhenUnknownTypeUsed() {
         com.sabre.oss.yare.serializer.json.model.Attribute toConvert = new com.sabre.oss.yare.serializer.json.model.Attribute()
                 .withName("attribute-name")

@@ -35,7 +35,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -290,11 +289,6 @@ class PredicateConverterTest {
                                     ),
                             new Operator()
                                     .withType("operator-type-2")
-                                    .withOperands(
-                                            new Value()
-                                                    .withValue(100)
-                                                    .withType(BigDecimal.class.getName())
-                                    )
                     );
 
             Expression expression = predicateConverter.convert(toConvert);
@@ -307,9 +301,7 @@ class PredicateConverterTest {
                     functionOf("function-name", Boolean.class, "function-name", Collections.singletonList(
                             valuesOf("parameter-name", String.class, null)
                     )),
-                    operatorOf(null, Boolean.class, "operator-type-2", Collections.singletonList(
-                            valueOf(null, BigDecimal.class, 100)
-                    ))
+                    operatorOf(null, Boolean.class, "operator-type-2", (List<Expression>) null)
             ));
             assertThat(expression).isEqualTo(expected);
         }

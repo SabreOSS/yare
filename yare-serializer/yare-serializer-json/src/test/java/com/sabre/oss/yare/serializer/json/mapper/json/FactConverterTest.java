@@ -50,4 +50,11 @@ class FactConverterTest {
                 .withType("String");
         assertThat(fact).isEqualTo(expected);
     }
+  
+    @Test
+    void shouldConvertNullFact() {
+        Fact fact = factConverter.convert(null);
+
+        assertThat(fact).isNull();
+    }
 }

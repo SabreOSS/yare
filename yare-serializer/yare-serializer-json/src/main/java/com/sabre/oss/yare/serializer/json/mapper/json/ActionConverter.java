@@ -44,8 +44,9 @@ class ActionConverter {
     }
 
     private Action convert(Expression.Action action) {
-        return action == null
-                ? null
-                : new Action().withName(action.getName()).withParameters(nodeConverter.convertParameters(action.getArguments()));
+        if (action == null) {
+            return null;
+        }
+        return new Action().withName(action.getName()).withParameters(nodeConverter.convertParameters(action.getArguments()));
     }
 }

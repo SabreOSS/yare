@@ -72,34 +72,26 @@ class NodeConverter {
         return (input) -> {
             Object value = input.getValue();
             String type = typeConverter.toString(Type.class, input.getType());
-            return new Value()
-                    .withValue(value)
-                    .withType(type);
+            return new Value().withValue(value).withType(type);
         };
     }
 
     private Converter<Expression.Values> createValuesConverter() {
         return (input) -> {
             String type = typeConverter.toString(Type.class, input.getType());
-            return new Values()
-                    .withType(type)
-                    .withValues(castToJsonExpressions(input.getValues()));
+            return new Values().withType(type).withValues(castToJsonExpressions(input.getValues()));
         };
     }
 
     private Converter<Expression.Function> createFunctionConverter() {
         return (input) -> {
             String returnType = typeConverter.toString(Type.class, input.getType());
-            return new Function()
-                    .withName(input.getCall())
-                    .withReturnType(returnType).withParameters(convertParameters(input.getArguments()));
+            return new Function().withName(input.getCall()).withReturnType(returnType).withParameters(convertParameters(input.getArguments()));
         };
     }
 
     private Converter<Expression.Operator> createOperatorConverter() {
-        return (input) -> new Operator()
-                .withType(input.getCall())
-                .withOperands(convert(input.getArguments()));
+        return (input) -> new Operator().withType(input.getCall()).withOperands(convert(input.getArguments()));
     }
 
     private Parameter convertParameter(Expression expression) {
@@ -108,16 +100,14 @@ class NodeConverter {
         }
         String name = expression.getName();
         Operand converted = convert(expression);
-        return new Parameter()
-                .withName(name)
-                .withExpression((com.sabre.oss.yare.serializer.json.model.Expression) converted);
+        return new Parameter().withName(name).withExpression((com.sabre.oss.yare.serializer.json.model.Expression) converted);
     }
 
-    private List<com.sabre.oss.yare.serializer.json.model.Expression> castToJsonExpressions(List<Expression> modelExpression) {
-        if (modelExpression == null) {
+    private List<com.sabre.oss.yare.serializer.json.model.Expression> castToJsonExpressions(List<Expression> expressions) {
+        if (expressions == null) {
             return null;
         }
-        return convert(modelExpression).stream()
+        return convert(expressions).stream()
                 .map(com.sabre.oss.yare.serializer.json.model.Expression.class::cast)
                 .collect(Collectors.toList());
     }

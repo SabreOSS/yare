@@ -64,4 +64,11 @@ class AttributeConverterTest {
                 .withValue("attribute-value");
         assertThat(attribute).isEqualTo(expected);
     }
+
+    @Test
+    void shouldConvertNullAttribute() {
+        Attribute attribute = attributeConverter.convert(null);
+
+        assertThat(attribute).isNull();
+    }
 }

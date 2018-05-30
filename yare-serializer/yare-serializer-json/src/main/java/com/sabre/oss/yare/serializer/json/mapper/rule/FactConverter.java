@@ -37,8 +37,9 @@ class FactConverter {
     }
 
     Fact convert(com.sabre.oss.yare.serializer.json.model.Fact fact) {
-        return fact == null
-                ? null
-                : new Fact(fact.getName(), typeConverter.fromString(Type.class, fact.getType()));
+        if (fact == null) {
+            return null;
+        }
+        return new Fact(fact.getName(), typeConverter.fromString(Type.class, fact.getType()));
     }
 }

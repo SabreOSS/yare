@@ -53,6 +53,13 @@ class FactConverterTest {
     }
 
     @Test
+    void shouldConvertNullFact() {
+        Fact fact = factConverter.convert(null);
+
+        assertThat(fact).isNull();
+    }
+
+    @Test
     void shouldThrowExceptionWhenUnknownTypeUsed() {
         com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
                 .withName("fact-name")
