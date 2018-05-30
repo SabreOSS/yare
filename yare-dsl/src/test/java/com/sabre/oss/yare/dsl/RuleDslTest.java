@@ -80,7 +80,9 @@ class RuleDslTest {
                                                 ),
                                                 not(
                                                         value("true", Boolean.class)
-                                                )
+                                                ),
+                                                value(null),
+                                                value((Boolean) null)
                                         )
                                 ),
                                 less(
@@ -261,7 +263,9 @@ class RuleDslTest {
                                 ),
                                 operatorOf(null, Boolean.class, "not",
                                         valueOf(null, Boolean.class, true)
-                                )
+                                ),
+                                valueOf(null, Expression.UNDEFINED, null),
+                                valueOf(null, Expression.UNDEFINED, null)
                         )
                 ),
                 operatorOf(null, Boolean.class, "less",

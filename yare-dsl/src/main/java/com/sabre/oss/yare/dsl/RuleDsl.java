@@ -302,7 +302,10 @@ public final class RuleDsl {
      * @return value operand
      */
     public static <T> ExpressionOperand<T> value(String value) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, String.class, value);
+        return (name, builder) -> {
+            Type type = value != null ? String.class : com.sabre.oss.yare.core.model.Expression.UNDEFINED;
+            return ExpressionFactory.valueOf(name, type, value);
+        };
     }
 
     /**
