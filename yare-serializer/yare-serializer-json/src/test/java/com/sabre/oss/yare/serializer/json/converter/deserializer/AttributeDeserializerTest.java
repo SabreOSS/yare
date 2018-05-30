@@ -24,6 +24,83 @@
 
 package com.sabre.oss.yare.serializer.json.converter.deserializer;
 
-class AttributeDeserializerTest {
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.model.Attribute;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class AttributeDeserializerTest {
+    private ObjectMapper mapper;
+    private AttributeDeserializer deserializer;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        deserializer = new AttributeDeserializer();
+    }
+
+    @Test
+    void shouldResolveAttributeProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"name\": \"ATTRIBUTE_NAME\"," +
+                "  \"value\": \"100\"," +
+                "  \"type\": \"java.lang.Integer\"" +
+                "}");
+
+        // when
+        Attribute result = deserializer.deserialize(node.traverse(mapper), null);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Attribute.class, a -> {
+            assertThat(a.getName()).isEqualTo("ATTRIBUTE_NAME");
+            assertThat(a.getValue()).isEqualTo(100);
+            assertThat(a.getType()).isEqualTo(Integer.class.getName());
+        });
+    }
+
+    @Test
+    void shouldResolveAttributeWithNullValuesProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"name\": null," +
+                "  \"type\": null," +
+                "  \"value\": null" +
+                "}");
+
+        // when
+        Attribute result = deserializer.deserialize(node.traverse(mapper), null);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Attribute.class, a -> {
+            assertThat(a.getName()).isNull();
+            assertThat(a.getType()).isNull();
+            assertThat(a.getValue()).isNull();
+        });
+    }
+
+    @Test
+    void shouldThrowExceptionIfTypeCannotBeResolved() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"name\": \"ATTRIBUTE_NAME\"," +
+                "  \"value\": \"100\"," +
+                "  \"type\": \"java.lang.Unknown\"" +
+                "}");
+
+        // when / then
+        String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";
+        assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
+    }
 }
