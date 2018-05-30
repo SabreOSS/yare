@@ -27,7 +27,6 @@ package com.sabre.oss.yare.examples;
 import com.google.common.io.Resources;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
-import com.sabre.oss.yare.examples.facts.Flight;
 import com.sabre.oss.yare.model.validator.DefaultRuleValidator;
 import com.sabre.oss.yare.model.validator.ValidationResult;
 import com.sabre.oss.yare.model.validator.ValidationResults;
@@ -37,17 +36,20 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
 class ValidationTest {
+    private static final String COLLECT = "collect";
 
     @Test
     void shouldNotThrowExceptionWithMalformedRuleAndDisabledValidation() {
         // given / when /then
-        Rule rule = RuleDsl.ruleBuilder()
+        RuleDsl.ruleBuilder()
                 .fact("flight", Flight.class)
                 .predicate(
                         and(
@@ -62,7 +64,7 @@ class ValidationTest {
                                 )
                         )
                 )
-                .action("collect",
+                .action(COLLECT,
                         param("context", value("${ctx}")),
                         param("fact", value("${flight}")))
                 .build(false);
@@ -87,7 +89,7 @@ class ValidationTest {
                                         )
                                 )
                         )
-                        .action("collect",
+                        .action(COLLECT,
                                 param("context", value("${ctx}")),
                                 param("fact", value("${flight}")))
                         .build()
@@ -111,4 +113,28 @@ class ValidationTest {
                 ValidationResult.error("rule.attribute.rule-name-attribute-not-set", "Attribute Error: \"ruleName\" was not specified")
         );
     }
+
+    public class Flight {
+        public String classOfService;
+        public LocalDateTime dateOfDeparture;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Flight that = (Flight) o;
+            return Objects.equals(classOfService, that.classOfService) &&
+                    Objects.equals(dateOfDeparture, that.dateOfDeparture);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(classOfService, dateOfDeparture);
+        }
+    }
+
 }

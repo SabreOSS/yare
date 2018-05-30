@@ -29,7 +29,6 @@ import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
-import com.sabre.oss.yare.examples.facts.Hotel;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import static com.sabre.oss.yare.invoker.js.JavaScriptCallMetadata.js;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class JavaScriptFunctionTest {
+    private static final String COLLECT = "collect";
 
     @Test
     void shouldMatchFactsWhenUsingJavaScriptFunction() {
@@ -55,7 +55,18 @@ class JavaScriptFunctionTest {
         );
         List<Rule> rules = createRules();
 
-        RulesEngine rulesEngine = createRulesEngine(rules);
+        String script = "" +
+                "function concat(str1, str2) { " +
+                "   return str1 + str2; " +
+                "}" +
+                "function collect(ctx, fact) {" +
+                "   ctx.add(fact);" +
+                "}";
+        RulesEngine rulesEngine = new RulesEngineBuilder()
+                .withRulesRepository(i -> rules)
+                .withActionMapping(COLLECT, js(COLLECT, script))
+                .withFunctionMapping("concat", js("concat", script))
+                .build();
         RuleSession ruleSession = rulesEngine.createSession("test");
 
         // when
@@ -81,25 +92,38 @@ class JavaScriptFunctionTest {
                                         value("Chain code:HH")
                                 )
                         )
-                        .action("collect",
+                        .action(COLLECT,
                                 param("context", value("${ctx}")),
                                 param("fact", value("${hotel}")))
                         .build()
         );
     }
 
-    private RulesEngine createRulesEngine(List<Rule> rules) {
-        String script = "" +
-                "function concat(str1, str2) { " +
-                "   return str1 + str2; " +
-                "}" +
-                "function collect(ctx, fact) {" +
-                "   ctx.add(fact);" +
-                "}";
-        return new RulesEngineBuilder()
-                .withRulesRepository(i -> rules)
-                .withActionMapping("collect", js("collect", script))
-                .withFunctionMapping("concat", js("concat", script))
-                .build();
+    public class Hotel {
+        public String chainCode;
+
+        public Hotel withChainCode(final String chainCode) {
+            this.chainCode = chainCode;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            Hotel hotel = (Hotel) o;
+
+            return chainCode != null ? chainCode.equals(hotel.chainCode) : hotel.chainCode == null;
+        }
+
+        @Override
+        public int hashCode() {
+            return chainCode != null ? chainCode.hashCode() : 0;
+        }
     }
 }

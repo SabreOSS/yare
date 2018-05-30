@@ -24,7 +24,7 @@
 
 <Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
     <Attribute name="ruleName" value="Should match flight with given class of service" type="java.lang.String"/>
-    <Fact name="flight" type="com.sabre.oss.yare.examples.facts.Flight"/>
+    <Fact name="flight" type="com.sabre.oss.yare.examples.ValidationTest.Flight"/>
     <Predicate>
         <Operator type="equal">
             <Value>${flight.classOfService}</Value>
