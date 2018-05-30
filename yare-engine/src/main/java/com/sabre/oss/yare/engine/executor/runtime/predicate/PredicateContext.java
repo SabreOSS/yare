@@ -34,12 +34,12 @@ import java.util.Map;
 public class PredicateContext implements ProcessingContext {
     private final String ruleId;
     private final Object result;
-    private final Map<String, Object> facts;
+    private final Map<String, Object> references;
 
-    public PredicateContext(String ruleId, Object result, Map<String, Object> facts) {
+    public PredicateContext(String ruleId, Object result, Map<String, Object> references) {
         this.ruleId = ruleId;
         this.result = result;
-        this.facts = facts;
+        this.references = references;
     }
 
     @Override
@@ -60,16 +60,16 @@ public class PredicateContext implements ProcessingContext {
         if ("ruleName".equals(identifier)) {
             return ruleId;
         }
-        return facts.get(identifier);
+        return references.get(identifier);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T resolve(String identifier, T defaultValue) {
-        return (T) facts.getOrDefault(identifier, defaultValue);
+        return (T) references.getOrDefault(identifier, defaultValue);
     }
 
     public PredicateContext copy(String ruleId) {
-        return new PredicateContext(ruleId, result, facts);
+        return new PredicateContext(ruleId, result, references);
     }
 }

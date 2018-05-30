@@ -134,7 +134,11 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
         Predicate predicate = RuntimeInputValidator.of(rule.getFacts(), createPredicate(factoryContext, rule.getPredicate()));
         Invocation<ProcessingContext, Void> consequence = prepareConsequence(rule);
 
-        return RuntimeRules.ExecutableRule.of(ruleName, predicate, consequence, priority.longValue());
+        return RuntimeRules.ExecutableRule.of(ruleName, createAttributeMap(rule), predicate, consequence, priority.longValue());
+    }
+
+    private Map<String, Object> createAttributeMap(Rule rule) {
+        return rule.getAttributes().stream().collect(Collectors.toMap(Attribute::getName, Attribute::getValue));
     }
 
     private Invocation<ProcessingContext, Void> prepareConsequence(Rule rule) {
