@@ -26,23 +26,24 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
+import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Attribute;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class AttributeDeserializer extends JsonDeserializer<Attribute> {
     @Override
     public Attribute deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
         JsonNode attributeNode = objectMapper.readTree(jsonParser);
-        String name = attributeNode.get(JsonPropertyNames.Attribute.NAME).textValue();
-        String type = attributeNode.get(JsonPropertyNames.Attribute.TYPE).textValue();
+        String name = getName(attributeNode);
+        String type = getType(attributeNode);
         Object value = getValue(attributeNode, type, objectMapper);
         return new Attribute()
                 .withName(name)
@@ -50,13 +51,29 @@ public class AttributeDeserializer extends JsonDeserializer<Attribute> {
                 .withValue(value);
     }
 
+    private String getName(JsonNode jsonNode) {
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Attribute.NAME)
+                .map(JsonNode::textValue)
+                .orElse(null);
+    }
+
+    private String getType(JsonNode jsonNode) {
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Attribute.TYPE)
+                .map(JsonNode::textValue)
+                .orElse(null);
+    }
+
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
-        TreeNode valueNode = jsonNode.get(JsonPropertyNames.Attribute.VALUE);
+        Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Attribute.VALUE);
+        return o.isPresent() ? mapValueByType(o.get(), type, objectMapper) : null;
+    }
+
+    private Object mapValueByType(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
         try {
             Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
-            return objectMapper.treeToValue(valueNode, resolvedType);
+            return objectMapper.treeToValue(jsonNode, resolvedType);
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", valueNode.toString(), type), e);
+            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", jsonNode.toString(), type), e);
         }
     }
 }
