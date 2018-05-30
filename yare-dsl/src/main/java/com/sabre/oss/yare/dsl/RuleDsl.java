@@ -302,7 +302,10 @@ public final class RuleDsl {
      * @return value operand
      */
     public static <T> ExpressionOperand<T> value(String value) {
-        return (name, builder) -> ExpressionFactory.valueOf(name, String.class, value);
+        return (name, builder) -> {
+            Type type = value != null ? String.class : com.sabre.oss.yare.core.model.Expression.UNDEFINED;
+            return ExpressionFactory.valueOf(name, type, value);
+        };
     }
 
     /**
@@ -335,6 +338,24 @@ public final class RuleDsl {
     public static <T> CollectionOperand<T> values(Class<T> type, T... values) {
         return (name, builder) -> {
             List<com.sabre.oss.yare.core.model.Expression> expressions = Stream.of(values)
+                    .map(RuleDsl::escapeStrings)
+                    .map(v -> ExpressionFactory.valueOf(null, type, v))
+                    .collect(Collectors.toList());
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
+        };
+    }
+
+    /**
+     * Creates operand representing a collection of constant values.
+     *
+     * @param type   class describing collection item type
+     * @param values values collection
+     * @param <T>    collection item type
+     * @return operand representing collection of constant values
+     */
+    public static <T> CollectionOperand<T> values(Class<T> type, Collection<T> values) {
+        return (name, builder) -> {
+            List<com.sabre.oss.yare.core.model.Expression> expressions = values.stream()
                     .map(RuleDsl::escapeStrings)
                     .map(v -> ExpressionFactory.valueOf(null, type, v))
                     .collect(Collectors.toList());

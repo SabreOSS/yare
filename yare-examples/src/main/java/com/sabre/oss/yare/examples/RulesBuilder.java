@@ -59,7 +59,7 @@ public final class RulesBuilder {
                                 equal(
                                         function(CONTAINS, Boolean.class,
                                                 param("outerList", value("${airline.airlineCodes}")),
-                                                param("innerList", values(String.class, mapToArray(airlineCodes)))),
+                                                param("innerList", values(String.class, airlineCodes))),
                                         value(true)
                                 )
                         )
@@ -78,7 +78,7 @@ public final class RulesBuilder {
                         .predicate(
                                 equal(
                                         function(CONTAINS, Boolean.class,
-                                                param("outerList", values(String.class, mapToArray(airlineCodes))),
+                                                param("outerList", values(String.class, airlineCodes)),
                                                 param("innerList", value("${airline.airlineCodes}"))),
                                         value(true)
                                 )
@@ -99,7 +99,7 @@ public final class RulesBuilder {
                                 equal(
                                         function(CONTAINS_ANY, Boolean.class,
                                                 param("outerList", value("${airline.airlineCodes}")),
-                                                param("innerList", values(String.class, mapToArray(airlineCodes)))),
+                                                param("innerList", values(String.class, airlineCodes))),
                                         value(true)
                                 )
                         )
@@ -261,9 +261,5 @@ public final class RulesBuilder {
                                 param("fact", value("${hotel}")))
                         .build()
         );
-    }
-
-    private static String[] mapToArray(List<String> list) {
-        return list.toArray(new String[list.size()]);
     }
 }
