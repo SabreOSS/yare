@@ -25,12 +25,14 @@
 package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
+import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
+
+import java.util.Optional;
 
 class ValueDeserializationHandler extends DeserializationHandler {
     @Override
@@ -48,18 +50,22 @@ class ValueDeserializationHandler extends DeserializationHandler {
     }
 
     private String getType(JsonNode jsonNode) {
-        return jsonNode.has(JsonPropertyNames.Value.TYPE)
-                ? jsonNode.get(JsonPropertyNames.Value.TYPE).textValue()
-                : String.class.getName();
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Value.TYPE)
+                .map(JsonNode::textValue)
+                .orElse(String.class.getName());
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
-        TreeNode valueNode = jsonNode.get(JsonPropertyNames.Value.VALUE);
+        Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Value.VALUE);
+        return o.isPresent() ? mapValueByType(o.get(), type, objectMapper) : null;
+    }
+
+    private Object mapValueByType(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
         try {
             Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
-            return objectMapper.treeToValue(valueNode, resolvedType);
+            return objectMapper.treeToValue(jsonNode, resolvedType);
         } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", valueNode.toString(), type), e);
+            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", jsonNode.toString(), type), e);
         }
     }
 }

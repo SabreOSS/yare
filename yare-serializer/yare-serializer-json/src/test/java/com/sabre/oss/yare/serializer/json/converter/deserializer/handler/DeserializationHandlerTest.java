@@ -69,6 +69,21 @@ class DeserializationHandlerTest {
     }
 
     @Test
+    void shouldDeserializeNullJsonIntoNullValue() throws JsonProcessingException {
+        // given
+        JsonNode node = null;
+
+        DeserializationHandler handler = mockNotApplicableDeserializationHandler()
+                .withNext(mockNotApplicableDeserializationHandler());
+
+        // when
+        Operand result = handler.handle(node, null);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
     void shouldThrownAnExceptionWhenApplicableHandlerCannotBeFound() throws JsonProcessingException {
         // given
         JsonNode node = mock(JsonNode.class);

@@ -83,6 +83,21 @@ class OperatorDeserializationHandlerTest {
     }
 
     @Test
+    void shouldNotBeApplicableForJsonWithNullProperties() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"or\" : null" +
+                "}");
+
+        // when
+        Boolean applicable = handler.isApplicable(node);
+
+        // then
+        assertThat(applicable).isFalse();
+    }
+
+    @Test
     void shouldNotBeApplicableForJsonWithNoProperties() throws IOException {
         // given
         JsonNode node = mapper.readTree("{}");
@@ -95,7 +110,7 @@ class OperatorDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveOperator() throws IOException {
+    void shouldResolveOperatorProperly() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +
@@ -121,6 +136,24 @@ class OperatorDeserializationHandlerTest {
                     createValueExpression(true),
                     createValueExpression(100)
             );
+        });
+    }
+
+    @Test
+    void shouldResolveNullOperatorProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"or\" : null" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Operator.class, o -> {
+            assertThat(o.getType()).isEqualTo("or");
+            assertThat(o.getOperands()).isNull();
         });
     }
 

@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
+import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Expression;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Values;
@@ -35,6 +36,7 @@ import com.sabre.oss.yare.serializer.json.model.Values;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 class ValuesDeserializationHandler extends DeserializationHandler {
     @Override
@@ -46,15 +48,26 @@ class ValuesDeserializationHandler extends DeserializationHandler {
 
     @Override
     protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        String type = jsonNode.get(JsonPropertyNames.Values.TYPE).textValue();
+        String type = getType(jsonNode);
         List<Expression> values = getValues(jsonNode, objectMapper);
         return new Values()
                 .withType(type)
                 .withValues(values);
     }
 
+    private String getType(JsonNode jsonNode) {
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Values.TYPE)
+                .map(JsonNode::textValue)
+                .orElse(null);
+    }
+
     private List<Expression> getValues(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        Iterator<JsonNode> valueNodes = jsonNode.get(JsonPropertyNames.Values.VALUES).iterator();
+        Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Values.VALUES);
+        return o.isPresent() ? mapNodeAsListOfExpressions(o.get(), objectMapper) : null;
+    }
+
+    private List<Expression> mapNodeAsListOfExpressions(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        Iterator<JsonNode> valueNodes = jsonNode.iterator();
         List<Expression> expressions = new ArrayList<>();
         while (valueNodes.hasNext()) {
             JsonNode node = valueNodes.next();

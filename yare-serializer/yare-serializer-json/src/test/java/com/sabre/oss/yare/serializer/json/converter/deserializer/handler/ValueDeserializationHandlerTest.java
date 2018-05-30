@@ -111,6 +111,24 @@ class ValueDeserializationHandlerTest {
     }
 
     @Test
+    void shouldResolveNullValueProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"value\": null" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
+            assertThat(v.getValue()).isNull();
+            assertThat(v.getType()).isEqualTo(String.class.getName());
+        });
+    }
+
+    @Test
     void shouldThrowExceptionIfTypeCannotBeResolved() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +

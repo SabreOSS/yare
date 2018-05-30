@@ -22,35 +22,17 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sabre.oss.yare.serializer.json.model.Operand;
 
-public abstract class DeserializationHandler {
-    private DeserializationHandler next;
+import java.util.Optional;
 
-    DeserializationHandler withNext(DeserializationHandler next) {
-        this.next = next;
-        return this;
+public final class JsonNodeUtils {
+    private JsonNodeUtils() {
     }
 
-    public Operand handle(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        if (jsonNode == null) {
-            return null;
-        }
-        if (isApplicable(jsonNode)) {
-            return deserialize(jsonNode, objectMapper);
-        }
-        if (next != null) {
-            return next.handle(jsonNode, objectMapper);
-        }
-        throw new IllegalArgumentException(String.format("Given node: %s could not be deserialized to any known operand model", jsonNode));
+    public static Optional<JsonNode> resolveChildNode(JsonNode p, String key) {
+        return p != null && p.hasNonNull(key) ? Optional.of(p.get(key)) : Optional.empty();
     }
-
-    protected abstract boolean isApplicable(JsonNode jsonNode);
-
-    protected abstract Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException;
 }
