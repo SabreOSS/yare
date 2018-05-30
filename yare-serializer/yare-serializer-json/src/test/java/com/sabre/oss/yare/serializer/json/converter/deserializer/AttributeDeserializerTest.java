@@ -67,24 +67,18 @@ class AttributeDeserializerTest {
     }
 
     @Test
-    void shouldResolveAttributeWithNullValuesProperly() throws IOException {
+    void shouldThrowExceptionIfTypeIsNull() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +
-                "  \"name\": null," +
-                "  \"type\": null," +
-                "  \"value\": null" +
+                "  \"type\": null" +
                 "}");
 
-        // when
-        Attribute result = deserializer.deserialize(node.traverse(mapper), null);
-
-        // then
-        assertThat(result).isInstanceOfSatisfying(Attribute.class, a -> {
-            assertThat(a.getName()).isNull();
-            assertThat(a.getValue()).isNull();
-            assertThat(a.getType()).isEqualTo(String.class.getName());
-        });
+        // when / then
+        String expectedMessage = "Unable to deserialize {\"type\":null}, type must be null";
+        assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
     }
 
     @Test

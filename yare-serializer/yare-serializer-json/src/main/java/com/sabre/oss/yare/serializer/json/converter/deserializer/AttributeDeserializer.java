@@ -60,7 +60,7 @@ public class AttributeDeserializer extends JsonDeserializer<Attribute> {
     private String getType(JsonNode jsonNode) {
         return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Attribute.TYPE)
                 .map(JsonNode::textValue)
-                .orElse(String.class.getName());
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Unable to deserialize %s, type must be null", jsonNode.toString())));
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
