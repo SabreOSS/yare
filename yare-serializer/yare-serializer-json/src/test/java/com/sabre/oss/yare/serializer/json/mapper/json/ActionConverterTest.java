@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
 import com.sabre.oss.yare.core.model.Expression;
@@ -52,7 +52,17 @@ class ActionConverterTest {
 
     @Test
     void shouldConvertAction() {
-        Action toConvert = new Action()
+        Expression.Action toConvert = actionOf("action-name", "action-name", Arrays.asList(
+                valueOf("parameter-name-1", String.class, "value-value"),
+                valuesOf("parameter-name-2", Set.class, Collections.singletonList(
+                        valueOf(null, Long.class, 100L)
+                )),
+                functionOf("parameter-name-3", Boolean.class, "function-name", Collections.emptyList())
+        ));
+
+        List<Action> actions = actionConverter.convert(Collections.singletonList(toConvert));
+
+        Action expected = new Action()
                 .withName("action-name")
                 .withParameters(
                         new Parameter()
@@ -76,17 +86,6 @@ class ActionConverterTest {
                                         .withReturnType("Boolean")
                                         .withParameters(Collections.emptyList()))
                 );
-
-        List<Expression.Action> actions = actionConverter.convert(Collections.singletonList(toConvert));
-
-        Expression.Action expected = actionOf("action-name", "action-name", Arrays.asList(
-                valueOf("parameter-name-1", String.class, "value-value"),
-                valuesOf("parameter-name-2", Set.class, Collections.singletonList(
-                        valueOf(null, Long.class, 100L)
-                )),
-                functionOf("parameter-name-3", Boolean.class, "function-name", Collections.emptyList())
-        ));
-
         assertThat(actions).containsExactly(expected);
     }
 }

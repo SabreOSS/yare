@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
 import com.sabre.oss.yare.serializer.json.model.Action;
@@ -44,17 +44,46 @@ import java.util.List;
 import static com.sabre.oss.yare.core.model.ExpressionFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ToRuleConverterTest {
-    private ToRuleConverter toRuleConverter;
+class ToJsonConverterTest {
+    private ToJsonConverter toJsonConverter;
 
     @BeforeEach
     void setUp() {
-        toRuleConverter = new ToRuleConverter(DefaultTypeConverters.getDefaultTypeConverter());
+        toJsonConverter = new ToJsonConverter(DefaultTypeConverters.getDefaultTypeConverter());
     }
 
     @Test
     void shouldConvertRule() {
-        Rule toConvert = new Rule()
+        com.sabre.oss.yare.core.model.Rule toConvert = new com.sabre.oss.yare.core.model.Rule(
+                new LinkedHashSet<>(Arrays.asList(
+                        new com.sabre.oss.yare.core.model.Attribute("attribute-name-1", String.class, "attribute-value-1"),
+                        new com.sabre.oss.yare.core.model.Attribute("attribute-name-2", Integer.class, 100)
+                )),
+                Arrays.asList(
+                        new com.sabre.oss.yare.core.model.Fact("fact-name-1", Character.class),
+                        new com.sabre.oss.yare.core.model.Fact("fact-name-2", BigDecimal.class)
+                ),
+                operatorOf(null, Boolean.class, "operator-type-1", Arrays.asList(
+                        operatorOf(null, Boolean.class, "operator-type-2", Collections.singletonList(
+                                valueOf(null, BigInteger.class, 100)
+                        )),
+                        null,
+                        functionOf("function-name-1", Boolean.class, "function-name-1", Arrays.asList(
+                                valuesOf("parameter-name-1", List.class, Collections.emptyList()),
+                                null
+                        ))
+                )),
+                Arrays.asList(
+                        null,
+                        actionOf("action-name", "action-name", Collections.singletonList(
+                                functionOf("parameter-name-2", Boolean.class, "function-name-2", Collections.emptyList())
+                        ))
+                )
+        );
+
+        Rule rule = toJsonConverter.convert(toConvert);
+
+        Rule expected = new Rule()
                 .withAttributes(
                         new Attribute()
                                 .withName("attribute-name-1")
@@ -113,35 +142,6 @@ class ToRuleConverterTest {
                                                 )
                                 )
                 );
-
-        com.sabre.oss.yare.core.model.Rule rule = toRuleConverter.convert(toConvert);
-
-        com.sabre.oss.yare.core.model.Rule expected = new com.sabre.oss.yare.core.model.Rule(
-                new LinkedHashSet<>(Arrays.asList(
-                        new com.sabre.oss.yare.core.model.Attribute("attribute-name-1", String.class, "attribute-value-1"),
-                        new com.sabre.oss.yare.core.model.Attribute("attribute-name-2", Integer.class, 100)
-                )),
-                Arrays.asList(
-                        new com.sabre.oss.yare.core.model.Fact("fact-name-1", Character.class),
-                        new com.sabre.oss.yare.core.model.Fact("fact-name-2", BigDecimal.class)
-                ),
-                operatorOf(null, Boolean.class, "operator-type-1", Arrays.asList(
-                        operatorOf(null, Boolean.class, "operator-type-2", Collections.singletonList(
-                                valueOf(null, BigInteger.class, 100)
-                        )),
-                        null,
-                        functionOf("function-name-1", Boolean.class, "function-name-1", Arrays.asList(
-                                valuesOf("parameter-name-1", List.class, Collections.emptyList()),
-                                null
-                        ))
-                )),
-                Arrays.asList(
-                        null,
-                        actionOf("action-name", "action-name", Collections.singletonList(
-                                functionOf("parameter-name-2", Boolean.class, "function-name-2", Collections.emptyList())
-                        ))
-                )
-        );
         assertThat(rule).isEqualTo(expected);
     }
 }

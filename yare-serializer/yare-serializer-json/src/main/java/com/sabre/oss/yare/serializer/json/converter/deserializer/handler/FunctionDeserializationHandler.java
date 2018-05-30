@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
+import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
@@ -35,6 +36,7 @@ import com.sabre.oss.yare.serializer.json.model.Parameter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 class FunctionDeserializationHandler extends DeserializationHandler {
     @Override
@@ -44,18 +46,39 @@ class FunctionDeserializationHandler extends DeserializationHandler {
 
     @Override
     protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        JsonNode functionNode = jsonNode.get(JsonPropertyNames.Function.FUNCTION);
-        String functionName = functionNode.get(JsonPropertyNames.Function.NAME).textValue();
-        String returnType = functionNode.get(JsonPropertyNames.Function.RETURN_TYPE).textValue();
-        List<Parameter> functionParameters = getParameters(functionNode, objectMapper);
+        Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Function.FUNCTION);
+        return o.isPresent() ? getFunction(o.get(), objectMapper) : null;
+    }
+
+    private Operand getFunction(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        String functionName = getName(jsonNode);
+        String returnType = getType(jsonNode);
+        List<Parameter> functionParameters = getParameters(jsonNode, objectMapper);
         return new Function()
                 .withName(functionName)
                 .withReturnType(returnType)
                 .withParameters(functionParameters);
     }
 
+    private String getName(JsonNode jsonNode) {
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Function.NAME)
+                .map(JsonNode::textValue)
+                .orElse(null);
+    }
+
+    private String getType(JsonNode jsonNode) {
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Function.RETURN_TYPE)
+                .map(JsonNode::textValue)
+                .orElse(null);
+    }
+
     private List<Parameter> getParameters(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        Iterator<JsonNode> parametersNodes = jsonNode.get(JsonPropertyNames.Function.PARAMETERS).iterator();
+        Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Function.PARAMETERS);
+        return o.isPresent() ? mapNodeAsListOfParameters(o.get(), objectMapper) : null;
+    }
+
+    private List<Parameter> mapNodeAsListOfParameters(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        Iterator<JsonNode> parametersNodes = jsonNode.iterator();
         List<Parameter> parameters = new ArrayList<>();
         while (parametersNodes.hasNext()) {
             JsonNode node = parametersNodes.next();

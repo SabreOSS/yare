@@ -22,24 +22,17 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.converter.utils;
 
-import com.sabre.oss.yare.common.converter.TypeConverter;
-import com.sabre.oss.yare.core.model.Fact;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import java.lang.reflect.Type;
+import java.util.Optional;
 
-class FactConverter {
-    private final TypeConverter typeConverter;
-
-    FactConverter(TypeConverter typeConverter) {
-        this.typeConverter = typeConverter;
+public final class JsonNodeUtils {
+    private JsonNodeUtils() {
     }
 
-    Fact convert(com.sabre.oss.yare.serializer.json.model.Fact fact) {
-        if (fact == null) {
-            return null;
-        }
-        return new Fact(fact.getName(), typeConverter.fromString(Type.class, fact.getType()));
+    public static Optional<JsonNode> resolveChildNode(JsonNode p, String key) {
+        return p != null && p.hasNonNull(key) ? Optional.of(p.get(key)) : Optional.empty();
     }
 }

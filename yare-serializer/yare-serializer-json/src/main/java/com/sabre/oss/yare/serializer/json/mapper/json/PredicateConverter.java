@@ -22,24 +22,19 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
-import com.sabre.oss.yare.common.converter.TypeConverter;
-import com.sabre.oss.yare.core.model.Fact;
+import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.serializer.json.model.Operand;
 
-import java.lang.reflect.Type;
+class PredicateConverter {
+    private final NodeConverter nodeConverter;
 
-class FactConverter {
-    private final TypeConverter typeConverter;
-
-    FactConverter(TypeConverter typeConverter) {
-        this.typeConverter = typeConverter;
+    PredicateConverter(NodeConverter nodeConverter) {
+        this.nodeConverter = nodeConverter;
     }
 
-    Fact convert(com.sabre.oss.yare.serializer.json.model.Fact fact) {
-        if (fact == null) {
-            return null;
-        }
-        return new Fact(fact.getName(), typeConverter.fromString(Type.class, fact.getType()));
+    Operand convert(Expression predicate) {
+        return nodeConverter.convert(predicate);
     }
 }

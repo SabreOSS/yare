@@ -27,12 +27,14 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Operator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 class OperatorDeserializationHandler extends DeserializationHandler {
     @Override
@@ -48,14 +50,18 @@ class OperatorDeserializationHandler extends DeserializationHandler {
     @Override
     protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         String operatorType = jsonNode.fieldNames().next();
-        JsonNode operandsNode = jsonNode.get(operatorType);
-        List<Operand> operands = getOperands(operandsNode, objectMapper);
+        List<Operand> operands = getOperands(jsonNode, operatorType, objectMapper);
         return new Operator()
                 .withType(operatorType)
                 .withOperands(operands);
     }
 
-    private List<Operand> getOperands(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+    private List<Operand> getOperands(JsonNode jsonNode, String operatorType, ObjectMapper objectMapper) throws JsonProcessingException {
+        Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, operatorType);
+        return o.isPresent() ? mapNodeAsListOfOperands(o.get(), objectMapper) : null;
+    }
+
+    private List<Operand> mapNodeAsListOfOperands(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         Iterator<JsonNode> operandNodes = jsonNode.iterator();
         List<Operand> operands = new ArrayList<>();
         while (operandNodes.hasNext()) {

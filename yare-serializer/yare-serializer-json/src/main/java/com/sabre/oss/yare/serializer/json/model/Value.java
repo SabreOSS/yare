@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.serializer.json.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sabre.oss.yare.serializer.json.converter.serializer.StringTypeFilter;
 
 import java.util.Objects;
 

@@ -38,6 +38,9 @@ public abstract class DeserializationHandler {
     }
 
     public Operand handle(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        if (jsonNode == null) {
+            return null;
+        }
         if (isApplicable(jsonNode)) {
             return deserialize(jsonNode, objectMapper);
         }

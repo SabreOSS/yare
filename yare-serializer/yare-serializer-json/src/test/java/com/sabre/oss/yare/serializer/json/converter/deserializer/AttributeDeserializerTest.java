@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sabre.oss.yare.serializer.json.model.Operand;
-import com.sabre.oss.yare.serializer.json.model.Value;
+import com.sabre.oss.yare.serializer.json.model.Attribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,96 +35,50 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ValueDeserializationHandlerTest {
+class AttributeDeserializerTest {
     private ObjectMapper mapper;
-    private DeserializationHandler handler;
+    private AttributeDeserializer deserializer;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new ValueDeserializationHandler();
+        deserializer = new AttributeDeserializer();
     }
 
     @Test
-    void shouldBeApplicableForJsonWithValueProperty() throws IOException {
+    void shouldResolveAttributeProperly() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +
-                "  \"value\": \"TEST_VALUE\"" +
-                "}");
-
-        // when
-        Boolean applicable = handler.isApplicable(node);
-
-        // then
-        assertThat(applicable).isTrue();
-    }
-
-    @Test
-    void shouldNotBeApplicableForJsonWithoutValueProperty() throws IOException {
-        // given
-        JsonNode node = mapper.readTree("{}");
-
-        // when
-        Boolean applicable = handler.isApplicable(node);
-
-        // then
-        assertThat(applicable).isFalse();
-    }
-
-    @Test
-    void shouldResolveValueAccordingToTheGivenType() throws IOException {
-        // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
+                "  \"name\": \"ATTRIBUTE_NAME\"," +
                 "  \"value\": \"100\"," +
                 "  \"type\": \"java.lang.Integer\"" +
                 "}");
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Attribute result = deserializer.deserialize(node.traverse(mapper), null);
 
         // then
-        assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
-            assertThat(v.getValue()).isEqualTo(100);
-            assertThat(v.getType()).isEqualTo(Integer.class.getName());
+        assertThat(result).isInstanceOfSatisfying(Attribute.class, a -> {
+            assertThat(a.getName()).isEqualTo("ATTRIBUTE_NAME");
+            assertThat(a.getValue()).isEqualTo(100);
+            assertThat(a.getType()).isEqualTo(Integer.class.getName());
         });
     }
 
     @Test
-    void shouldResolveValueAsStringWhenTypeIsNotSpecified() throws IOException {
+    void shouldThrowExceptionIfTypeIsNull() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +
-                "  \"value\": \"100\"" +
+                "  \"type\": null" +
                 "}");
 
-        // when
-        Operand result = handler.deserialize(node, mapper);
-
-        // then
-        assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
-            assertThat(v.getValue()).isEqualTo("100");
-            assertThat(v.getType()).isEqualTo(String.class.getName());
-        });
-    }
-
-    @Test
-    void shouldResolveNullValueProperly() throws IOException {
-        // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"value\": null" +
-                "}");
-
-        // when
-        Operand result = handler.deserialize(node, mapper);
-
-        // then
-        assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
-            assertThat(v.getValue()).isNull();
-            assertThat(v.getType()).isEqualTo(String.class.getName());
-        });
+        // when / then
+        String expectedMessage = "Unable to deserialize {\"type\":null}, type must be null";
+        assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
     }
 
     @Test
@@ -133,13 +86,14 @@ class ValueDeserializationHandlerTest {
         // given
         JsonNode node = mapper.readTree("" +
                 "{" +
+                "  \"name\": \"ATTRIBUTE_NAME\"," +
                 "  \"value\": \"100\"," +
                 "  \"type\": \"java.lang.Unknown\"" +
                 "}");
 
         // when / then
         String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";
-        assertThatThrownBy(() -> handler.deserialize(node, mapper))
+        assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
     }

@@ -65,6 +65,21 @@ class FunctionDeserializationHandlerTest {
     }
 
     @Test
+    void shouldBeApplicableForJsonWithNullFunctionProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"function\" : null" +
+                "}");
+
+        // when
+        Boolean applicable = handler.isApplicable(node);
+
+        // then
+        assertThat(applicable).isTrue();
+    }
+
+    @Test
     void shouldNotBeApplicableForJsonWithoutFunctionProperty() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
@@ -115,6 +130,44 @@ class FunctionDeserializationHandlerTest {
                     createParameter("PARAM_NAME_1", false),
                     createParameter("PARAM_NAME_2", true)
             );
+        });
+    }
+
+    @Test
+    void shouldResolveNullFunctionAsNull() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"function\" : null" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldResolveNullFunctionPropertiesProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"function\" : {" +
+                "    \"name\": null," +
+                "    \"returnType\": null," +
+                "    \"parameters\": null" +
+                "  }" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Function.class, f -> {
+            assertThat(f.getName()).isNull();
+            assertThat(f.getReturnType()).isNull();
+            assertThat(f.getParameters()).isNull();
         });
     }
 

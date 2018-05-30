@@ -63,6 +63,24 @@ class ValuesDeserializationHandlerTest {
     }
 
     @Test
+    void shouldBeApplicableForJsonWithNullTypeProperty() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"values\": [" +
+                "    \"TEST_VALUE\"" +
+                "  ]," +
+                "  \"type\": null" +
+                "}");
+
+        // when
+        Boolean applicable = handler.isApplicable(node);
+
+        // then
+        assertThat(applicable).isTrue();
+    }
+
+    @Test
     void shouldNotBeApplicableForJsonWithoutValuesProperty() throws IOException {
         // given
         JsonNode node = mapper.readTree("" +
@@ -240,6 +258,44 @@ class ValuesDeserializationHandlerTest {
                     )
             );
             assertThat(v.getType()).isEqualTo(Object.class.getName());
+        });
+    }
+
+    @Test
+    void shouldResolveNullWithinValuesAsNullValue() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"values\": [ null, null ]," +
+                "  \"type\": \"java.lang.Object\"" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
+            assertThat(v.getValues()).containsExactly(null, null);
+            assertThat(v.getType()).isEqualTo(Object.class.getName());
+        });
+    }
+
+    @Test
+    void shouldResolveNullValuesPropertyProperly() throws IOException {
+        // given
+        JsonNode node = mapper.readTree("" +
+                "{" +
+                "  \"values\": null," +
+                "  \"type\": null" +
+                "}");
+
+        // when
+        Operand result = handler.deserialize(node, mapper);
+
+        // then
+        assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
+            assertThat(v.getValues()).isNull();
+            assertThat(v.getType()).isNull();
         });
     }
 

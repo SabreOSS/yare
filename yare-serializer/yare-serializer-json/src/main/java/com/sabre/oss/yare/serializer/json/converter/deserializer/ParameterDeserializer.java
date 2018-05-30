@@ -25,11 +25,13 @@
 package com.sabre.oss.yare.serializer.json.converter.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
+import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Expression;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 
@@ -40,10 +42,20 @@ public class ParameterDeserializer extends JsonDeserializer<Parameter> {
     public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
         JsonNode jsonNode = objectMapper.readTree(jsonParser);
-        String name = jsonNode.get(JsonPropertyNames.Parameter.NAME).textValue();
-        Expression expression = objectMapper.treeToValue(jsonNode, Expression.class);
+        String name = getName(jsonNode);
+        Expression expression = getExpression(jsonNode, objectMapper);
         return new Parameter()
                 .withName(name)
                 .withExpression(expression);
+    }
+
+    private String getName(JsonNode jsonNode) {
+        return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Parameter.NAME)
+                .map(JsonNode::textValue)
+                .orElse(null);
+    }
+
+    private Expression getExpression(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        return jsonNode != null ? objectMapper.treeToValue(jsonNode, Expression.class) : null;
     }
 }
