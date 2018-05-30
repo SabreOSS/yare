@@ -346,6 +346,24 @@ public final class RuleDsl {
     }
 
     /**
+     * Creates operand representing a collection of constant values.
+     *
+     * @param type   class describing collection item type
+     * @param values values collection
+     * @param <T>    collection item type
+     * @return operand representing collection of constant values
+     */
+    public static <T> CollectionOperand<T> values(Class<T> type, Collection<T> values) {
+        return (name, builder) -> {
+            List<com.sabre.oss.yare.core.model.Expression> expressions = values.stream()
+                    .map(RuleDsl::escapeStrings)
+                    .map(v -> ExpressionFactory.valueOf(null, type, v))
+                    .collect(Collectors.toList());
+            return ExpressionFactory.valuesOf(name, extractParametrizedType(type), expressions);
+        };
+    }
+
+    /**
      * Creates a logical AND expression for given logical expressions.
      *
      * @param booleanExpressions logical expressions
