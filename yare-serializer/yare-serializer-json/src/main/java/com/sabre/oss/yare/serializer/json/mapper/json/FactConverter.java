@@ -22,16 +22,25 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.model;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
-public class StringTypeFilter {
-    @Override
-    public boolean equals(Object other) {
-        return String.class.getName().equals(other);
+import com.sabre.oss.yare.common.converter.TypeConverter;
+import com.sabre.oss.yare.serializer.json.model.Fact;
+
+import java.lang.reflect.Type;
+
+class FactConverter {
+    private final TypeConverter typeConverter;
+
+    FactConverter(TypeConverter typeConverter) {
+        this.typeConverter = typeConverter;
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    Fact convert(com.sabre.oss.yare.core.model.Fact fact) {
+        if (fact == null) {
+            return null;
+        }
+        String type = typeConverter.toString(Type.class, fact.getType());
+        return new Fact().withName(fact.getIdentifier()).withType(type);
     }
 }

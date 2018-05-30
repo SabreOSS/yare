@@ -45,7 +45,7 @@ class AttributeConverterTest {
     void shouldConvertToAttribute() {
         com.sabre.oss.yare.serializer.json.model.Attribute toConvert = new com.sabre.oss.yare.serializer.json.model.Attribute()
                 .withName("attribute-name")
-                .withType("java.lang.String")
+                .withType("String")
                 .withValue("attribute-value");
 
         Attribute attribute = attributeConverter.convert(toConvert);

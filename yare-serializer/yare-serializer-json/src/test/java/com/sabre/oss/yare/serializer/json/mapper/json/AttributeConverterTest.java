@@ -22,43 +22,46 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
-import com.sabre.oss.yare.core.model.Fact;
+import com.sabre.oss.yare.serializer.json.model.Attribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class FactConverterTest {
-    private FactConverter factConverter;
+class AttributeConverterTest {
+    private AttributeConverter attributeConverter;
 
     @BeforeEach
     void setUp() {
-        factConverter = new FactConverter(DefaultTypeConverters.getDefaultTypeConverter());
+        attributeConverter = new AttributeConverter(DefaultTypeConverters.getDefaultTypeConverter());
     }
 
     @Test
-    void shouldConvertToFact() {
-        com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
-                .withName("fact-name")
-                .withType("String");
+    void shouldConvertToAttribute() {
+        com.sabre.oss.yare.core.model.Attribute toConvert = new com.sabre.oss.yare.core.model.Attribute("attribute-name", String.class, "attribute-value");
 
-        Fact fact = factConverter.convert(toConvert);
+        Attribute attribute = attributeConverter.convert(toConvert);
 
-        Fact expected = new Fact("fact-name", String.class);
-        assertThat(fact).isEqualTo(expected);
+        Attribute expected = new Attribute()
+                .withName("attribute-name")
+                .withType("String")
+                .withValue("attribute-value");
+        assertThat(attribute).isEqualTo(expected);
     }
 
     @Test
-    void shouldThrowExceptionWhenUnknownTypeUsed() {
-        com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
-                .withName("fact-name")
-                .withType("unknown");
+    void shouldConvertToAttributeWhenTypeIsNull() {
+        com.sabre.oss.yare.core.model.Attribute toConvert = new com.sabre.oss.yare.core.model.Attribute("attribute-name", null, "attribute-value");
 
-        assertThatThrownBy(() -> factConverter.convert(toConvert))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+        Attribute attribute = attributeConverter.convert(toConvert);
+
+        Attribute expected = new Attribute()
+                .withName("attribute-name")
+                .withType("@null")
+                .withValue("attribute-value");
+        assertThat(attribute).isEqualTo(expected);
     }
 }

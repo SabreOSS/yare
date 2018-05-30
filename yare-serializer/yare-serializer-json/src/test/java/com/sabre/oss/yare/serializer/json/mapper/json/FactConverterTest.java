@@ -22,15 +22,14 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
-import com.sabre.oss.yare.core.model.Fact;
+import com.sabre.oss.yare.serializer.json.model.Fact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class FactConverterTest {
     private FactConverter factConverter;
@@ -42,23 +41,13 @@ class FactConverterTest {
 
     @Test
     void shouldConvertToFact() {
-        com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
-                .withName("fact-name")
-                .withType("String");
+        com.sabre.oss.yare.core.model.Fact toConvert = new com.sabre.oss.yare.core.model.Fact("fact-name", String.class);
 
         Fact fact = factConverter.convert(toConvert);
 
-        Fact expected = new Fact("fact-name", String.class);
-        assertThat(fact).isEqualTo(expected);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenUnknownTypeUsed() {
-        com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
+        Fact expected = new Fact()
                 .withName("fact-name")
-                .withType("unknown");
-
-        assertThatThrownBy(() -> factConverter.convert(toConvert))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .withType("String");
+        assertThat(fact).isEqualTo(expected);
     }
 }

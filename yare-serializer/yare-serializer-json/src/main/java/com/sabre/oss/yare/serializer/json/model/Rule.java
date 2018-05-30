@@ -107,10 +107,11 @@ public class Rule {
             return false;
         }
         Rule rule = (Rule) o;
-        return Objects.equals(attributes, rule.attributes) &&
+        boolean result = Objects.equals(attributes, rule.attributes) &&
                 Objects.equals(facts, rule.facts) &&
                 Objects.equals(predicate, rule.predicate) &&
                 Objects.equals(actions, rule.actions);
+        return result;
     }
 
     @Override
