@@ -22,48 +22,8 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.examples.facts;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
+package com.sabre.oss.yare.example.fact;
 
 public class Flight {
-    private String classOfService;
-    private LocalDateTime dateOfDeparture;
-
-    public String getClassOfService() {
-        return this.classOfService;
-    }
-
-    public LocalDateTime getDateOfDeparture() {
-        return dateOfDeparture;
-    }
-
-    public Flight withClassOfService(final String classOfService) {
-        this.classOfService = classOfService;
-        return this;
-    }
-
-    public Flight withDateOfDeparture(final LocalDateTime dateOfDeparture) {
-        this.dateOfDeparture = dateOfDeparture;
-        return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Flight that = (Flight) o;
-        return Objects.equals(classOfService, that.classOfService) &&
-                Objects.equals(dateOfDeparture, that.dateOfDeparture);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(classOfService, dateOfDeparture);
-    }
+    public String classOfService;
 }

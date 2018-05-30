@@ -22,20 +22,16 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.examples;
+package com.sabre.oss.yare.example;
 
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
-import com.sabre.oss.yare.examples.facts.Hotel;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static com.sabre.oss.yare.invoker.js.JavaScriptCallMetadata.js;
@@ -46,6 +42,24 @@ class JavaScriptFunctionTest {
     @Test
     void shouldMatchFactsWhenUsingJavaScriptFunction() {
         // given
+        List<Rule> rules = Collections.singletonList(
+                RuleDsl.ruleBuilder()
+                        .name("Rule matching when hotel has specified chain code")
+                        .fact("hotel", Hotel.class)
+                        .predicate(
+                                equal(
+                                        function("concat", String.class,
+                                                param("str1", value("Chain code:")),
+                                                param("str2", value("${hotel.chainCode}"))
+                                        ),
+                                        value("Chain code:HH")
+                                )
+                        )
+                        .action("collect",
+                                param("context", value("${ctx}")),
+                                param("fact", value("${hotel}")))
+                        .build()
+        );
         List<Hotel> facts = Arrays.asList(
                 new Hotel().withChainCode("HH"),
                 new Hotel().withChainCode("BV"),
@@ -53,9 +67,19 @@ class JavaScriptFunctionTest {
                 new Hotel().withChainCode("BW"),
                 new Hotel().withChainCode("HH")
         );
-        List<Rule> rules = createRules();
 
-        RulesEngine rulesEngine = createRulesEngine(rules);
+        String script = "" +
+                "function concat(str1, str2) { " +
+                "   return str1 + str2; " +
+                "}" +
+                "function collect(ctx, fact) {" +
+                "   ctx.add(fact);" +
+                "}";
+        RulesEngine rulesEngine = new RulesEngineBuilder()
+                .withRulesRepository(i -> rules)
+                .withActionMapping("collect", js("collect", script))
+                .withFunctionMapping("concat", js("concat", script))
+                .build();
         RuleSession ruleSession = rulesEngine.createSession("test");
 
         // when
@@ -68,38 +92,29 @@ class JavaScriptFunctionTest {
         );
     }
 
-    private List<Rule> createRules() {
-        return Collections.singletonList(
-                RuleDsl.ruleBuilder()
-                        .name("Rule matching when hotel has specified chain code")
-                        .fact("hotel", Hotel.class)
-                        .predicate(
-                                equal(
-                                        function("concat", String.class,
-                                                param("str1", value("Chain code:")),
-                                                param("str2", value("${hotel.chainCode}"))),
-                                        value("Chain code:HH")
-                                )
-                        )
-                        .action("collect",
-                                param("context", value("${ctx}")),
-                                param("fact", value("${hotel}")))
-                        .build()
-        );
-    }
+    public static class Hotel {
+        public String chainCode;
 
-    private RulesEngine createRulesEngine(List<Rule> rules) {
-        String script = "" +
-                "function concat(str1, str2) { " +
-                "   return str1 + str2; " +
-                "}" +
-                "function collect(ctx, fact) {" +
-                "   ctx.add(fact);" +
-                "}";
-        return new RulesEngineBuilder()
-                .withRulesRepository(i -> rules)
-                .withActionMapping("collect", js("collect", script))
-                .withFunctionMapping("concat", js("concat", script))
-                .build();
+        Hotel withChainCode(String chainCode) {
+            this.chainCode = chainCode;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Hotel hotel = (Hotel) o;
+            return Objects.equals(chainCode, hotel.chainCode);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(chainCode);
+        }
     }
 }
