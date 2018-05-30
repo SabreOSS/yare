@@ -46,12 +46,16 @@ class AttributeConverter implements Mapper<AttributeSer, Attribute> {
     public Attribute map(AttributeSer attribute) {
         String name = attribute.getName();
         ValueSer value = attribute.getValue();
+        CustomValueSer customValue = attribute.getCustomValue();
+
+        if (value != null && customValue != null) {
+            throw new IllegalStateException("Please set either Value or CustomValue");
+        }
 
         if (value != null) {
             return convertValue(name, value);
         }
 
-        CustomValueSer customValue = attribute.getCustomValue();
         if (customValue != null) {
             return convertCustomValue(name, customValue);
         }

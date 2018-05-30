@@ -174,7 +174,7 @@ class AttributeConverterTest {
     }
 
     @Test
-    void shouldConvertToSimpleValueWhenAttributeWithValueAndCustomValue() {
+    void shouldThrowExceptionWhenAttributeWithValueAndCustomValue() {
         // given
         AttributeSer attributeSer = new AttributeSer()
                 .withName("attribute")
@@ -185,12 +185,9 @@ class AttributeConverterTest {
                         .withType(CustomTestValue.class.getName())
                         .withAny(new CustomTestValue("testValue")));
 
-        // when
-        Attribute actual = attributeConverter.map(attributeSer);
-
-        // then
-        Attribute expected = new Attribute("attribute", String.class, "Test");
-        assertThat(actual).isEqualTo(expected);
+        // when / then
+        assertThatThrownBy(() -> attributeConverter.map(attributeSer))
+                .isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test

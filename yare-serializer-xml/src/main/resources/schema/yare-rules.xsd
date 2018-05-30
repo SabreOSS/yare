@@ -46,7 +46,7 @@
             <xsd:element ref="rul:CustomValue"/>
             <xsd:element ref="rul:Value"/>
         </xsd:choice>
-        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:element name="Fact" type="rul:Fact"/>
