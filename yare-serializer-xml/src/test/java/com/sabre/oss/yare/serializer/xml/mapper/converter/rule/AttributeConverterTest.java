@@ -89,6 +89,57 @@ class AttributeConverterTest {
     }
 
     @Test
+    void shouldConvertAttributeWithNullValue() {
+        // given
+        AttributeSer attributeSer = new AttributeSer()
+                .withName("attribute")
+                .withValue(new ValueSer()
+                        .withType("String")
+                        .withValue(null));
+
+        // when
+        Attribute actual = attributeConverter.map(attributeSer);
+
+        // then
+        Attribute expected = new Attribute("attribute", String.class, null);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldConvertToNullWhenAttributeWithValueWithLiteralNull() {
+        // given
+        AttributeSer attributeSer = new AttributeSer()
+                .withName("attribute")
+                .withValue(new ValueSer()
+                        .withType("String")
+                        .withValue(StringTypeConverter.NULL_LITERAL));
+
+        // when
+        Attribute actual = attributeConverter.map(attributeSer);
+
+        // then
+        Attribute expected = new Attribute("attribute", String.class, null);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldConvertAttributeWithUndefinedTypeAndNullValue() {
+        // given
+        AttributeSer attributeSer = new AttributeSer()
+                .withName("attribute")
+                .withValue(new ValueSer()
+                        .withType(Expression.Undefined.class.getName())
+                        .withValue(null));
+
+        // when
+        Attribute actual = attributeConverter.map(attributeSer);
+
+        // then
+        Attribute expected = new Attribute("attribute", Expression.Undefined.class, null);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     void shouldConvertAttributeWithCustomValue() {
         // given
         AttributeSer attributeSer = new AttributeSer()
@@ -102,6 +153,23 @@ class AttributeConverterTest {
 
         // then
         Attribute expected = new Attribute("attribute", CustomTestValue.class, new CustomTestValue("testValue"));
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldConvertWhenValueInCustomValueIsNullAndTypeIsNull() {
+        // given
+        AttributeSer attributeSer = new AttributeSer()
+                .withName("attribute")
+                .withCustomValue(new CustomValueSer()
+                        .withType(null)
+                        .withAny(null));
+
+        // when
+        Attribute actual = attributeConverter.map(attributeSer);
+
+        // then
+        Attribute expected = new Attribute("attribute", Expression.Undefined.class, null);
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -122,23 +190,6 @@ class AttributeConverterTest {
 
         // then
         Attribute expected = new Attribute("attribute", String.class, "Test");
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void shouldConvertToNullWhenAttributeWithValueWithLiteralNull() {
-        // given
-        AttributeSer attributeSer = new AttributeSer()
-                .withName("attribute")
-                .withValue(new ValueSer()
-                        .withType("String")
-                        .withValue(StringTypeConverter.NULL_LITERAL));
-
-        // when
-        Attribute actual = attributeConverter.map(attributeSer);
-
-        // then
-        Attribute expected = new Attribute("attribute", String.class, null);
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -172,34 +223,6 @@ class AttributeConverterTest {
         // then
         Attribute expected = new Attribute("attribute", Expression.Undefined.class, new CustomTestValue("testValue"));
         assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenValueInValueIsNull() {
-        // given
-        AttributeSer attributeSer = new AttributeSer()
-                .withName("attribute")
-                .withValue(new ValueSer()
-                        .withType("String")
-                        .withValue(null));
-
-        // when / then
-        assertThatThrownBy(() -> attributeConverter.map(attributeSer))
-                .isExactlyInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenValueInCustomValueIsNull() {
-        // given
-        AttributeSer attributeSer = new AttributeSer()
-                .withName("attribute")
-                .withCustomValue(new CustomValueSer()
-                        .withType(CustomTestValue.class.getName())
-                        .withAny(null));
-
-        // when / then
-        assertThatThrownBy(() -> attributeConverter.map(attributeSer))
-                .isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test

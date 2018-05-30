@@ -55,10 +55,10 @@ class AttributeConverter implements Mapper<Attribute, AttributeSer> {
         }
 
         if (isSimpleValue(type)) {
-            return convertSimpleValue(type, attributeSer, value);
+            return convertSimpleValue(attributeSer, type, value);
         }
 
-        return convertCustomValue(type, attributeSer, value);
+        return convertCustomValue(attributeSer, type, value);
     }
 
     private AttributeSer convertUndefinedType(AttributeSer attributeSer, Object value) {
@@ -83,14 +83,14 @@ class AttributeConverter implements Mapper<Attribute, AttributeSer> {
         return typeConverter.isApplicable(type);
     }
 
-    private AttributeSer convertSimpleValue(Type type, AttributeSer attributeSer, Object value) {
+    private AttributeSer convertSimpleValue(AttributeSer attributeSer, Type type, Object value) {
         return attributeSer
                 .withValue(new ValueSer()
                         .withType(typeConverter.toString(Type.class, type))
                         .withValue(typeConverter.toString(type, value)));
     }
 
-    private AttributeSer convertCustomValue(Type type, AttributeSer attributeSer, Object value) {
+    private AttributeSer convertCustomValue(AttributeSer attributeSer, Type type, Object value) {
         return attributeSer
                 .withCustomValue(new CustomValueSer()
                         .withType(typeConverter.toString(Type.class, type))

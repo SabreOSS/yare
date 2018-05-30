@@ -48,28 +48,20 @@ class AttributeConverter implements Mapper<AttributeSer, Attribute> {
         ValueSer value = attribute.getValue();
 
         if (value != null) {
-            checkNonNull(value.getValue(), "Value.value cannot be null");
             return convertValue(name, value);
         }
 
         CustomValueSer customValue = attribute.getCustomValue();
         if (customValue != null) {
-            checkNonNull(customValue.getAny(), "CustomValue.any cannot be null");
             return convertCustomValue(name, customValue);
         }
 
         throw new IllegalStateException("Attribute value or customValue must be set");
     }
 
-    private void checkNonNull(Object o, String message) {
-        if (o == null) {
-            throw new IllegalStateException(message);
-        }
-    }
-
     private Attribute convertValue(String name, ValueSer value) {
         Type type = getType(value.getType());
-        String v = value.getValue();
+        String v = value.getValue() == null ? StringTypeConverter.NULL_LITERAL : value.getValue();
 
         Object attributeValue = null;
         if (!isNullLiteral(v)) {
@@ -89,6 +81,6 @@ class AttributeConverter implements Mapper<AttributeSer, Attribute> {
     }
 
     private boolean isNullLiteral(String value) {
-        return value.equals(StringTypeConverter.NULL_LITERAL);
+        return StringTypeConverter.NULL_LITERAL.equals(value);
     }
 }
