@@ -22,24 +22,39 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.mapper.rule;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
-import com.sabre.oss.yare.common.converter.TypeConverter;
-import com.sabre.oss.yare.core.model.Fact;
+import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
+import com.sabre.oss.yare.serializer.json.model.Fact;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
+import static org.assertj.core.api.Assertions.assertThat;
 
-class FactConverter {
-    private final TypeConverter typeConverter;
+class FactConverterTest {
+    private FactConverter factConverter;
 
-    FactConverter(TypeConverter typeConverter) {
-        this.typeConverter = typeConverter;
+    @BeforeEach
+    void setUp() {
+        factConverter = new FactConverter(DefaultTypeConverters.getDefaultTypeConverter());
     }
 
-    Fact convert(com.sabre.oss.yare.serializer.json.model.Fact fact) {
-        if (fact == null) {
-            return null;
-        }
-        return new Fact(fact.getName(), typeConverter.fromString(Type.class, fact.getType()));
+    @Test
+    void shouldConvertToFact() {
+        com.sabre.oss.yare.core.model.Fact toConvert = new com.sabre.oss.yare.core.model.Fact("fact-name", String.class);
+
+        Fact fact = factConverter.convert(toConvert);
+
+        Fact expected = new Fact()
+                .withName("fact-name")
+                .withType("String");
+        assertThat(fact).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldConvertNullFact() {
+        Fact fact = factConverter.convert(null);
+
+        assertThat(fact).isNull();
     }
 }

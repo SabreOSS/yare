@@ -92,4 +92,13 @@ public class Attribute {
     public int hashCode() {
         return Objects.hash(name, value, type);
     }
+
+    @Override
+    public String toString() {
+        return "Attribute{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

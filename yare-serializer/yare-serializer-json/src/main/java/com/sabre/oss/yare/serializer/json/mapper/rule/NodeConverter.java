@@ -57,11 +57,7 @@ class NodeConverter {
         if (node == null) {
             return null;
         }
-        Converter<?> converter = converterRegistry.get(node.getClass());
-        if (converter == null) {
-            return null;
-        }
-        return ((Converter<Object>) converter).convert(name, node);
+        return ((Converter<Object>) converterRegistry.get(node.getClass())).convert(name, node);
     }
 
     List<Expression> convert(List<?> nodes) {

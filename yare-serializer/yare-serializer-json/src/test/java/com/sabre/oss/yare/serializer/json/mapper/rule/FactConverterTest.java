@@ -44,12 +44,19 @@ class FactConverterTest {
     void shouldConvertToFact() {
         com.sabre.oss.yare.serializer.json.model.Fact toConvert = new com.sabre.oss.yare.serializer.json.model.Fact()
                 .withName("fact-name")
-                .withType("java.lang.String");
+                .withType("String");
 
         Fact fact = factConverter.convert(toConvert);
 
         Fact expected = new Fact("fact-name", String.class);
         assertThat(fact).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldConvertNullFact() {
+        Fact fact = factConverter.convert(null);
+
+        assertThat(fact).isNull();
     }
 
     @Test
