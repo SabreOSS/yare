@@ -35,8 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.sabre.oss.yare.common.converter.StringTypeConverter.NULL_LITERAL;
-
 /**
  * {@link TypeTypeConverter} is able to fromString string to {@link Type}.
  * <p>
@@ -83,8 +81,8 @@ public class TypeTypeConverter implements TypeConverter {
 
     @Override
     public String toString(Type ignored, Object value) {
-        if (Objects.isNull(value)) {
-            return NULL_LITERAL;
+        if (value == null) {
+            return Expression.Undefined.class.getName();
         }
         String result = typeToStringCache.get(value);
         if (result == null) {

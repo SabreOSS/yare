@@ -86,7 +86,6 @@ class ActionConverterTest {
                 )),
                 functionOf("parameter-name-3", Boolean.class, "function-name", Collections.emptyList())
         ));
-
         assertThat(actions).containsExactly(expected);
     }
 }

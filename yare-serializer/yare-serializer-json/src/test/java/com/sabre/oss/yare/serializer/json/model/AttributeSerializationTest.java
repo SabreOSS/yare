@@ -103,7 +103,7 @@ class AttributeSerializationTest {
 
         assertThatThrownBy(() -> objectMapper.readValue(json, Attribute.class))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Unable to deserialize \"attribute-value\", cannot find UNKNOWN class");
+                .hasMessage("Can't convert 'UNKNOWN' into Java type");
     }
 
     public static class TestClass {

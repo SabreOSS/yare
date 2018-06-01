@@ -111,7 +111,7 @@ class ValueSerializationTest {
 
         assertThatThrownBy(() -> objectMapper.readValue(json, Value.class))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Unable to deserialize \"test-value\", cannot find UNKNOWN class");
+                .hasMessage("Can't convert 'UNKNOWN' into Java type");
     }
 
     public static class TestClass {

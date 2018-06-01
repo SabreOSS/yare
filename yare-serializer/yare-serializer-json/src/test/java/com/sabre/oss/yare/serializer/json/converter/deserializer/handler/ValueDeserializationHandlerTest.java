@@ -129,7 +129,7 @@ class ValueDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when / then
-        String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";
+        String expectedMessage = "Can't convert 'java.lang.Unknown' into Java type";
         assertThatThrownBy(() -> handler.deserialize(node, mapper))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);

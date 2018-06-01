@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.serializer.json.mapper.json;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
+import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.json.model.Attribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class AttributeConverterTest {
 
         Attribute expected = new Attribute()
                 .withName("attribute-name")
-                .withType("@null")
+                .withType(Expression.Undefined.class.getName())
                 .withValue("attribute-value");
         assertThat(attribute).isEqualTo(expected);
     }

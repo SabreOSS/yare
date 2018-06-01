@@ -27,14 +27,18 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.common.converter.TypeTypeConverter;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
 import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
 
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 class ValueDeserializationHandler extends DeserializationHandler {
+    private final TypeTypeConverter typeConverter = new TypeTypeConverter();
+
     @Override
     protected boolean isApplicable(JsonNode jsonNode) {
         return jsonNode.has(JsonPropertyNames.Value.VALUE);
@@ -61,11 +65,7 @@ class ValueDeserializationHandler extends DeserializationHandler {
     }
 
     private Object mapValueByType(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
-        try {
-            Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
-            return objectMapper.treeToValue(jsonNode, resolvedType);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", jsonNode.toString(), type), e);
-        }
+        Class<?> resolvedType = (Class<?>) typeConverter.fromString(Type.class, type);
+        return objectMapper.treeToValue(jsonNode, resolvedType);
     }
 }

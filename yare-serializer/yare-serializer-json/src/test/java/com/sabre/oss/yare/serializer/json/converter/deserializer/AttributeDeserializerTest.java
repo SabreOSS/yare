@@ -72,7 +72,7 @@ class AttributeDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when / then
-        String expectedMessage = "Unable to deserialize {\"type\":null}, type must be null";
+        String expectedMessage = "Unable to deserialize {\"type\":null}, type must not be null";
         assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
@@ -85,7 +85,7 @@ class AttributeDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when / then
-        String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";
+        String expectedMessage = "Can't convert 'java.lang.Unknown' into Java type";
         assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);

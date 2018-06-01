@@ -30,14 +30,18 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.common.converter.TypeTypeConverter;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
 import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Attribute;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 public class AttributeDeserializer extends JsonDeserializer<Attribute> {
+    private final TypeTypeConverter typeConverter = new TypeTypeConverter();
+
     @Override
     public Attribute deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
@@ -60,7 +64,7 @@ public class AttributeDeserializer extends JsonDeserializer<Attribute> {
     private String getType(JsonNode jsonNode) {
         return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Attribute.TYPE)
                 .map(JsonNode::textValue)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Unable to deserialize %s, type must be null", jsonNode.toString())));
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Unable to deserialize %s, type must not be null", jsonNode.toString())));
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
@@ -69,11 +73,7 @@ public class AttributeDeserializer extends JsonDeserializer<Attribute> {
     }
 
     private Object mapValueByType(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {
-        try {
-            Class<?> resolvedType = Thread.currentThread().getContextClassLoader().loadClass(type);
-            return objectMapper.treeToValue(jsonNode, resolvedType);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException(String.format("Unable to deserialize %s, cannot find %s class", jsonNode.toString(), type), e);
-        }
+        Class<?> resolvedType = (Class<?>) typeConverter.fromString(Type.class, type);
+        return objectMapper.treeToValue(jsonNode, resolvedType);
     }
 }

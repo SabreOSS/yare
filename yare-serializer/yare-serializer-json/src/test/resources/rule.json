@@ -1,0 +1,167 @@
+/*
+ * MIT License
+ *
+ * Copyright 2018 Sabre GLBL Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+{
+  "attributes": [
+    {
+      "name": "ruleName",
+      "value": "Name of the rule",
+      "type": "String"
+    },
+    {
+      "name": "customObject",
+      "value": {
+        "stringProperty": "testclass-property-1",
+        "integerProperty": 100
+      },
+      "type": "com.sabre.oss.yare.serializer.json.RuleToJsonConverterTest.TestClass"
+    }
+  ],
+  "facts": [
+    {
+      "name": "fact-1",
+      "type": "Object"
+    },
+    {
+      "name": "fact-2",
+      "type": "java.math.BigDecimal"
+    }
+  ],
+  "predicate": {
+    "and": [
+      {
+        "or": [
+          {
+            "equal": [
+              {
+                "values": [
+                  {
+                    "value": "test",
+                    "type": "String"
+                  },
+                  {
+                    "function": {
+                      "name": "function-1",
+                      "returnType": "String",
+                      "parameters": []
+                    }
+                  }
+                ],
+                "type": "List<String>"
+              },
+              {
+                "function": {
+                  "name": "function-1",
+                  "returnType": "java.util.Collections.EmptyList",
+                  "parameters": [
+                    {
+                      "name": "param-1",
+                      "function": {
+                        "name": "function-2",
+                        "returnType": "com.sabre.oss.yare.core.model.Expression.Undefined",
+                        "parameters": []
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "function": {
+          "name": "function-3",
+          "returnType": "Boolean",
+          "parameters": [
+            {
+              "name": "param-2",
+              "value": {
+                "stringProperty": "testclass-property-2",
+                "integerProperty": 200
+              },
+              "type": "com.sabre.oss.yare.serializer.json.RuleToJsonConverterTest.TestClass"
+            },
+            {
+              "name": "param-3",
+              "values": [
+                {
+                  "values": [
+                    {
+                      "value": "test",
+                      "type": "String"
+                    }
+                  ],
+                  "type": "List<String>"
+                }
+              ],
+              "type": "List<java.util.Collections.EmptyList>"
+            }
+          ]
+        }
+      },
+      {
+        "not": [
+          {
+            "is-null": [
+              {
+                "value": null,
+                "type": "com.sabre.oss.yare.core.model.Expression.Undefined"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "actions": [
+    {
+      "name": "action-name",
+      "parameters": [
+        {
+          "name": "param-1",
+          "value": 100,
+          "type": "java.math.BigDecimal"
+        },
+        {
+          "name": "param-2",
+          "values": [
+            {
+              "value": "test",
+              "type": "String"
+            }
+          ],
+          "type": "List<String>"
+        },
+        {
+          "name": "param-3",
+          "function": {
+            "name": "function-4",
+            "returnType": "com.sabre.oss.yare.core.model.Expression.Undefined",
+            "parameters": []
+          }
+        }
+      ]
+    }
+  ]
+}
