@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 
 public class CollectionsPredicateTest extends AbstractPerformanceTest {
 

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.invoker.js.JavaScriptCallMetadata.js;
+import static com.sabre.oss.yare.invoker.java.js.JavaScriptCallMetadata.js;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class JavaScriptFunctionTest {

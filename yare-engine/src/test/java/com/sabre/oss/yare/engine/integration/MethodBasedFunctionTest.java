@@ -35,12 +35,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MethodBasedFunctionTest {
+public class MethodBasedFunctionTest {
     private static final String RULE_NAME = "NAME";
 
     @Test

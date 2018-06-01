@@ -28,7 +28,7 @@ import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
 import com.sabre.oss.yare.engine.executor.DefaultRulesExecutorBuilder;
 
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static com.sabre.oss.yare.engine.integration.BaseRulesUtils.*;
 
 abstract class AbstractBaseRulesTest {

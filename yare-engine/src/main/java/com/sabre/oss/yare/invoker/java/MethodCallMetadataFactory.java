@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.engine;
+package com.sabre.oss.yare.invoker.java;
 
 import com.google.common.base.Defaults;
 import com.sabre.oss.yare.core.call.ProcessingContext;
@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadataValidator.*;
 import static java.lang.String.format;
 
 abstract class MethodCallMetadataFactory {
@@ -50,6 +51,7 @@ abstract class MethodCallMetadataFactory {
     @SuppressWarnings("unchecked")
     static <T> MethodCallMetadata method(T instance, CatchingInvocation<T> invocation) {
         Class<?> targetType = instance.getClass();
+        validateActionMappingCandidate(targetType);
         Class<?> proxyClass = proxies.computeIfAbsent(targetType, aClass -> {
             ProxyFactory proxy = new ProxyFactory();
             proxy.setSuperclass(targetType);
@@ -60,6 +62,7 @@ abstract class MethodCallMetadataFactory {
             AtomicReference<Method> calledMethod = new AtomicReference<>();
             Proxy proxy = (Proxy) proxyClass.<Proxy>newInstance();
             proxy.setHandler((self, method, proceed, args) -> {
+                validateActionMappingCandidate(method);
                 calledMethod.set(method);
                 return Defaults.defaultValue(method.getReturnType());
             });

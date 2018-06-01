@@ -35,11 +35,11 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ContainsOperatorTest {
+public class ContainsOperatorTest {
     private static final String ACTION_NAME = "testAction";
 
     public RulesEngine createRuleEngine(RulesExecutionConfig config) {
