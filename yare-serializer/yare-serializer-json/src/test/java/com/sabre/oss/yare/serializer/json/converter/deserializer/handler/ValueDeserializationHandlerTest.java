@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ValueDeserializationHandlerTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/value";
+
     private ObjectMapper mapper;
     private DeserializationHandler handler;
 
@@ -49,10 +52,8 @@ class ValueDeserializationHandlerTest {
     @Test
     void shouldBeApplicableForJsonWithValueProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"value\": \"TEST_VALUE\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -76,11 +77,8 @@ class ValueDeserializationHandlerTest {
     @Test
     void shouldResolveValueAccordingToTheGivenType() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"value\": \"100\"," +
-                "  \"type\": \"java.lang.Integer\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueAndTypeProperties.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -95,28 +93,24 @@ class ValueDeserializationHandlerTest {
     @Test
     void shouldResolveValueAsStringWhenTypeIsNotSpecified() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"value\": \"100\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
-            assertThat(v.getValue()).isEqualTo("100");
+            assertThat(v.getValue()).isEqualTo("TEST_VALUE");
             assertThat(v.getType()).isEqualTo(String.class.getName());
         });
     }
 
     @Test
-    void shouldResolveNullValueProperly() throws IOException {
+    void shouldResolveNullValue() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"value\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullValueProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -131,11 +125,8 @@ class ValueDeserializationHandlerTest {
     @Test
     void shouldThrowExceptionIfTypeCannotBeResolved() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"value\": \"100\"," +
-                "  \"type\": \"java.lang.Unknown\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/unknownTypeProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when / then
         String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";

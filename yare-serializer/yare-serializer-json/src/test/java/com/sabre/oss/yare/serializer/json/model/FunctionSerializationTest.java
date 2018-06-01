@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FunctionSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/function";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -91,33 +94,6 @@ class FunctionSerializationTest {
     }
 
     private String getFunctionJson() {
-        return "" +
-                "{" +
-                "  \"function\" : {" +
-                "    \"name\" : \"function-name-1\"," +
-                "    \"returnType\" : \"function-return-type-1\"," +
-                "    \"parameters\" : [ {" +
-                "      \"name\" : \"param-name-1\"," +
-                "      \"value\" : 10," +
-                "      \"type\" : \"java.lang.Integer\"" +
-                "    }, {" +
-                "      \"name\" : \"param-name-2\"," +
-                "      \"values\" : [ {" +
-                "        \"value\" : \"value-value\"" +
-                "      }, {" +
-                "        \"value\" : 10," +
-                "        \"type\" : \"java.lang.Integer\"" +
-                "      } ]," +
-                "      \"type\" : \"values-type\"" +
-                "    }, {" +
-                "      \"name\" : \"param-name-3\"," +
-                "      \"function\" : {" +
-                "        \"name\" : \"function-name-2\"," +
-                "        \"returnType\" : \"function-return-type-2\"," +
-                "        \"parameters\" : [ ]" +
-                "      }" +
-                "    } ]" +
-                "  }" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/function.json");
     }
 }

@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AttributeSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/attribute";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -80,12 +83,7 @@ class AttributeSerializationTest {
     }
 
     private static String createBuildInTypeAttributeJson() {
-        return "" +
-                "{" +
-                "  \"name\" : \"attribute-name\"," +
-                "  \"value\" : \"attribute-value\"," +
-                "  \"type\" : \"java.lang.String\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/attributeWithBuildInType.json");
     }
 
     private static Attribute createCustomTypeAttributeModel() {
@@ -96,24 +94,12 @@ class AttributeSerializationTest {
     }
 
     private static String createCustomTypeAttributeJson() {
-        return "" +
-                "{" +
-                "  \"name\" : \"attribute-name\"," +
-                "  \"value\" : {" +
-                "    \"property\" : \"testclass-property\"" +
-                "  }," +
-                "  \"type\" : \"com.sabre.oss.yare.serializer.json.model.AttributeSerializationTest$TestClass\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/attributeWithCustomType.json");
     }
 
     @Test
     void shouldThrowExceptionWhenUnknownTypeUsed() {
-        String json = "" +
-                "{" +
-                "  \"name\" : \"attribute-name\"," +
-                "  \"value\" : \"attribute-value\"," +
-                "  \"type\" : \"UNKNOWN\"" +
-                "}";
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/attributeWithUnknownType.json");
 
         assertThatThrownBy(() -> objectMapper.readValue(json, Attribute.class))
                 .isExactlyInstanceOf(IllegalArgumentException.class)

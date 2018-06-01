@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FactSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/fact";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -70,10 +73,6 @@ class FactSerializationTest {
     }
 
     private String getFactJson() {
-        return "" +
-                "{" +
-                "  \"name\": \"fact-name\"," +
-                "  \"type\": \"fact-type\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/fact.json");
     }
 }

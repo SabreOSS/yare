@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RuleSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/rule";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -136,61 +139,6 @@ class RuleSerializationTest {
     }
 
     private String getRuleJson() {
-        return "" +
-                "{" +
-                "  \"attributes\" : [ {" +
-                "    \"name\" : \"ruleName\"," +
-                "    \"value\" : \"Should match preferred hotel basing on preferred property or chain code\"," +
-                "    \"type\" : \"java.lang.String\"" +
-                "  }, {" +
-                "    \"name\" : \"active\"," +
-                "    \"value\" : true," +
-                "    \"type\" : \"java.lang.Boolean\"" +
-                "  } ]," +
-                "  \"facts\" : [ {" +
-                "    \"name\" : \"hotel\"," +
-                "    \"type\" : \"com.sabre.sp.ere.demo.facts.Hotel\"" +
-                "  } ]," +
-                "  \"predicate\" : {" +
-                "    \"or\" : [ {" +
-                "      \"equal\" : [ {" +
-                "        \"value\" : \"${hotel.isPreferred}\"" +
-                "      }, {" +
-                "        \"value\" : true," +
-                "        \"type\" : \"java.lang.Boolean\"" +
-                "      } ]" +
-                "    }, {" +
-                "      \"equal\" : [ {" +
-                "        \"function\" : {" +
-                "          \"name\" : \"getAmountOfMoney\"," +
-                "          \"returnType\" : \"java.math.BigDecimal\"," +
-                "          \"parameters\" : [ {" +
-                "            \"name\" : \"amount\"," +
-                "            \"value\" : \"${hotel.roomRate}\"" +
-                "          }, {" +
-                "            \"name\" : \"inputCurrency\"," +
-                "            \"value\" : \"${hotel.currency}\"" +
-                "          }, {" +
-                "            \"name\" : \"outputCurrency\"," +
-                "            \"value\" : \"USD\"" +
-                "          } ]" +
-                "        }" +
-                "      }, {" +
-                "        \"value\" : 100," +
-                "        \"type\" : \"java.math.BigDecimal\"" +
-                "      } ]" +
-                "    } ]" +
-                "  }," +
-                "  \"actions\" : [ {" +
-                "    \"name\" : \"collect\"," +
-                "    \"parameters\" : [ {" +
-                "      \"name\" : \"collect\"," +
-                "      \"value\" : \"${ctx}\"" +
-                "    }, {" +
-                "      \"name\" : \"fact\"," +
-                "      \"value\" : \"${hotel}\"" +
-                "    } ]" +
-                "  } ]" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/rule.json");
     }
 }

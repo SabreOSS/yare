@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ActionSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/action";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -90,30 +93,6 @@ class ActionSerializationTest {
     }
 
     private String getActionJson() {
-        return "" +
-                "{" +
-                "  \"name\" : \"action-name\"," +
-                "  \"parameters\" : [ {" +
-                "    \"name\" : \"param-name-1\"," +
-                "    \"value\" : 10," +
-                "    \"type\" : \"java.lang.Integer\"" +
-                "  }, {" +
-                "    \"name\" : \"param-name-2\"," +
-                "    \"values\" : [ {" +
-                "      \"value\" : \"value-value\"" +
-                "    }, {" +
-                "      \"value\" : 10," +
-                "      \"type\" : \"java.lang.Integer\"" +
-                "    } ]," +
-                "    \"type\" : \"values-type\"" +
-                "  }, {" +
-                "    \"name\" : \"param-name-3\"," +
-                "    \"function\" : {" +
-                "      \"name\" : \"function-name\"," +
-                "      \"returnType\" : \"function-return-type\"," +
-                "      \"parameters\" : [ ]" +
-                "    }" +
-                "  } ]" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/action.json");
     }
 }

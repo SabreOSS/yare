@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.*;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,8 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ValuesDeserializationHandlerTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/values";
+
     private ObjectMapper mapper;
     private DeserializationHandler handler;
 
@@ -47,13 +50,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldBeApplicableForJsonWithValuesAndTypeProperties() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [" +
-                "    \"TEST_VALUE\"" +
-                "  ]," +
-                "  \"type\": \"java.lang.String\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valuesAndTypeProperties.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -65,13 +63,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldBeApplicableForJsonWithNullTypeProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [" +
-                "    \"TEST_VALUE\"" +
-                "  ]," +
-                "  \"type\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullTypeProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -83,10 +76,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldNotBeApplicableForJsonWithoutValuesProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"type\": \"java.lang.String\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/noValuesProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -98,15 +89,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldNotBeApplicableForJsonWithoutTypeProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [" +
-                "    {" +
-                "      \"value\": \"100\"," +
-                "      \"type\": \"java.lang.Integer\"" +
-                "    }" +
-                "  ]" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/noTypeProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -118,11 +102,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldNotBeApplicableForJsonWithNonArrayValuesProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": \"TEST_VALUE\"," +
-                "  \"type\": \"java.lang.String\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nonArrayValuesProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -134,19 +115,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldResolveValueExpressionWithinValues() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [" +
-                "    {" +
-                "      \"value\": \"100\"," +
-                "      \"type\": \"java.lang.Integer\"" +
-                "    }," +
-                "    {" +
-                "      \"value\": \"VALUE_1\"" +
-                "    }" +
-                "  ]," +
-                "  \"type\": \"java.lang.Object\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueExpression.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -164,36 +134,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldResolveValuesExpressionWithinValues() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [" +
-                "    {" +
-                "      \"values\": [" +
-                "        {" +
-                "          \"value\": \"100\"," +
-                "          \"type\": \"java.lang.Integer\"" +
-                "        }," +
-                "        {" +
-                "          \"value\": \"200\"," +
-                "          \"type\": \"java.lang.Integer\"" +
-                "        }" +
-                "      ]," +
-                "      \"type\": \"java.lang.Integer\"" +
-                "    }," +
-                "    {" +
-                "      \"values\": [" +
-                "        {" +
-                "          \"value\": \"VALUE_1\"" +
-                "        }," +
-                "        {" +
-                "          \"value\": \"VALUE_2\"" +
-                "        }" +
-                "      ]," +
-                "      \"type\": \"java.lang.String\"" +
-                "    }" +
-                "  ]," +
-                "  \"type\": \"java.lang.Object\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valuesExpression.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -211,38 +153,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldResolveFunctionExpressionWithinValues() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [" +
-                "    {" +
-                "      \"function\": {" +
-                "        \"name\": \"FUNCTION_NAME_1\"," +
-                "        \"returnType\": \"RETURN_TYPE_1\"," +
-                "        \"parameters\": [" +
-                "          {" +
-                "            \"name\": \"PARAMETER_NAME_1\"," +
-                "            \"value\": \"true\"," +
-                "            \"type\": \"java.lang.Boolean\"" +
-                "          }" +
-                "        ]" +
-                "      }" +
-                "    }," +
-                "    {" +
-                "      \"function\": {" +
-                "        \"name\": \"FUNCTION_NAME_2\"," +
-                "        \"returnType\": \"RETURN_TYPE_2\"," +
-                "        \"parameters\": [" +
-                "          {" +
-                "            \"name\": \"PARAMETER_NAME_2\"," +
-                "            \"value\": \"false\"," +
-                "            \"type\": \"java.lang.Boolean\"" +
-                "          }" +
-                "        ]" +
-                "      }" +
-                "    }" +
-                "  ]," +
-                "  \"type\": \"java.lang.Object\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/functionExpression.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -264,11 +176,8 @@ class ValuesDeserializationHandlerTest {
     @Test
     void shouldResolveNullWithinValuesAsNullValue() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": [ null, null ]," +
-                "  \"type\": \"java.lang.Object\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullExpressions.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -281,13 +190,10 @@ class ValuesDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveNullValuesPropertyProperly() throws IOException {
+    void shouldResolveNullValuesProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"values\": null," +
-                "  \"type\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullProperties.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);

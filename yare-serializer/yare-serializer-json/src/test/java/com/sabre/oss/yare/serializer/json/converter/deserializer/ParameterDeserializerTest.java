@@ -30,6 +30,7 @@ import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 import com.sabre.oss.yare.serializer.json.model.Value;
 import com.sabre.oss.yare.serializer.json.model.Values;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ParameterDeserializerTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/parameter";
+
     private ObjectMapper mapper;
     private ParameterDeserializer deserializer;
 
@@ -49,13 +52,10 @@ class ParameterDeserializerTest {
     }
 
     @Test
-    void shouldResolveParameterWithValueExpressionProperly() throws IOException {
+    void shouldResolveParameterWithValueExpression() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": \"PARAMETER_NAME\"," +
-                "  \"value\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueExpression.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Parameter result = deserializer.deserialize(node.traverse(mapper), null);
@@ -68,14 +68,10 @@ class ParameterDeserializerTest {
     }
 
     @Test
-    void shouldResolveParameterWithValuesExpressionProperly() throws IOException {
+    void shouldResolveParameterWithValuesExpression() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": \"PARAMETER_NAME\"," +
-                "  \"values\": []," +
-                "  \"type\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valuesExpression.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Parameter result = deserializer.deserialize(node.traverse(mapper), null);
@@ -88,13 +84,10 @@ class ParameterDeserializerTest {
     }
 
     @Test
-    void shouldResolveParameterWithFunctionExpressionProperly() throws IOException {
+    void shouldResolveParameterWithFunctionExpression() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": \"PARAMETER_NAME\"," +
-                "  \"function\": {}" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/functionExpression.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Parameter result = deserializer.deserialize(node.traverse(mapper), null);
@@ -107,13 +100,10 @@ class ParameterDeserializerTest {
     }
 
     @Test
-    void shouldResolveParameterWithNullNameProperly() throws IOException {
+    void shouldResolveParameterWithNullName() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": null," +
-                "  \"function\": {}" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullNameProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Parameter result = deserializer.deserialize(node.traverse(mapper), null);
@@ -128,10 +118,8 @@ class ParameterDeserializerTest {
     @Test
     void shouldRThrowExceptionIfJsonHasNamePropertyOnly() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/noExpressionProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when / then
         String expectedMessage = "Given node: {\"name\":null} could not be deserialized to any known operand model";

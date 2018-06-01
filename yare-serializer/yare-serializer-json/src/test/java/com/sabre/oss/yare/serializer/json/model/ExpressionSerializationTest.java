@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,6 +41,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ExpressionSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/expression";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -77,10 +80,7 @@ class ExpressionSerializationTest {
     }
 
     private static String createValueExpressionJson() {
-        return "" +
-                "{" +
-                "  \"value\" : \"value-value\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueExpression.json");
     }
 
     private static Expression createValuesExpressionModel() {
@@ -92,15 +92,7 @@ class ExpressionSerializationTest {
     }
 
     private static String createValuesExpressionJson() {
-        return "" +
-                "{" +
-                "  \"values\": [" +
-                "    {" +
-                "      \"value\": \"value-value\"" +
-                "    }" +
-                "  ]," +
-                "  \"type\": \"values-type\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valuesExpression.json");
     }
 
     private static Expression createFunctionExpressionModel() {
@@ -115,18 +107,6 @@ class ExpressionSerializationTest {
     }
 
     private static String createFunctionExpressionJson() {
-        return "" +
-                "{" +
-                "  \"function\": {" +
-                "    \"name\": \"function-name\"," +
-                "    \"returnType\": \"function-return-type\"," +
-                "    \"parameters\": [" +
-                "      {" +
-                "        \"name\": \"parameter-name\"," +
-                "        \"value\": \"value-value\"" +
-                "      }" +
-                "    ]" +
-                "  }" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/functionExpression.json");
     }
 }

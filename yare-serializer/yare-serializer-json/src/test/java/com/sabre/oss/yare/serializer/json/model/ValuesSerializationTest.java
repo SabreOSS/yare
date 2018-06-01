@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ValuesSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/values";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -86,31 +89,7 @@ class ValuesSerializationTest {
     }
 
     private String getValuesJson() {
-        return "" +
-                "{" +
-                "  \"values\" : [ {" +
-                "    \"value\" : \"value-value\"" +
-                "  }, {" +
-                "    \"values\" : [ {" +
-                "      \"value\" : {" +
-                "        \"property\" : \"testclass-property\"" +
-                "      }," +
-                "      \"type\" : \"com.sabre.oss.yare.serializer.json.model.ValuesSerializationTest$TestClass\"" +
-                "    } ]," +
-                "    \"type\" : \"values-type-1\"" +
-                "  }, {" +
-                "    \"function\" : {" +
-                "      \"name\" : \"function-name\"," +
-                "      \"returnType\" : \"function-return-type\"," +
-                "      \"parameters\" : [ {" +
-                "        \"name\" : \"parameter-name\"," +
-                "        \"value\" : 10," +
-                "        \"type\" : \"java.lang.Integer\"" +
-                "      } ]" +
-                "    }" +
-                "  } ]," +
-                "  \"type\" : \"values-type-2\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/values.json");
     }
 
     public static class TestClass {

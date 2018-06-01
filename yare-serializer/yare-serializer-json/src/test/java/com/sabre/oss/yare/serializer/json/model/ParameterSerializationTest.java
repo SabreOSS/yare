@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,6 +41,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ParameterSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/parameter";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -78,11 +81,7 @@ class ParameterSerializationTest {
     }
 
     private static String createValueParameterJson() {
-        return "" +
-                "{" +
-                "  \"name\": \"parameter-name\"," +
-                "  \"value\": \"value-value\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueParameter.json");
     }
 
     private static Parameter createValuesParameterModel() {
@@ -96,16 +95,7 @@ class ParameterSerializationTest {
     }
 
     private static String createValuesParameterJson() {
-        return "" +
-                "{" +
-                "  \"name\": \"parameter-name\"," +
-                "  \"values\": [" +
-                "    {" +
-                "      \"value\": \"value-value\"" +
-                "    }" +
-                "  ]," +
-                "  \"type\": \"values-type\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valuesParameter.json");
     }
 
     private static Parameter createFunctionParameterModel() {
@@ -122,19 +112,6 @@ class ParameterSerializationTest {
     }
 
     private static String createFunctionParameterJson() {
-        return "" +
-                "{" +
-                "  \"name\": \"parameter-name-1\"," +
-                "  \"function\": {" +
-                "    \"name\": \"function-name\"," +
-                "    \"returnType\": \"function-return-type\"," +
-                "    \"parameters\": [" +
-                "      {" +
-                "        \"name\": \"parameter-name-2\"," +
-                "        \"value\": \"value-value\"" +
-                "      }" +
-                "    ]" +
-                "  }" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/functionParameter.json");
     }
 }

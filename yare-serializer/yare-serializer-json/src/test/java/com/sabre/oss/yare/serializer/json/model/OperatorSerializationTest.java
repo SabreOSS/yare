@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OperatorSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/operator";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -85,27 +88,6 @@ class OperatorSerializationTest {
     }
 
     private String getOperatorJson() {
-        return "" +
-                "{" +
-                "  \"operator-type-1\" : [ {" +
-                "    \"value\" : \"value-type\"" +
-                "  }, {" +
-                "    \"values\" : [ {" +
-                "      \"value\" : \"value-value\"" +
-                "    }, {" +
-                "      \"value\" : 10," +
-                "      \"type\" : \"java.lang.Long\"" +
-                "    } ]," +
-                "    \"type\" : \"values-type\"" +
-                "  }, {" +
-                "    \"function\" : {" +
-                "      \"name\" : \"function-name\"," +
-                "      \"returnType\" : \"function-return-type\"," +
-                "      \"parameters\" : [ ]" +
-                "    }" +
-                "  }, {" +
-                "    \"operator-type-2\" : [ ]" +
-                "  } ]" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/operator.json");
     }
 }

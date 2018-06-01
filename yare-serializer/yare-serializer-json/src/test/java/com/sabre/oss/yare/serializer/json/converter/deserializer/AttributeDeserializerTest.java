@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Attribute;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AttributeDeserializerTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/attribute";
+
     private ObjectMapper mapper;
     private AttributeDeserializer deserializer;
 
@@ -46,14 +49,10 @@ class AttributeDeserializerTest {
     }
 
     @Test
-    void shouldResolveAttributeProperly() throws IOException {
+    void shouldResolveAttribute() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": \"ATTRIBUTE_NAME\"," +
-                "  \"value\": \"100\"," +
-                "  \"type\": \"java.lang.Integer\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/attribute.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Attribute result = deserializer.deserialize(node.traverse(mapper), null);
@@ -69,10 +68,8 @@ class AttributeDeserializerTest {
     @Test
     void shouldThrowExceptionIfTypeIsNull() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"type\": null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullTypeProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when / then
         String expectedMessage = "Unable to deserialize {\"type\":null}, type must be null";
@@ -84,12 +81,8 @@ class AttributeDeserializerTest {
     @Test
     void shouldThrowExceptionIfTypeCannotBeResolved() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"name\": \"ATTRIBUTE_NAME\"," +
-                "  \"value\": \"100\"," +
-                "  \"type\": \"java.lang.Unknown\"" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/unknownTypeProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when / then
         String expectedMessage = "Unable to deserialize \"100\", cannot find java.lang.Unknown class";

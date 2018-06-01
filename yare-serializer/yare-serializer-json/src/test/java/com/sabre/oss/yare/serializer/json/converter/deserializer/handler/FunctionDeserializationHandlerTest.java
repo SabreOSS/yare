@@ -30,6 +30,7 @@ import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 import com.sabre.oss.yare.serializer.json.model.Value;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +39,8 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FunctionDeserializationHandlerTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/function";
+
     private ObjectMapper mapper;
     private DeserializationHandler handler;
 
@@ -50,12 +53,8 @@ class FunctionDeserializationHandlerTest {
     @Test
     void shouldBeApplicableForJsonWithFunctionProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"function\" : {" +
-                "    \"name\": \"FUNCTION_NAME\"" +
-                "  }" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/functionProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -67,10 +66,8 @@ class FunctionDeserializationHandlerTest {
     @Test
     void shouldBeApplicableForJsonWithNullFunctionProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"function\" : null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullFunctionProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -82,12 +79,8 @@ class FunctionDeserializationHandlerTest {
     @Test
     void shouldNotBeApplicableForJsonWithoutFunctionProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"unknown\" : {" +
-                "    \"name\": \"NAME\"" +
-                "  }" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/noFunctionProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -99,25 +92,8 @@ class FunctionDeserializationHandlerTest {
     @Test
     void shouldResolveFunction() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"function\" : {" +
-                "    \"name\": \"FUNCTION_NAME\"," +
-                "    \"returnType\": \"RETURN_TYPE\"," +
-                "    \"parameters\": [" +
-                "      {" +
-                "        \"name\": \"PARAM_NAME_1\"," +
-                "        \"value\": \"false\"," +
-                "        \"type\": \"java.lang.Boolean\"" +
-                "      }," +
-                "      {" +
-                "        \"name\": \"PARAM_NAME_2\"," +
-                "        \"value\": \"true\"," +
-                "        \"type\": \"java.lang.Boolean\"" +
-                "      }" +
-                "    ]" +
-                "  }" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/function.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -136,10 +112,8 @@ class FunctionDeserializationHandlerTest {
     @Test
     void shouldResolveNullFunctionAsNull() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"function\" : null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullFunctionProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -149,16 +123,10 @@ class FunctionDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveNullFunctionPropertiesProperly() throws IOException {
+    void shouldResolveNullFunctionProperties() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"function\" : {" +
-                "    \"name\": null," +
-                "    \"returnType\": null," +
-                "    \"parameters\": null" +
-                "  }" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullProperties.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);

@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Operator;
 import com.sabre.oss.yare.serializer.json.model.Value;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,8 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OperatorDeserializationHandlerTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/operator";
+
     private ObjectMapper mapper;
     private DeserializationHandler handler;
 
@@ -49,14 +52,8 @@ class OperatorDeserializationHandlerTest {
     @Test
     void shouldBeApplicableForJsonWithAnyArrayProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"or\" : [" +
-                "    {" +
-                "      \"value\": \"true\"" +
-                "    }" +
-                "  ]" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/arrayProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -68,12 +65,8 @@ class OperatorDeserializationHandlerTest {
     @Test
     void shouldNotBeApplicableForJsonWithoutArrayProperty() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"or\" : {" +
-                "    \"value\": \"true\"" +
-                "  }" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/noArrayProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -85,10 +78,8 @@ class OperatorDeserializationHandlerTest {
     @Test
     void shouldNotBeApplicableForJsonWithNullProperties() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"or\" : null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullArrayProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Boolean applicable = handler.isApplicable(node);
@@ -110,21 +101,10 @@ class OperatorDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveOperatorProperly() throws IOException {
+    void shouldResolveOperator() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"or\" : [" +
-                "    {" +
-                "      \"value\": \"true\"," +
-                "      \"type\": \"java.lang.Boolean\"" +
-                "    }," +
-                "    {" +
-                "      \"value\": \"100\"," +
-                "      \"type\": \"java.lang.Integer\"" +
-                "    }" +
-                "  ]" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/operator.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);
@@ -140,12 +120,10 @@ class OperatorDeserializationHandlerTest {
     }
 
     @Test
-    void shouldResolveNullOperatorProperly() throws IOException {
+    void shouldResolveNullOperator() throws IOException {
         // given
-        JsonNode node = mapper.readTree("" +
-                "{" +
-                "  \"or\" : null" +
-                "}");
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/nullArrayProperty.json");
+        JsonNode node = mapper.readTree(json);
 
         // when
         Operand result = handler.deserialize(node, mapper);

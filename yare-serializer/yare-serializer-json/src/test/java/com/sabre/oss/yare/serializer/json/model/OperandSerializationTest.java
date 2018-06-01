@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,6 +41,8 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OperandSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/operand";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -78,10 +81,7 @@ class OperandSerializationTest {
     }
 
     private static String createValueOperandJson() {
-        return "" +
-                "{" +
-                "  \"value\" : \"value-value\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueOperand.json");
     }
 
     private static Operand createValuesOperandModel() {
@@ -93,15 +93,7 @@ class OperandSerializationTest {
     }
 
     private static String createValuesOperandJson() {
-        return "" +
-                "{" +
-                "  \"values\": [" +
-                "    {" +
-                "      \"value\": \"value-value\"" +
-                "    }" +
-                "  ]," +
-                "  \"type\": \"values-type\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valuesOperand.json");
     }
 
     private static Operand createFunctionOperandModel() {
@@ -116,19 +108,7 @@ class OperandSerializationTest {
     }
 
     private static String createFunctionOperandJson() {
-        return "" +
-                "{" +
-                "  \"function\": {" +
-                "    \"name\": \"function-name\"," +
-                "    \"returnType\": \"function-return-type\"," +
-                "    \"parameters\": [" +
-                "      {" +
-                "        \"name\": \"parameter-name\"," +
-                "        \"value\": \"value-value\"" +
-                "      }" +
-                "    ]" +
-                "  }" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/functionOperand.json");
     }
 
     private static Operand createOperatorOperandModel() {
@@ -138,13 +118,6 @@ class OperandSerializationTest {
     }
 
     private static String createOperatorOperandJson() {
-        return "" +
-                "{" +
-                "  \"operator-type\": [" +
-                "    {" +
-                "      \"value\": \"value-value\"" +
-                "    }" +
-                "  ]" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/operatorOperand.json");
     }
 }

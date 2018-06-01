@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +43,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ValueSerializationTest {
+    private static final String TEST_RESOURCES_DIRECTORY = "/model/value";
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -80,11 +83,7 @@ class ValueSerializationTest {
     }
 
     private static String createBuildInTypeValueJson() {
-        return "" +
-                "{" +
-                "  \"value\": 10," +
-                "  \"type\": \"java.lang.Integer\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueWithBuildInType.json");
     }
 
     private static Value createStringTypeValueModel() {
@@ -93,10 +92,7 @@ class ValueSerializationTest {
     }
 
     private static String createStringTypeValueJson() {
-        return "" +
-                "{" +
-                "  \"value\": \"test-value\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueWithStringType.json");
     }
 
     private static Value createCustomTypeValueModel() {
@@ -106,22 +102,12 @@ class ValueSerializationTest {
     }
 
     private static String createCustomTypeValueJson() {
-        return "" +
-                "{" +
-                "  \"value\" : {" +
-                "    \"property\" : \"test-property\"" +
-                "  }," +
-                "  \"type\" : \"com.sabre.oss.yare.serializer.json.model.ValueSerializationTest$TestClass\"" +
-                "}";
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueWithCustomType.json");
     }
 
     @Test
     void shouldThrowExceptionWhenUnknownTypeUsed() {
-        String json = "" +
-                "{" +
-                "  \"value\" : \"test-value\"," +
-                "  \"type\" : \"UNKNOWN\"" +
-                "}";
+        String json = JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/valueWithUnknownType.json");
 
         assertThatThrownBy(() -> objectMapper.readValue(json, Value.class))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
