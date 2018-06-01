@@ -41,6 +41,8 @@ class FactConverter {
             return null;
         }
         String type = typeConverter.toString(Type.class, fact.getType());
-        return new Fact().withName(fact.getIdentifier()).withType(type);
+        return new Fact()
+                .withName(fact.getIdentifier())
+                .withType(type);
     }
 }

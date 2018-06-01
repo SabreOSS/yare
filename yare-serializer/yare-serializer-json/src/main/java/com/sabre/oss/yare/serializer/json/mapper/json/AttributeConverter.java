@@ -41,6 +41,9 @@ class AttributeConverter {
             return null;
         }
         String type = typeConverter.toString(Type.class, attribute.getType());
-        return new Attribute().withName(attribute.getName()).withType(type).withValue(attribute.getValue());
+        return new Attribute()
+                .withName(attribute.getName())
+                .withType(type)
+                .withValue(attribute.getValue());
     }
 }

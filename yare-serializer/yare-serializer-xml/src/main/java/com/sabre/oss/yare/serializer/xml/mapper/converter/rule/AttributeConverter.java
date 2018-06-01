@@ -64,7 +64,8 @@ class AttributeConverter implements Mapper<AttributeSer, Attribute> {
     }
 
     private Attribute convertValue(String name, ValueSer value) {
-        Type type = getType(value.getType());
+        String type1 = value.getType();
+        Type type = typeConverter.fromString(Type.class, type1);
         String v = value.getValue() == null ? StringTypeConverter.NULL_LITERAL : value.getValue();
 
         Object attributeValue = null;
@@ -76,12 +77,9 @@ class AttributeConverter implements Mapper<AttributeSer, Attribute> {
     }
 
     private Attribute convertCustomValue(String name, CustomValueSer customValue) {
-        Type type = getType(customValue.getType());
+        String type1 = customValue.getType();
+        Type type = typeConverter.fromString(Type.class, type1);
         return new Attribute(name, type, customValue.getAny());
-    }
-
-    private Type getType(String type) {
-        return type == null ? Expression.Undefined.class : typeConverter.fromString(Type.class, type);
     }
 
     private boolean isNullLiteral(String value) {
