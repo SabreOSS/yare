@@ -27,14 +27,14 @@
       "values": [
         {
           "value": "100",
-          "type": "java.lang.Integer"
+          "type": "Integer"
         },
         {
           "value": "200",
-          "type": "java.lang.Integer"
+          "type": "Integer"
         }
       ],
-      "type": "java.lang.Integer"
+      "type": "Integer"
     },
     {
       "values": [
@@ -45,8 +45,8 @@
           "value": "VALUE_2"
         }
       ],
-      "type": "java.lang.String"
+      "type": "String"
     }
   ],
-  "type": "java.lang.Object"
+  "type": "Object"
 }

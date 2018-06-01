@@ -82,7 +82,7 @@ class ValuesSerializationTest {
                                 .withParameters(
                                         new Parameter()
                                                 .withName("parameter-name")
-                                                .withExpression(new Value().withValue(10).withType(Integer.class.getName()))
+                                                .withExpression(new Value().withValue(10).withType("Integer"))
                                 )
                 )
                 .withType("values-type-2");

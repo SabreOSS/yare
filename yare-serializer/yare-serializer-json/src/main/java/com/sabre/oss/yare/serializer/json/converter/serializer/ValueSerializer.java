@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright 2018 Sabre GLBL c.
+ * Copyright 2018 Sabre GLBL Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-{
-  "value": 10,
-  "type": "Integer"
+
+package com.sabre.oss.yare.serializer.json.converter.serializer;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.util.NameTransformer;
+import com.sabre.oss.yare.serializer.json.model.Value;
+
+import java.io.IOException;
+
+public class ValueSerializer extends JsonSerializer<Value> {
+    private final JsonSerializer<Value> unwrappingSerializer = new UnwrappingValueSerializer();
+
+    @Override
+    public void serialize(Value value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeStartObject();
+        unwrappingSerializer.serialize(value, gen, serializers);
+        gen.writeEndObject();
+    }
+
+    @Override
+    public JsonSerializer<Value> unwrappingSerializer(NameTransformer unwrapper) {
+        return unwrappingSerializer;
+    }
 }

@@ -103,8 +103,8 @@ class FunctionDeserializationHandlerTest {
             assertThat(f.getName()).isEqualTo("FUNCTION_NAME");
             assertThat(f.getReturnType()).isEqualTo("RETURN_TYPE");
             assertThat(f.getParameters()).containsExactlyInAnyOrder(
-                    createParameter("PARAM_NAME_1", false),
-                    createParameter("PARAM_NAME_2", true)
+                    createParameter("PARAM_NAME_1", false, "Boolean"),
+                    createParameter("PARAM_NAME_2", true, "Boolean")
             );
         });
     }
@@ -139,11 +139,11 @@ class FunctionDeserializationHandlerTest {
         });
     }
 
-    private Parameter createParameter(String name, Object o) {
+    private Parameter createParameter(String name, Object o, String type) {
         return new Parameter()
                 .withName(name)
                 .withExpression(new Value()
                         .withValue(o)
-                        .withType(o.getClass().getName()));
+                        .withType(type));
     }
 }

@@ -28,7 +28,7 @@
     {
       "name": "param-name-1",
       "value": 10,
-      "type": "java.lang.Integer"
+      "type": "Integer"
     },
     {
       "name": "param-name-2",
@@ -38,7 +38,7 @@
         },
         {
           "value": 10,
-          "type": "java.lang.Integer"
+          "type": "Integer"
         }
       ],
       "type": "values-type"

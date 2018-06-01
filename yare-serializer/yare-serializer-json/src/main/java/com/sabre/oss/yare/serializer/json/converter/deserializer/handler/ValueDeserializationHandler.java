@@ -56,7 +56,7 @@ class ValueDeserializationHandler extends DeserializationHandler {
     private String getType(JsonNode jsonNode) {
         return JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Value.TYPE)
                 .map(JsonNode::textValue)
-                .orElse(String.class.getName());
+                .orElse("String");
     }
 
     private Object getValue(JsonNode jsonNode, String type, ObjectMapper objectMapper) throws JsonProcessingException {

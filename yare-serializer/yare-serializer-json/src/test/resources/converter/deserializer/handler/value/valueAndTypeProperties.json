@@ -23,5 +23,5 @@
  */
 {
   "value": "100",
-  "type": "java.lang.Integer"
+  "type": "Integer"
 }

@@ -45,7 +45,7 @@
           {
             "name": "parameter-name",
             "value": 10,
-            "type": "java.lang.Integer"
+            "type": "Integer"
           }
         ]
       }

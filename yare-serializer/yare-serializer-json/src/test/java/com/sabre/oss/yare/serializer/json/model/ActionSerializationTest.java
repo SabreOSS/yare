@@ -74,14 +74,14 @@ class ActionSerializationTest {
                                 .withName("param-name-1")
                                 .withExpression(new Value()
                                         .withValue(10)
-                                        .withType(Integer.class.getName())),
+                                        .withType("Integer")),
                         new Parameter()
                                 .withName("param-name-2")
                                 .withExpression(new Values()
                                         .withType("values-type")
                                         .withValues(
                                                 new Value().withValue("value-value"),
-                                                new Value().withValue(10).withType(Integer.class.getName())
+                                                new Value().withValue(10).withType("Integer")
                                         )),
                         new Parameter()
                                 .withName("param-name-3")

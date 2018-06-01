@@ -29,12 +29,12 @@
       {
         "name": "PARAM_NAME_1",
         "value": "false",
-        "type": "java.lang.Boolean"
+        "type": "Boolean"
       },
       {
         "name": "PARAM_NAME_2",
         "value": "true",
-        "type": "java.lang.Boolean"
+        "type": "Boolean"
       }
     ]
   }

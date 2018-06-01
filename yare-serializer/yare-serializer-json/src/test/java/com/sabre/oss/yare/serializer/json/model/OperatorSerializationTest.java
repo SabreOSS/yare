@@ -75,7 +75,7 @@ class OperatorSerializationTest {
                                 .withType("values-type")
                                 .withValues(
                                         new Value().withValue("value-value"),
-                                        new Value().withValue(10L).withType(Long.class.getName())
+                                        new Value().withValue(10L).withType("Long")
                                 ),
                         new Function()
                                 .withName("function-name")

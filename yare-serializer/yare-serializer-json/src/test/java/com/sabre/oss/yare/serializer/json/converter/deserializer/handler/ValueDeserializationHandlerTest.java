@@ -86,7 +86,7 @@ class ValueDeserializationHandlerTest {
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
             assertThat(v.getValue()).isEqualTo(100);
-            assertThat(v.getType()).isEqualTo(Integer.class.getName());
+            assertThat(v.getType()).isEqualTo("Integer");
         });
     }
 
@@ -102,7 +102,7 @@ class ValueDeserializationHandlerTest {
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
             assertThat(v.getValue()).isEqualTo("TEST_VALUE");
-            assertThat(v.getType()).isEqualTo(String.class.getName());
+            assertThat(v.getType()).isEqualTo("String");
         });
     }
 
@@ -118,7 +118,7 @@ class ValueDeserializationHandlerTest {
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
             assertThat(v.getValue()).isNull();
-            assertThat(v.getType()).isEqualTo(String.class.getName());
+            assertThat(v.getType()).isEqualTo("String");
         });
     }
 

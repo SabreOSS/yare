@@ -113,8 +113,8 @@ class OperatorDeserializationHandlerTest {
         assertThat(result).isInstanceOfSatisfying(Operator.class, o -> {
             assertThat(o.getType()).isEqualTo("or");
             assertThat(o.getOperands()).containsExactlyInAnyOrder(
-                    createValueExpression(true),
-                    createValueExpression(100)
+                    createValueExpression(true, "Boolean"),
+                    createValueExpression(100, "Integer")
             );
         });
     }
@@ -135,9 +135,9 @@ class OperatorDeserializationHandlerTest {
         });
     }
 
-    private Value createValueExpression(Object o) {
+    private Value createValueExpression(Object o, String type) {
         return new Value()
                 .withValue(o)
-                .withType(o.getClass().getName());
+                .withType(type);
     }
 }

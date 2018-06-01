@@ -25,11 +25,11 @@
   "or": [
     {
       "value": "true",
-      "type": "java.lang.Boolean"
+      "type": "Boolean"
     },
     {
       "value": "100",
-      "type": "java.lang.Integer"
+      "type": "Integer"
     }
   ]
 }

@@ -56,8 +56,7 @@
               {
                 "values": [
                   {
-                    "value": "test",
-                    "type": "String"
+                    "value": "#{fact-1.property}"
                   },
                   {
                     "function": {
@@ -108,8 +107,7 @@
                 {
                   "values": [
                     {
-                      "value": "test",
-                      "type": "String"
+                      "value": "test"
                     }
                   ],
                   "type": "List<String>"
@@ -147,8 +145,7 @@
           "name": "param-2",
           "values": [
             {
-              "value": "test",
-              "type": "String"
+              "value": "#{fact-2}"
             }
           ],
           "type": "List<String>"

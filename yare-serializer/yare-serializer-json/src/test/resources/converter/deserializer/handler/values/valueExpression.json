@@ -25,11 +25,11 @@
   "values": [
     {
       "value": "100",
-      "type": "java.lang.Integer"
+      "type": "Integer"
     },
     {
       "value": "VALUE_1"
     }
   ],
-  "type": "java.lang.Object"
+  "type": "Object"
 }

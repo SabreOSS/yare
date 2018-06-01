@@ -26,7 +26,6 @@
 package com.sabre.oss.yare.common.mapper;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ByClassRegistry<C extends Class<?>, E> {
@@ -45,14 +44,10 @@ public class ByClassRegistry<C extends Class<?>, E> {
         if (element != null) {
             return element;
         }
-        Optional<E> optional = registry.entrySet().stream()
+        return registry.entrySet().stream()
                 .filter(entry -> entry.getKey().isAssignableFrom(clazz))
                 .map(Map.Entry::getValue)
-                .findFirst();
-        return optional.orElse(null);
-    }
-
-    public <R extends E> R get(C clazz, Class<R> elementClass) {
-        return elementClass.cast(get(clazz));
+                .findFirst()
+                .orElse(null);
     }
 }

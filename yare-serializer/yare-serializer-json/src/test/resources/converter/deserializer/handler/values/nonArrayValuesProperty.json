@@ -23,5 +23,5 @@
  */
 {
   "values": "TEST_VALUE",
-  "type": "java.lang.String"
+  "type": "String"
 }

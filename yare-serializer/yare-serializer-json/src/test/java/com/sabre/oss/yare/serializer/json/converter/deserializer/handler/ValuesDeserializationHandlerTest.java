@@ -124,10 +124,10 @@ class ValuesDeserializationHandlerTest {
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
             assertThat(v.getValues()).containsExactlyInAnyOrder(
-                    createValueExpression(100),
-                    createValueExpression("VALUE_1")
+                    createValueExpression(100, "Integer"),
+                    createValueExpression("VALUE_1", "String")
             );
-            assertThat(v.getType()).isEqualTo(Object.class.getName());
+            assertThat(v.getType()).isEqualTo("Object");
         });
     }
 
@@ -143,10 +143,10 @@ class ValuesDeserializationHandlerTest {
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
             assertThat(v.getValues()).containsExactlyInAnyOrder(
-                    createValuesExpression(100, 200),
-                    createValuesExpression("VALUE_1", "VALUE_2")
+                    createValuesExpression(100, 200, "Integer"),
+                    createValuesExpression("VALUE_1", "VALUE_2", "String")
             );
-            assertThat(v.getType()).isEqualTo(Object.class.getName());
+            assertThat(v.getType()).isEqualTo("Object");
         });
     }
 
@@ -163,13 +163,13 @@ class ValuesDeserializationHandlerTest {
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
             assertThat(v.getValues()).containsExactlyInAnyOrder(
                     createFunctionExpression("FUNCTION_NAME_1", "RETURN_TYPE_1",
-                            createParameter("PARAMETER_NAME_1", true)
+                            createParameter("PARAMETER_NAME_1", true, "Boolean")
                     ),
                     createFunctionExpression("FUNCTION_NAME_2", "RETURN_TYPE_2",
-                            createParameter("PARAMETER_NAME_2", false)
+                            createParameter("PARAMETER_NAME_2", false, "Boolean")
                     )
             );
-            assertThat(v.getType()).isEqualTo(Object.class.getName());
+            assertThat(v.getType()).isEqualTo("Object");
         });
     }
 
@@ -185,7 +185,7 @@ class ValuesDeserializationHandlerTest {
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
             assertThat(v.getValues()).containsExactly(null, null);
-            assertThat(v.getType()).isEqualTo(Object.class.getName());
+            assertThat(v.getType()).isEqualTo("Object");
         });
     }
 
@@ -205,19 +205,19 @@ class ValuesDeserializationHandlerTest {
         });
     }
 
-    private Value createValueExpression(Object o) {
+    private Value createValueExpression(Object o, String type) {
         return new Value()
                 .withValue(o)
-                .withType(o.getClass().getName());
+                .withType(type);
     }
 
-    private Values createValuesExpression(Object o1, Object o2) {
+    private Values createValuesExpression(Object o1, Object o2, String type) {
         return new Values()
                 .withValues(
-                        createValueExpression(o1),
-                        createValueExpression(o2)
+                        createValueExpression(o1, type),
+                        createValueExpression(o2, type)
                 )
-                .withType(o1.getClass().getName());
+                .withType(type);
     }
 
     private Function createFunctionExpression(String name, String returnType, Parameter p) {
@@ -227,9 +227,9 @@ class ValuesDeserializationHandlerTest {
                 .withParameters(p);
     }
 
-    private Parameter createParameter(String name, Object o) {
+    private Parameter createParameter(String name, Object o, String type) {
         return new Parameter()
                 .withName(name)
-                .withExpression(createValueExpression(o));
+                .withExpression(createValueExpression(o, type));
     }
 }

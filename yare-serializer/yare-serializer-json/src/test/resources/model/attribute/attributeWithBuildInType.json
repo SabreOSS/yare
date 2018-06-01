@@ -25,5 +25,5 @@
 {
   "name": "attribute-name",
   "value": "attribute-value",
-  "type": "java.lang.String"
+  "type": "String"
 }

@@ -79,7 +79,7 @@ class AttributeSerializationTest {
         return new Attribute()
                 .withName("attribute-name")
                 .withValue("attribute-value")
-                .withType("java.lang.String");
+                .withType("String");
     }
 
     private static String createBuildInTypeAttributeJson() {

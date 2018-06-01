@@ -31,7 +31,7 @@
           {
             "name": "PARAMETER_NAME_1",
             "value": "true",
-            "type": "java.lang.Boolean"
+            "type": "Boolean"
           }
         ]
       }
@@ -44,11 +44,11 @@
           {
             "name": "PARAMETER_NAME_2",
             "value": "false",
-            "type": "java.lang.Boolean"
+            "type": "Boolean"
           }
         ]
       }
     }
   ],
-  "type": "java.lang.Object"
+  "type": "Object"
 }

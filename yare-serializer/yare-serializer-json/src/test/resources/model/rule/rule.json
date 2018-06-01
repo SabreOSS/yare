@@ -26,12 +26,12 @@
     {
       "name": "ruleName",
       "value": "Should match preferred hotel basing on preferred property or chain code",
-      "type": "java.lang.String"
+      "type": "String"
     },
     {
       "name": "active",
       "value": true,
-      "type": "java.lang.Boolean"
+      "type": "Boolean"
     }
   ],
   "facts": [
@@ -49,7 +49,7 @@
           },
           {
             "value": true,
-            "type": "java.lang.Boolean"
+            "type": "Boolean"
           }
         ]
       },

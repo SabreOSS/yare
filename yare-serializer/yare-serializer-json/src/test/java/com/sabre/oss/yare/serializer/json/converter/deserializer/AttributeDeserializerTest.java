@@ -61,7 +61,7 @@ class AttributeDeserializerTest {
         assertThat(result).isInstanceOfSatisfying(Attribute.class, a -> {
             assertThat(a.getName()).isEqualTo("ATTRIBUTE_NAME");
             assertThat(a.getValue()).isEqualTo(100);
-            assertThat(a.getType()).isEqualTo(Integer.class.getName());
+            assertThat(a.getType()).isEqualTo("Integer");
         });
     }
 

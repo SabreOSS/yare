@@ -29,10 +29,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,37 +50,40 @@ class RuleSerializationTest {
         this.objectMapper = RuleToJsonConverter.getObjectMapper();
     }
 
-    @Test
-    void shouldSerializeRule() throws JsonProcessingException {
-        Rule rule = getRuleModel();
-
+    @ParameterizedTest
+    @MethodSource("conversionParams")
+    void shouldSerializeRule(Rule rule, String expected) throws JsonProcessingException {
         String serialized = objectMapper.writeValueAsString(rule);
 
-        String expected = getRuleJson();
         assertThatJson(serialized).isEqualTo(expected);
     }
 
-    @Test
-    void shouldDeserializeRule() throws IOException {
-        String json = getRuleJson();
-
+    @ParameterizedTest
+    @MethodSource("conversionParams")
+    void shouldDeserializeRule(Rule expected, String json) throws IOException {
         Rule rule = objectMapper.readValue(json, Rule.class);
 
-        Rule expected = getRuleModel();
         assertThat(rule).isEqualTo(expected);
     }
 
-    private Rule getRuleModel() {
+    private static Stream<Arguments> conversionParams() {
+        return Stream.of(
+                Arguments.of(createRuleModel(), createRuleJson()),
+                Arguments.of(createEmptyRuleModel(), createEmptyRuleJson())
+        );
+    }
+
+    private static Rule createRuleModel() {
         return new Rule()
                 .withAttributes(
                         new Attribute()
                                 .withName("ruleName")
                                 .withValue("Should match preferred hotel basing on preferred property or chain code")
-                                .withType("java.lang.String"),
+                                .withType("String"),
                         new Attribute()
                                 .withName("active")
                                 .withValue(true)
-                                .withType("java.lang.Boolean")
+                                .withType("Boolean")
                 )
                 .withFacts(
                         new Fact()
@@ -95,7 +101,7 @@ class RuleSerializationTest {
                                                                 .withValue("${hotel.isPreferred}"),
                                                         new Value()
                                                                 .withValue(true)
-                                                                .withType(Boolean.class.getName())
+                                                                .withType("Boolean")
                                                 ),
                                         new Operator()
                                                 .withType("equal")
@@ -138,7 +144,15 @@ class RuleSerializationTest {
                 );
     }
 
-    private String getRuleJson() {
+    private static String createRuleJson() {
         return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/rule.json");
+    }
+
+    private static Rule createEmptyRuleModel() {
+        return new Rule();
+    }
+
+    private static String createEmptyRuleJson() {
+        return JsonResourceUtils.getJsonResourceAsString(TEST_RESOURCES_DIRECTORY + "/emptyRule.json");
     }
 }

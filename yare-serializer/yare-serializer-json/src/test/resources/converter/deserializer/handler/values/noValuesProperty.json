@@ -22,5 +22,5 @@
  * SOFTWARE.
  */
 {
-  "type": "java.lang.String"
+  "type": "String"
 }

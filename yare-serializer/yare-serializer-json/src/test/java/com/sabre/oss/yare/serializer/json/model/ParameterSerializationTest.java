@@ -89,7 +89,7 @@ class ParameterSerializationTest {
                 .withName("parameter-name")
                 .withExpression(new Values()
                         .withValues(Collections.singletonList(
-                                new Value().withValue("value-value").withType("java.lang.String")
+                                new Value().withValue("value-value").withType("String")
                         ))
                         .withType("values-type"));
     }

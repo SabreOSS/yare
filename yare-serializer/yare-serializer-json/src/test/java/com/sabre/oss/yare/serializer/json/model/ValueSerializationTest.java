@@ -79,7 +79,7 @@ class ValueSerializationTest {
     private static Value createBuildInTypeValueModel() {
         return new Value()
                 .withValue(10)
-                .withType(Integer.class.getName());
+                .withType("Integer");
     }
 
     private static String createBuildInTypeValueJson() {

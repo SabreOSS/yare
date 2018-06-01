@@ -24,15 +24,15 @@
 
 package com.sabre.oss.yare.serializer.json.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sabre.oss.yare.serializer.json.converter.serializer.StringTypeFilter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sabre.oss.yare.serializer.json.converter.serializer.ValueSerializer;
 
 import java.util.Objects;
 
+@JsonSerialize(using = ValueSerializer.class)
 public class Value implements Expression {
     private Object value;
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = StringTypeFilter.class)
-    private String type = String.class.getName();
+    private String type = "String";
 
     public Object getValue() {
         return value;

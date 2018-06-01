@@ -33,7 +33,7 @@
         },
         {
           "value": 10,
-          "type": "java.lang.Long"
+          "type": "Long"
         }
       ],
       "type": "values-type"

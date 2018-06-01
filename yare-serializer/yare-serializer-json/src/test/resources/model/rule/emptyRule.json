@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 {
-  "value": 10,
-  "type": "Integer"
+  "attributes": null,
+  "facts": null,
+  "predicate": null,
+  "actions": null
 }
