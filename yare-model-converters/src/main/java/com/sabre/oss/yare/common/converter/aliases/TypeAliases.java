@@ -31,23 +31,32 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 final class TypeAliases {
-    private static final String ALIAS_CONFIGURATION_RESOURCE_FILE =
-            "com/sabre/oss/yare/common/converter/aliases/typeAliases.properties";
+    private static final Logger log = LoggerFactory.getLogger(TypeAliases.class);
+
+    static final String ALIAS_CONFIGURATION_RESOURCE_FILE = "typeAliases.properties";
+    private static final String CUSTOM_ALIAS_CONFIGURATION_RESOURCE_FILE = "typeAliases-custom.properties";
 
     private final Map<String, TypeAlias> nameToAliasMap;
     private final Map<Type, TypeAlias> typeToAliasMap;
 
     TypeAliases() {
-        Properties properties = loadAliasProperties();
+        this(ALIAS_CONFIGURATION_RESOURCE_FILE, CUSTOM_ALIAS_CONFIGURATION_RESOURCE_FILE);
+    }
+
+    TypeAliases(String aliasConfigurationFile, String customAliasConfigurationFile) {
+        Properties properties = new Properties();
+        properties.putAll(loadAliasProperties(aliasConfigurationFile));
+        properties.putAll(loadCustomAliasProperties(customAliasConfigurationFile));
         nameToAliasMap = Collections.unmodifiableMap(mapAliasesByName(properties));
         typeToAliasMap = Collections.unmodifiableMap(mapAliasesByType(properties));
     }
 
-    private Properties loadAliasProperties() {
-        InputStream stream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream(ALIAS_CONFIGURATION_RESOURCE_FILE);
-        try {
+    private Properties loadAliasProperties(String propertyFile) {
+        try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertyFile)) {
             Properties result = new Properties();
             result.load(stream);
             return result;
@@ -55,6 +64,15 @@ final class TypeAliases {
             throw new IllegalStateException(
                     String.format("Could not initialize type aliases form property file: %s",
                             ALIAS_CONFIGURATION_RESOURCE_FILE));
+        }
+    }
+
+    private Properties loadCustomAliasProperties(String propertyFile) {
+        if (Thread.currentThread().getContextClassLoader().getResource(propertyFile) != null) {
+            log.info(String.format("Reading custom type aliases from %s", propertyFile));
+            return loadAliasProperties(propertyFile);
+        } else {
+            return new Properties();
         }
     }
 
