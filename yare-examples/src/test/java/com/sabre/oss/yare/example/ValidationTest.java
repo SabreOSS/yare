@@ -35,7 +35,6 @@ import com.sabre.oss.yare.serializer.xml.RuleToXmlConverter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
@@ -47,12 +46,12 @@ class ValidationTest {
     @Test
     void shouldNotThrowExceptionWithMalformedRuleAndDisabledValidation() {
         RuleDsl.ruleBuilder()
-                .name("Rule name")
+                .name("Should match flight with given class of service - incorrect field name")
                 .fact("flight", Flight.class)
                 .predicate(
-                        lessOrEqual(
+                        equal(
                                 value("${flight.missingField}"),
-                                value(new BigDecimal(100))
+                                value("First Class")
                         )
                 )
                 .action("collect",
@@ -65,12 +64,12 @@ class ValidationTest {
     void shouldThrowExceptionWhenValidationEnabledAndRuleInvalid() {
         assertThatThrownBy(() ->
                 RuleDsl.ruleBuilder()
-                        .name("Rule name")
+                        .name("Should match flight with given class of service - incorrect field name")
                         .fact("flight", Flight.class)
                         .predicate(
-                                lessOrEqual(
+                                equal(
                                         value("${flight.missingField}"),
-                                        value(new BigDecimal(100))
+                                        value("First Class")
                                 )
                         )
                         .action("collect",
