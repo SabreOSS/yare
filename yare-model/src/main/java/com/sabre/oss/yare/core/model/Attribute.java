@@ -27,7 +27,7 @@ package com.sabre.oss.yare.core.model;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class Attribute {
+public final class Attribute {
     private final String name;
     private final Type type;
     private final Object value;

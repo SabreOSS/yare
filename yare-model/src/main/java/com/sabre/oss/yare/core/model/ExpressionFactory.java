@@ -27,10 +27,7 @@ package com.sabre.oss.yare.core.model;
 import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -142,7 +139,7 @@ public final class ExpressionFactory {
 
         BaseInvocation(String name, Type type, String value, List<Expression> arguments) {
             super(name, type, value);
-            this.arguments = arguments;
+            this.arguments = arguments == null ? null : Collections.unmodifiableList(arguments);
             this.hashCode = Objects.hash(super.hashCode(), arguments);
         }
 
@@ -230,7 +227,7 @@ public final class ExpressionFactory {
     static final class Values extends InternalOperand<List<Expression>> implements Expression.Values {
 
         Values(String name, Type type, List<Expression> expressions) {
-            super(name, type, expressions);
+            super(name, type, expressions == null ? null : Collections.unmodifiableList(expressions));
         }
 
         @Override

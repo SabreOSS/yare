@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-public class InternalParameterizedType implements ParameterizedType {
+public final class InternalParameterizedType implements ParameterizedType {
     private final Type[] actualTypeArguments;
     private final Class<?> rawType;
     private final Type ownerType;

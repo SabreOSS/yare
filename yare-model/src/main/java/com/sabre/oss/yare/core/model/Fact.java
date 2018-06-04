@@ -27,7 +27,7 @@ package com.sabre.oss.yare.core.model;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class Fact {
+public final class Fact {
     private final String identifier;
     private final Type type;
 

@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class Rule {
+public final class Rule {
     private final Set<Attribute> attributes;
     private final List<Fact> facts;
     private final Expression predicate;
