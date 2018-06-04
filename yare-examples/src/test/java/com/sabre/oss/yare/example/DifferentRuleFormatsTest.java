@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.examples;
+package com.sabre.oss.yare.example;
 
 import com.google.common.io.Resources;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
-import com.sabre.oss.yare.examples.facts.Flight;
+import com.sabre.oss.yare.example.fact.Flight;
 import com.sabre.oss.yare.serializer.xml.RuleToXmlConverter;
 import org.junit.jupiter.api.Test;
 
@@ -42,14 +42,14 @@ class DifferentRuleFormatsTest {
     @Test
     void shouldMatchRuleWithXmlFormat() throws IOException {
         // given
-        Rule exampleRule = createExampleRule();
-        String marshalledRule = getResourceFileContent("exampleRule.xml");
+        Rule rule = createExampleRule();
+        String xmlRule = getResourceFileContent("rules/validRule.xml");
 
         // when
-        Rule unmarshalledRule = RuleToXmlConverter.getInstance().unmarshal(marshalledRule);
+        Rule deserialized = RuleToXmlConverter.getInstance().unmarshal(xmlRule);
 
         // then
-        assertThat(unmarshalledRule).isEqualTo(exampleRule);
+        assertThat(deserialized).isEqualTo(rule);
     }
 
     private Rule createExampleRule() {
@@ -68,9 +68,9 @@ class DifferentRuleFormatsTest {
                 .build();
     }
 
-    private String getResourceFileContent(String resourceFile) throws IOException {
+    private String getResourceFileContent(String resourceName) throws IOException {
         return Resources.toString(
-                Resources.getResource("exampleRules/" + resourceFile),
+                Resources.getResource(resourceName),
                 Charset.defaultCharset());
     }
 }

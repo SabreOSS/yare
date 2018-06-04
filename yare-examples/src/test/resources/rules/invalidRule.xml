@@ -24,12 +24,12 @@
 
 <Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
     <Attribute name="ruleName">
-        <Value type="java.lang.String">Should match flight with given class of service</Value>
+        <Value type="java.lang.String">Should match flight with given class of service - incorrect field name</Value>
     </Attribute>
-    <Fact name="flight" type="com.sabre.oss.yare.examples.facts.Flight"/>
+    <Fact name="flight" type="com.sabre.oss.yare.example.fact.Flight"/>
     <Predicate>
         <Operator type="equal">
-            <Value>${flight.classOfService}</Value>
+            <Value>${flight.missingField}</Value>
             <Value>First Class</Value>
         </Operator>
     </Predicate>

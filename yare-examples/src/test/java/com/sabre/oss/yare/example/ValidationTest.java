@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.examples;
+package com.sabre.oss.yare.example;
 
 import com.google.common.io.Resources;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
-import com.sabre.oss.yare.examples.facts.Flight;
+import com.sabre.oss.yare.example.fact.Flight;
 import com.sabre.oss.yare.model.validator.DefaultRuleValidator;
 import com.sabre.oss.yare.model.validator.ValidationResult;
 import com.sabre.oss.yare.model.validator.ValidationResults;
@@ -35,7 +35,6 @@ import com.sabre.oss.yare.serializer.xml.RuleToXmlConverter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
@@ -46,20 +45,13 @@ class ValidationTest {
 
     @Test
     void shouldNotThrowExceptionWithMalformedRuleAndDisabledValidation() {
-        // given / when /then
-        Rule rule = RuleDsl.ruleBuilder()
+        RuleDsl.ruleBuilder()
+                .name("Should match flight with given class of service - incorrect field name")
                 .fact("flight", Flight.class)
                 .predicate(
-                        and(
-                                lessOrEqual(
-                                        value("${flight.price}"),
-                                        value(new BigDecimal(100))
-                                ),
-                                less(
-                                        function("getDiffInHours", Long.class,
-                                                param("date", value("${flight.dateOfDeparture}"))),
-                                        value(24L)
-                                )
+                        equal(
+                                value("${flight.missingField}"),
+                                value("First Class")
                         )
                 )
                 .action("collect",
@@ -70,21 +62,14 @@ class ValidationTest {
 
     @Test
     void shouldThrowExceptionWhenValidationEnabledAndRuleInvalid() {
-        // given / when /then
         assertThatThrownBy(() ->
                 RuleDsl.ruleBuilder()
+                        .name("Should match flight with given class of service - incorrect field name")
                         .fact("flight", Flight.class)
                         .predicate(
-                                and(
-                                        lessOrEqual(
-                                                value("${flight.price}"),
-                                                value(new BigDecimal(100))
-                                        ),
-                                        less(
-                                                function("getDiffInHours", Long.class,
-                                                        param("date", value("${flight.dateOfDeparture}"))),
-                                                value(24L)
-                                        )
+                                equal(
+                                        value("${flight.missingField}"),
+                                        value("First Class")
                                 )
                         )
                         .action("collect",
@@ -98,7 +83,7 @@ class ValidationTest {
     void shouldValidateRuleOriginatingFromXmlUsingDefaultRuleValidator() throws IOException {
         // given
         String invalidRuleInXmlString = Resources.toString(
-                Resources.getResource("exampleRules/invalidRule.xml"),
+                Resources.getResource("rules/invalidRule.xml"),
                 Charset.defaultCharset());
 
         Rule unmarshalledRule = RuleToXmlConverter.getInstance().unmarshal(invalidRuleInXmlString);
@@ -108,7 +93,7 @@ class ValidationTest {
 
         // then
         assertThat(validationResults.getResults()).containsExactly(
-                ValidationResult.error("rule.attribute.rule-name-attribute-not-set", "Attribute Error: \"ruleName\" was not specified")
+                ValidationResult.error("rule.ref.unknown-field", "Reference Error: unknown field used -> flight.missingField")
         );
     }
 }
