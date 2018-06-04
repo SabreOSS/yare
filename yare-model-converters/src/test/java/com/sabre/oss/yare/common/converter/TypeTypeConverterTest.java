@@ -109,6 +109,13 @@ class TypeTypeConverterTest {
     }
 
     @Test
+    void shouldProperlyConvertFromNullType() {
+        Class<?> converted = typeConverter.fromString(null, null);
+
+        assertThat(converted).isEqualTo(Expression.Undefined.class);
+    }
+
+    @Test
     void shouldProperlyConvertAliasTypeFromFullyQualifiedString() {
         Type converted = typeConverter.fromString(null, "java.lang.String");
 

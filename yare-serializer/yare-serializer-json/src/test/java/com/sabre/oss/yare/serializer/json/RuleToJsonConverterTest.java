@@ -76,7 +76,7 @@ class RuleToJsonConverterTest {
                                 or(
                                         equal(
                                                 values(String.class,
-                                                        value("#{fact-1.property}"),
+                                                        value("${fact-1.property}"),
                                                         function("function-1", String.class)),
                                                 function("function-1", collectionTypeOf(String.class),
                                                         param("param-1", function("function-2")))
@@ -94,7 +94,7 @@ class RuleToJsonConverterTest {
                 )
                 .action("action-name",
                         param("param-1", value(new BigDecimal(100))),
-                        param("param-2", values(String.class, value("#{fact-2}"))),
+                        param("param-2", values(String.class, value("${fact-2}"))),
                         param("param-3", function("function-4")))
                 .build(false);
     }

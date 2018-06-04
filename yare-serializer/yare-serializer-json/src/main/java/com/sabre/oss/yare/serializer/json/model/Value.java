@@ -68,9 +68,9 @@ public class Value implements Expression {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Value value1 = (Value) o;
-        return Objects.equals(value, value1.value) &&
-                Objects.equals(type, value1.type);
+        Value value = (Value) o;
+        return Objects.equals(this.value, value.value) &&
+                Objects.equals(type, value.type);
     }
 
     @Override

@@ -40,10 +40,9 @@ class AttributeConverter {
         if (attribute == null) {
             return null;
         }
-        String type = typeConverter.toString(Type.class, attribute.getType());
         return new Attribute()
                 .withName(attribute.getName())
-                .withType(type)
+                .withType(typeConverter.toString(Type.class, attribute.getType()))
                 .withValue(attribute.getValue());
     }
 }

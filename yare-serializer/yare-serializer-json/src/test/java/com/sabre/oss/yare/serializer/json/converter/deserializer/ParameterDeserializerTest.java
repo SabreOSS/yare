@@ -58,13 +58,11 @@ class ParameterDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Parameter result = deserializer.deserialize(node.traverse(mapper), null);
+        Parameter parameter = deserializer.deserialize(node.traverse(mapper), null);
 
         // then
-        assertThat(result).isInstanceOfSatisfying(Parameter.class, p -> {
-            assertThat(p.getName()).isEqualTo("PARAMETER_NAME");
-            assertThat(p.getExpression()).isInstanceOf(Value.class);
-        });
+        assertThat(parameter.getName()).isEqualTo("PARAMETER_NAME");
+        assertThat(parameter.getExpression()).isInstanceOf(Value.class);
     }
 
     @Test
@@ -74,13 +72,11 @@ class ParameterDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Parameter result = deserializer.deserialize(node.traverse(mapper), null);
+        Parameter parameter = deserializer.deserialize(node.traverse(mapper), null);
 
         // then
-        assertThat(result).isInstanceOfSatisfying(Parameter.class, p -> {
-            assertThat(p.getName()).isEqualTo("PARAMETER_NAME");
-            assertThat(p.getExpression()).isInstanceOf(Values.class);
-        });
+        assertThat(parameter.getName()).isEqualTo("PARAMETER_NAME");
+        assertThat(parameter.getExpression()).isInstanceOf(Values.class);
     }
 
     @Test
@@ -90,13 +86,11 @@ class ParameterDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Parameter result = deserializer.deserialize(node.traverse(mapper), null);
+        Parameter parameter = deserializer.deserialize(node.traverse(mapper), null);
 
         // then
-        assertThat(result).isInstanceOfSatisfying(Parameter.class, p -> {
-            assertThat(p.getName()).isEqualTo("PARAMETER_NAME");
-            assertThat(p.getExpression()).isInstanceOf(Function.class);
-        });
+        assertThat(parameter.getName()).isEqualTo("PARAMETER_NAME");
+        assertThat(parameter.getExpression()).isInstanceOf(Function.class);
     }
 
     @Test
@@ -106,13 +100,11 @@ class ParameterDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Parameter result = deserializer.deserialize(node.traverse(mapper), null);
+        Parameter parameter = deserializer.deserialize(node.traverse(mapper), null);
 
         // then
-        assertThat(result).isInstanceOfSatisfying(Parameter.class, p -> {
-            assertThat(p.getName()).isNull();
-            assertThat(p.getExpression()).isInstanceOf(Function.class);
-        });
+        assertThat(parameter.getName()).isNull();
+        assertThat(parameter.getExpression()).isInstanceOf(Function.class);
     }
 
     @Test

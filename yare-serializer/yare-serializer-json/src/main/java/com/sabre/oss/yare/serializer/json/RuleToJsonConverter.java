@@ -39,6 +39,7 @@ import com.sabre.oss.yare.serializer.json.mapper.json.ToJsonConverter;
 import com.sabre.oss.yare.serializer.json.mapper.rule.ToRuleConverter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class RuleToJsonConverter implements RuleConverter {
     private final TypeConverter defaultTypeConverter = DefaultTypeConverters.getDefaultTypeConverter();
@@ -73,9 +74,11 @@ public class RuleToJsonConverter implements RuleConverter {
             com.sabre.oss.yare.serializer.json.model.Rule jsonRule = toJsonConverter.convert(rule);
             return objectMapper.writeValueAsString(jsonRule);
         } catch (JsonProcessingException e) {
-            Attribute ruleNameAttribute = rule.getAttribute("ruleName");
-            String ruleName = ruleNameAttribute != null ? ruleNameAttribute.getValue().toString() : null;
-            throw new RuleConversionException(String.format("Rule cannot be converted to JSON:\n%s", ruleName), e);
+            String ruleName = Optional.ofNullable(rule.getAttribute("ruleName"))
+                    .map(Attribute::getValue)
+                    .map(Object::toString)
+                    .orElse("");
+            throw new RuleConversionException(String.format("Rule cannot be converted to JSON: %s", ruleName), e);
         }
     }
 

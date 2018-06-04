@@ -70,9 +70,9 @@ public class Values implements Expression {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Values values1 = (Values) o;
-        return Objects.equals(values, values1.values) &&
-                Objects.equals(type, values1.type);
+        Values values = (Values) o;
+        return Objects.equals(this.values, values.values) &&
+                Objects.equals(type, values.type);
     }
 
     @Override

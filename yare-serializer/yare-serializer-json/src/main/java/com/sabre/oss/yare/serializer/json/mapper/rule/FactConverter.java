@@ -40,6 +40,8 @@ class FactConverter {
         if (fact == null) {
             return null;
         }
-        return new Fact(fact.getName(), typeConverter.fromString(Type.class, fact.getType()));
+        return new Fact(
+                fact.getName(),
+                typeConverter.fromString(Type.class, fact.getType()));
     }
 }

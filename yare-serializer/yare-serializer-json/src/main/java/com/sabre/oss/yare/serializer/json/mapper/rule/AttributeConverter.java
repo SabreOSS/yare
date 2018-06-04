@@ -40,7 +40,9 @@ class AttributeConverter {
         if (attribute == null) {
             return null;
         }
-        Type type = typeConverter.fromString(Type.class, attribute.getType());
-        return new Attribute(attribute.getName(), type, attribute.getValue());
+        return new Attribute(
+                attribute.getName(),
+                typeConverter.fromString(Type.class, attribute.getType()),
+                attribute.getValue());
     }
 }

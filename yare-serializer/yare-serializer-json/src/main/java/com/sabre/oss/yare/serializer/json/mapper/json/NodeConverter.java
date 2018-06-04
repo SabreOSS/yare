@@ -83,7 +83,7 @@ class NodeConverter {
             String type = typeConverter.toString(Type.class, input.getType());
             return new Values()
                     .withType(type)
-                    .withValues(castToJsonExpressions(input.getValues()));
+                    .withValues(convertValues(input.getValues()));
         };
     }
 
@@ -103,6 +103,15 @@ class NodeConverter {
                 .withOperands(convert(input.getArguments()));
     }
 
+    private List<com.sabre.oss.yare.serializer.json.model.Expression> convertValues(List<Expression> expressions) {
+        if (expressions == null) {
+            return null;
+        }
+        return convert(expressions).stream()
+                .map(com.sabre.oss.yare.serializer.json.model.Expression.class::cast)
+                .collect(Collectors.toList());
+    }
+
     private Parameter convertParameter(Expression expression) {
         if (expression == null) {
             return null;
@@ -112,15 +121,6 @@ class NodeConverter {
         return new Parameter()
                 .withName(name)
                 .withExpression((com.sabre.oss.yare.serializer.json.model.Expression) converted);
-    }
-
-    private List<com.sabre.oss.yare.serializer.json.model.Expression> castToJsonExpressions(List<Expression> expressions) {
-        if (expressions == null) {
-            return null;
-        }
-        return convert(expressions).stream()
-                .map(com.sabre.oss.yare.serializer.json.model.Expression.class::cast)
-                .collect(Collectors.toList());
     }
 
     @FunctionalInterface

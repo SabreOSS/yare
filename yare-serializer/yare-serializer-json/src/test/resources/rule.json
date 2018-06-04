@@ -56,7 +56,7 @@
               {
                 "values": [
                   {
-                    "value": "#{fact-1.property}"
+                    "value": "${fact-1.property}"
                   },
                   {
                     "function": {
@@ -145,7 +145,7 @@
           "name": "param-2",
           "values": [
             {
-              "value": "#{fact-2}"
+              "value": "${fact-2}"
             }
           ],
           "type": "List<String>"

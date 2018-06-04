@@ -70,9 +70,9 @@ public class Action {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Action that = (Action) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(parameters, that.parameters);
+        Action action = (Action) o;
+        return Objects.equals(name, action.name) &&
+                Objects.equals(parameters, action.parameters);
     }
 
     @Override

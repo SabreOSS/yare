@@ -55,14 +55,12 @@ class AttributeDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Attribute result = deserializer.deserialize(node.traverse(mapper), null);
+        Attribute attribute = deserializer.deserialize(node.traverse(mapper), null);
 
         // then
-        assertThat(result).isInstanceOfSatisfying(Attribute.class, a -> {
-            assertThat(a.getName()).isEqualTo("ATTRIBUTE_NAME");
-            assertThat(a.getValue()).isEqualTo(100);
-            assertThat(a.getType()).isEqualTo("Integer");
-        });
+        assertThat(attribute.getName()).isEqualTo("ATTRIBUTE_NAME");
+        assertThat(attribute.getValue()).isEqualTo(100);
+        assertThat(attribute.getType()).isEqualTo("Integer");
     }
 
     @Test

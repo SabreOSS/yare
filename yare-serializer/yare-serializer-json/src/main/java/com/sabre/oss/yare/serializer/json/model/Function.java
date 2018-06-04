@@ -89,9 +89,9 @@ public class Function implements Expression {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Function that = (Function) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(parameters, that.parameters);
+        Function function = (Function) o;
+        return Objects.equals(name, function.name) &&
+                Objects.equals(parameters, function.parameters);
     }
 
     @Override
