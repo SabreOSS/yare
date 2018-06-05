@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.invoker.js;
+package com.sabre.oss.yare.invoker.java.js;
 
 import com.sabre.oss.yare.core.call.*;
 import com.sabre.oss.yare.core.invocation.Invocation;

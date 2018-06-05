@@ -36,10 +36,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class FlightMatchingTest {
+public class FlightMatchingTest {
 
     @Test
     void shouldMatchFlightWhenTimeUntilDepartureInBounds() {

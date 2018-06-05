@@ -34,10 +34,10 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CustomFactNameTest {
+public class CustomFactNameTest {
 
     @Test
     void shouldProperlyMatchFacts() {

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.invoker.js;
+package com.sabre.oss.yare.invoker.java.js;
 
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.invoker.js.JavaScriptCallMetadata.js;
+import static com.sabre.oss.yare.invoker.java.js.JavaScriptCallMetadata.js;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;

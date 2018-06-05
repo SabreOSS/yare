@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.engine;
+package com.sabre.oss.yare.invoker.java;
 
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
@@ -39,10 +39,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class FunctionCachingResultTest {
+public class FunctionCachingResultTest {
     private static final String RETURN_TEST_STRING = "returnTestString";
 
     private TestFunction testFunction;
