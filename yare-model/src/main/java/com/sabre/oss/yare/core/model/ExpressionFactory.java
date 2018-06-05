@@ -80,7 +80,7 @@ public final class ExpressionFactory {
             } else if (value instanceof Set) {
                 clazz = Set.class;
             }
-            if (((Collection) value).size() > 0) {
+            if (!((Collection) value).isEmpty()) {
                 Object item = ((Collection) value).iterator().next();
                 Class<?> itemClazz = item != null ? item.getClass() : Object.class;
                 return new InternalParameterizedType(null, clazz, itemClazz);
@@ -89,7 +89,7 @@ public final class ExpressionFactory {
         return clazz;
     }
 
-    abstract static class InternalOperand<V> implements Expression {
+    private abstract static class InternalOperand<V> implements Expression {
         protected final String name;
         protected final Type type;
         protected final V value;
@@ -133,7 +133,7 @@ public final class ExpressionFactory {
         }
     }
 
-    static class BaseInvocation extends InternalOperand<String> {
+    private static class BaseInvocation extends InternalOperand<String> {
         protected final List<Expression> arguments;
         private final int hashCode;
 
