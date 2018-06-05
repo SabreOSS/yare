@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static com.sabre.oss.yare.invoker.java.MethodCallMetadataValidator.*;
 import static java.lang.String.format;
 
 abstract class MethodCallMetadataFactory {
@@ -51,7 +50,7 @@ abstract class MethodCallMetadataFactory {
     @SuppressWarnings("unchecked")
     static <T> MethodCallMetadata method(T instance, CatchingInvocation<T> invocation) {
         Class<?> targetType = instance.getClass();
-        validateActionMappingCandidate(targetType);
+        MethodCallMetadataValidator.validate(targetType);
         Class<?> proxyClass = proxies.computeIfAbsent(targetType, aClass -> {
             ProxyFactory proxy = new ProxyFactory();
             proxy.setSuperclass(targetType);
@@ -62,7 +61,7 @@ abstract class MethodCallMetadataFactory {
             AtomicReference<Method> calledMethod = new AtomicReference<>();
             Proxy proxy = (Proxy) proxyClass.<Proxy>newInstance();
             proxy.setHandler((self, method, proceed, args) -> {
-                validateActionMappingCandidate(method);
+                MethodCallMetadataValidator.validate(method);
                 calledMethod.set(method);
                 return Defaults.defaultValue(method.getReturnType());
             });
@@ -70,7 +69,7 @@ abstract class MethodCallMetadataFactory {
             if (Objects.nonNull(calledMethod.get())) {
                 return MethodCallMetadata.method(instance, calledMethod.get());
             }
-            throw new IllegalStateException("No method call on instance could be caught!");
+            throw new IllegalArgumentException("No method call on instance could be caught!");
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

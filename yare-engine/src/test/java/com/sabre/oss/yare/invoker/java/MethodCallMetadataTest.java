@@ -24,12 +24,11 @@
 
 package com.sabre.oss.yare.invoker.java;
 
-import com.sabre.oss.yare.engine.Collector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -37,7 +36,6 @@ import java.util.stream.Stream;
 import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MethodCallMetadataTest {
 
@@ -85,62 +83,76 @@ public class MethodCallMetadataTest {
 
     @ParameterizedTest
     @MethodSource("validImplementations")
-    public void shouldCreateProxyForGivenMethodCall(Collector collector) {
+    void shouldCreateProxyForGivenMethodCall(Collector collector) {
         method(collector, a -> a.collect(null, null));
     }
 
     private static Stream<Collector> validImplementations() {
-        PublicCollector collector1 = new PublicCollector();
-        PublicCollector.StaticPublicInnerInPublicOuter collector2 = new PublicCollector.StaticPublicInnerInPublicOuter();
-        PublicCollector.StaticPublicInnerInPublicOuterWithDefaultPublicConstructor collector3 = new PublicCollector.StaticPublicInnerInPublicOuterWithDefaultPublicConstructor();
         return Stream.of(
-                collector1,
-                collector2,
-                collector3
+                new PublicCollector(),
+                new PublicCollector.StaticPublicInner(),
+                new PublicCollector.StaticPublicInnerWithDefaultPublicConstructor()
         );
     }
 
     @ParameterizedTest
     @MethodSource("invalidImplementations")
-    public void shouldNotCreateProxyForGivenMethodCall(AbstractMap.SimpleEntry<Collector, String> entry) {
-        //given
-        Collector collector = entry.getKey();
-        String message = entry.getValue();
-        //when
-        Exception exception = assertThrows(RuntimeException.class, () -> method(collector, a -> a.collect(null, null)));
-        //then
-        assertThat(exception.getMessage()).isEqualTo(message);
+    void shouldNotCreateProxyForGivenMethodCall(Collector collector, String message) {
+        assertThatThrownBy(() -> method(collector, a -> a.collect(null, null)))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessage(message);
     }
 
-    private static Stream<AbstractMap.SimpleEntry<Collector, String>> invalidImplementations() {
-        PublicCollector collector1 = new PublicCollector();
-        PublicCollector.PublicInnerInPublicOuter collector2 = collector1.new PublicInnerInPublicOuter();
-        PublicCollector.PackageInnerInPublicOuter collector3 = collector1.new PackageInnerInPublicOuter();
-        PublicCollector.StaticPackageInnerInPublicOuter collector4 = new PublicCollector.StaticPackageInnerInPublicOuter();
-        PublicCollector.StaticPublicInnerInPublicOuter.StaticPublicTooDeeplyNested collector5 = new PublicCollector.StaticPublicInnerInPublicOuter.StaticPublicTooDeeplyNested();
-        PublicCollector.PublicInnerInPublicOuter.PublicTooDeeplyNested collector6 = collector2.new PublicTooDeeplyNested();
-        PublicCollector.StaticPublicInnerInPublicOuterWithNoDefaultConstructor collector7 = new PublicCollector.StaticPublicInnerInPublicOuterWithNoDefaultConstructor(0);
-        PublicCollector.StaticPublicInnerInPublicOuterWithDefaultPackageConstructor collector8 = new PublicCollector.StaticPublicInnerInPublicOuterWithDefaultPackageConstructor();
-
-        PackageCollector collector9 = new PackageCollector();
-        PackageCollector.PublicInnerInPackageOuter collector10 = collector9.new PublicInnerInPackageOuter();
-        PackageCollector.PackageInnerInPackageOuter collector11 = collector9.new PackageInnerInPackageOuter();
-        PackageCollector.StaticPublicInnerInPackageOuter collector12 = new PackageCollector.StaticPublicInnerInPackageOuter();
-        PackageCollector.StaticPackageInnerInPackageOuter collector13 = new PackageCollector.StaticPackageInnerInPackageOuter();
-
+    private static Stream<Arguments> invalidImplementations() {
         return Stream.of(
-                new AbstractMap.SimpleEntry<>(collector2, String.format(MethodCallMetadataValidator.CLASS_NONSTATIC, collector2.getClass())),
-                new AbstractMap.SimpleEntry<>(collector3, String.format(MethodCallMetadataValidator.CLASS_NONSTATIC, collector3.getClass())),
-                new AbstractMap.SimpleEntry<>(collector4, String.format(MethodCallMetadataValidator.CLASS_NON_PUBLIC, collector4.getClass())),
-                new AbstractMap.SimpleEntry<>(collector5, String.format(MethodCallMetadataValidator.CLASS_TOO_DEEPLY_NESTED, collector5.getClass())),
-                new AbstractMap.SimpleEntry<>(collector6, String.format(MethodCallMetadataValidator.CLASS_TOO_DEEPLY_NESTED, collector6.getClass())),
-                new AbstractMap.SimpleEntry<>(collector7, String.format(MethodCallMetadataValidator.CLASS_NO_DEF_CONSTRUCTOR, collector7.getClass())),
-                new AbstractMap.SimpleEntry<>(collector8, String.format(MethodCallMetadataValidator.CLASS_NO_DEF_CONSTRUCTOR, collector8.getClass())),
-                new AbstractMap.SimpleEntry<>(collector9, String.format(MethodCallMetadataValidator.CLASS_NON_PUBLIC, collector9.getClass())),
-                new AbstractMap.SimpleEntry<>(collector10, String.format(MethodCallMetadataValidator.CLASS_NON_PUBLIC, collector10.getClass().getDeclaringClass())),
-                new AbstractMap.SimpleEntry<>(collector11, String.format(MethodCallMetadataValidator.CLASS_NON_PUBLIC, collector11.getClass().getDeclaringClass())),
-                new AbstractMap.SimpleEntry<>(collector12, String.format(MethodCallMetadataValidator.CLASS_NON_PUBLIC, collector12.getClass().getDeclaringClass())),
-                new AbstractMap.SimpleEntry<>(collector13, String.format(MethodCallMetadataValidator.CLASS_NON_PUBLIC, collector13.getClass().getDeclaringClass()))
+                Arguments.of(
+                        new PublicCollector().new PublicInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.PublicInner has to be static!"
+                ),
+                Arguments.of(
+                        new PublicCollector().new PackageInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.PackageInner has to be static!"
+                ),
+                Arguments.of(
+                        new PublicCollector.StaticPackageInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.StaticPackageInner has to be public!"
+                ),
+                Arguments.of(
+                        new PublicCollector.StaticPublicInner.StaticPublicTooDeeplyNested(),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.StaticPublicInner.StaticPublicTooDeeplyNested is too deeply nested!"
+                ),
+                Arguments.of(
+                        new PublicCollector().new PublicInner().new PublicTooDeeplyNested(),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.PublicInner.PublicTooDeeplyNested is too deeply nested!"
+                ),
+                Arguments.of(
+                        new PublicCollector.StaticPublicInnerWithNoDefaultConstructor(0),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.StaticPublicInnerWithNoDefaultConstructor needs to have a public default constructor!"
+                ),
+                Arguments.of(
+                        new PublicCollector.StaticPublicInnerWithDefaultPackageConstructor(),
+                        "Class com.sabre.oss.yare.invoker.java.PublicCollector.StaticPublicInnerWithDefaultPackageConstructor needs to have a public default constructor!"
+                ),
+                Arguments.of(
+                        new PackageCollector(),
+                        "Class com.sabre.oss.yare.invoker.java.PackageCollector has to be public!"
+                ),
+                Arguments.of(
+                        new PackageCollector().new PublicInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PackageCollector has to be public!"
+                ),
+                Arguments.of(
+                        new PackageCollector().new PackageInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PackageCollector has to be public!"
+                ),
+                Arguments.of(
+                        new PackageCollector.StaticPublicInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PackageCollector has to be public!"
+                ),
+                Arguments.of(
+                        new PackageCollector.StaticPackageInner(),
+                        "Class com.sabre.oss.yare.invoker.java.PackageCollector has to be public!"
+                )
         );
     }
 
@@ -152,19 +164,22 @@ public class MethodCallMetadataTest {
     @Test
     void shouldFailWhenMappingPackageAccessMethod() {
         assertThatThrownBy(() -> method(this, a -> a.packageCollect(null, null)))
-                .isExactlyInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessage("" +
+                        "Method void com.sabre.oss.yare.invoker.java.MethodCallMetadataTest.packageCollect(java.util.List,java.lang.Object)" +
+                        " in class com.sabre.oss.yare.invoker.java.MethodCallMetadataTest must be public!");
     }
 
     @Test
     void shouldFailWhenMappingPrivateAccessMethod() {
         assertThatThrownBy(() -> method(this, a -> a.privateCollect(null, null)))
-                .isExactlyInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void shouldFailWhenMappingPublicStaticMethod() {
         assertThatThrownBy(() -> method(this, a -> a.publicStaticCollect(null, null)))
-                .isExactlyInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -177,7 +192,10 @@ public class MethodCallMetadataTest {
     void shouldFailWhenMappingPackageAccessMethodInDifferentPublicAccessClassInstance() {
         SimplePublicCollector simplePublicCollector = new SimplePublicCollector();
         assertThatThrownBy(() -> method(simplePublicCollector, a -> a.packageCollect(null, null)))
-                .isExactlyInstanceOf(RuntimeException.class);
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessage("" +
+                        "Method void com.sabre.oss.yare.invoker.java.SimplePublicCollector.packageCollect(java.util.List,java.lang.Object)" +
+                        " in class com.sabre.oss.yare.invoker.java.SimplePublicCollector must be public!");
     }
 
     @Test
@@ -195,19 +213,15 @@ public class MethodCallMetadataTest {
     }
 
     public void publicCollect(List<Object> context, Object object) {
-
     }
 
     void packageCollect(List<Object> context, Object object) {
-
     }
 
     private void privateCollect(List<Object> context, Object object) {
-
     }
 
     public static void publicStaticCollect(List<Object> context, Object object) {
-
     }
 
     public static class AnAction {

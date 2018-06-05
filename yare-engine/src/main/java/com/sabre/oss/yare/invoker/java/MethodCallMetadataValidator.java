@@ -29,18 +29,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 final class MethodCallMetadataValidator {
-
-    static final String CLASS_NON_PUBLIC = "- %s has to be public!";
-    static final String CLASS_TOO_DEEPLY_NESTED = "- %s is too deeply nested!";
-    static final String CLASS_NONSTATIC = "- %s has to be static!";
-    static final String CLASS_NO_DEF_CONSTRUCTOR = "- %s needs to have a public default constructor!";
-    static final String METHOD_NONPUBLIC = "Method %s in %s must be public!";
-    static final String METHOD_STATIC = "Method %s in %s cannot be static!";
+    private static final String METHOD_NONPUBLIC = "Method %s in %s must be public!";
+    private static final String METHOD_STATIC = "Method %s in %s cannot be static!";
+    private static final String CLASS_TOO_DEEPLY_NESTED = "Class %s is too deeply nested!";
+    private static final String CLASS_NO_DEF_CONSTRUCTOR = "Class %s needs to have a public default constructor!";
+    private static final String CLASS_NONSTATIC = "Class %s has to be static!";
+    private static final String CLASS_NON_PUBLIC = "Class %s has to be public!";
 
     private MethodCallMetadataValidator() {
     }
 
-    static void validateActionMappingCandidate(Class<?> clazz) throws IllegalArgumentException {
+    static void validate(Class<?> clazz) throws IllegalArgumentException {
         Class<?> outerClazz = clazz.getDeclaringClass();
         if (outerClazz != null) {
             checkTooDeeplyNested(clazz, outerClazz);
@@ -52,36 +51,36 @@ final class MethodCallMetadataValidator {
         checkDefaultConstructor(clazz);
     }
 
-    static void validateActionMappingCandidate(Method method) {
+    static void validate(Method method) {
         if (!Modifier.isPublic(method.getModifiers())) {
-            throw new RuntimeException(String.format(METHOD_NONPUBLIC, method, method.getDeclaringClass()));
+            throw new IllegalArgumentException(String.format(METHOD_NONPUBLIC, method, method.getDeclaringClass()));
         }
         if (Modifier.isStatic(method.getModifiers())) {
-            throw new RuntimeException(String.format(METHOD_STATIC, method, method.getDeclaringClass()));
+            throw new IllegalArgumentException(String.format(METHOD_STATIC, method, method.getDeclaringClass()));
         }
     }
 
     private static void checkTooDeeplyNested(Class<?> clazz, Class<?> outerClazz) {
         if (outerClazz.getDeclaringClass() != null) {
-            throw new IllegalArgumentException(String.format(CLASS_TOO_DEEPLY_NESTED, clazz));
+            throw new IllegalArgumentException(String.format(CLASS_TOO_DEEPLY_NESTED, clazz.getCanonicalName()));
         }
     }
 
     private static void checkDefaultConstructor(Class<?> outerClazz) {
         if (!hasDefaultPublicConstructor(outerClazz)) {
-            throw new IllegalArgumentException(String.format(CLASS_NO_DEF_CONSTRUCTOR, outerClazz));
+            throw new IllegalArgumentException(String.format(CLASS_NO_DEF_CONSTRUCTOR, outerClazz.getCanonicalName()));
         }
     }
 
     private static void checkStatic(Class<?> clazz) {
         if (!Modifier.isStatic(clazz.getModifiers())) {
-            throw new IllegalArgumentException(String.format(CLASS_NONSTATIC, clazz));
+            throw new IllegalArgumentException(String.format(CLASS_NONSTATIC, clazz.getCanonicalName()));
         }
     }
 
     private static void checkPublic(Class<?> outerClazz) {
         if (!Modifier.isPublic(outerClazz.getModifiers())) {
-            throw new IllegalArgumentException(String.format(CLASS_NON_PUBLIC, outerClazz));
+            throw new IllegalArgumentException(String.format(CLASS_NON_PUBLIC, outerClazz.getCanonicalName()));
         }
     }
 

@@ -22,12 +22,10 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.engine;
+package com.sabre.oss.yare.invoker.java;
 
 import java.util.List;
 
 public interface Collector {
-
     void collect(List<Object> context, Object object);
-
 }

@@ -24,47 +24,39 @@
 
 package com.sabre.oss.yare.invoker.java;
 
-import com.sabre.oss.yare.engine.Collector;
-
 import java.util.List;
 
 class PackageCollector implements Collector {
 
     @Override
     public void collect(List<Object> context, Object object) {
-
     }
 
-    public class PublicInnerInPackageOuter implements Collector {
+    public class PublicInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    public static class StaticPublicInnerInPackageOuter implements Collector {
+    public static class StaticPublicInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    static class StaticPackageInnerInPackageOuter implements Collector {
+    static class StaticPackageInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    class PackageInnerInPackageOuter implements Collector {
-
+    class PackageInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 }

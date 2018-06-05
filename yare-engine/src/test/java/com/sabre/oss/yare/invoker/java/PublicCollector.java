@@ -24,102 +24,84 @@
 
 package com.sabre.oss.yare.invoker.java;
 
-import com.sabre.oss.yare.engine.Collector;
-
 import java.util.List;
 
 public class PublicCollector implements Collector {
-
     public PublicCollector() {
     }
 
     @Override
     public void collect(List<Object> context, Object object) {
-
     }
 
-    public static class StaticPublicInnerInPublicOuter implements Collector {
+    public static class StaticPublicInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
 
         public static class StaticPublicTooDeeplyNested implements Collector {
 
             @Override
             public void collect(List<Object> context, Object object) {
-
             }
         }
     }
 
-    public static class StaticPublicInnerInPublicOuterWithDefaultPublicConstructor implements Collector {
-
-        public StaticPublicInnerInPublicOuterWithDefaultPublicConstructor() {
+    public static class StaticPublicInnerWithDefaultPublicConstructor implements Collector {
+        public StaticPublicInnerWithDefaultPublicConstructor() {
         }
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    public static class StaticPublicInnerInPublicOuterWithDefaultPackageConstructor implements Collector {
-
-        StaticPublicInnerInPublicOuterWithDefaultPackageConstructor() {
+    public static class StaticPublicInnerWithDefaultPackageConstructor implements Collector {
+        StaticPublicInnerWithDefaultPackageConstructor() {
         }
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    public static class StaticPublicInnerInPublicOuterWithNoDefaultConstructor implements Collector {
-
-        public StaticPublicInnerInPublicOuterWithNoDefaultConstructor(int i) {
+    public static class StaticPublicInnerWithNoDefaultConstructor implements Collector {
+        public StaticPublicInnerWithNoDefaultConstructor(int i) {
         }
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    public class PublicInnerInPublicOuter implements Collector {
-
-        public PublicInnerInPublicOuter() {
+    public class PublicInner implements Collector {
+        public PublicInner() {
         }
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
 
         public class PublicTooDeeplyNested implements Collector {
 
             @Override
             public void collect(List<Object> context, Object object) {
-
             }
         }
     }
 
-    static class StaticPackageInnerInPublicOuter implements Collector {
+    static class StaticPackageInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
 
-    class PackageInnerInPublicOuter implements Collector {
+    class PackageInner implements Collector {
 
         @Override
         public void collect(List<Object> context, Object object) {
-
         }
     }
-
 }

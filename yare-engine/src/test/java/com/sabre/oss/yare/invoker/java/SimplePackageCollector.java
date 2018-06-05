@@ -27,12 +27,9 @@ package com.sabre.oss.yare.invoker.java;
 import java.util.List;
 
 class SimplePackageCollector {
-
     public void publicCollect(List<Object> context, Object object) {
-
     }
 
     void packageCollect(List<Object> context, Object object) {
-
     }
 }

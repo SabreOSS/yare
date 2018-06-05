@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
+import static com.sabre.oss.yare.invoker.java.js.JavaScriptCallMetadata.js;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -238,9 +239,9 @@ class JavaScriptBasedFunctionTest {
     private RuleSession createRuleSession(Rule rule) {
         RulesEngine rulesEngine = new RulesEngineBuilder()
                 .withRulesRepository(i -> singletonList(rule))
-                .withActionMapping("collect", JavaScriptCallMetadata.js("collect", script))
-                .withFunctionMapping("upperCase", JavaScriptCallMetadata.js("upperCase", script))
-                .withFunctionMapping("concat", JavaScriptCallMetadata.js("concat", script))
+                .withActionMapping("collect", js("collect", script))
+                .withFunctionMapping("upperCase", js("upperCase", script))
+                .withFunctionMapping("concat", js("concat", script))
                 .build();
 
         return rulesEngine.createSession("test");
