@@ -39,11 +39,11 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
-class ChainingOperatorTest {
+public class ChainingOperatorTest {
     private static final String ACTION_NAME = "testAction";
     private static final String IS_NULL = "isNull";
     private static final String FLATTEN_AND_CONTAINS = "flattenAndContains";
