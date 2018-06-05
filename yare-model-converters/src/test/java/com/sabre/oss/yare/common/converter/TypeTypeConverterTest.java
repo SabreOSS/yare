@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.common.converter;
 
+import com.sabre.oss.yare.core.model.Expression;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,14 @@ class TypeTypeConverterTest {
     void shouldProperlyConvertFromNullLiteralString() {
         String converted = typeConverter.toString(null, null);
 
-        assertThat(converted).isEqualTo("@null");
+        assertThat(converted).isEqualTo(Expression.Undefined.class.getName());
+    }
+
+    @Test
+    void shouldProperlyConvertFromNullType() {
+        Class<?> converted = typeConverter.fromString(null, null);
+
+        assertThat(converted).isEqualTo(Expression.Undefined.class);
     }
 
     @Test

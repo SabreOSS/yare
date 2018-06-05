@@ -20,37 +20,57 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.model;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+public class Fact {
+    private String name;
+    private String type;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
-
-        registry.put(clazz, element);
+    public String getName() {
+        return name;
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Fact withName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Fact withType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Fact fact = (Fact) o;
+        return Objects.equals(name, fact.name) &&
+                Objects.equals(type, fact.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
     }
 }

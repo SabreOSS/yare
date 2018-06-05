@@ -20,37 +20,31 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.converter.serializer;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
+import com.sabre.oss.yare.serializer.json.model.Function;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+import java.io.IOException;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
-
-        registry.put(clazz, element);
+class UnwrappingFunctionSerializer extends JsonSerializer<Function> {
+    @Override
+    public void serialize(Function value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeFieldName(JsonPropertyNames.Function.FUNCTION);
+        gen.writeStartObject();
+        gen.writeObjectField(JsonPropertyNames.Function.NAME, value.getName());
+        gen.writeObjectField(JsonPropertyNames.Function.RETURN_TYPE, value.getReturnType());
+        gen.writeObjectField(JsonPropertyNames.Function.PARAMETERS, value.getParameters());
+        gen.writeEndObject();
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
-        }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+    @Override
+    public boolean isUnwrappingSerializer() {
+        return true;
     }
 }

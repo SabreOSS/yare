@@ -20,37 +20,35 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.converter;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
-
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
-
-        registry.put(clazz, element);
+public interface JsonPropertyNames {
+    interface Attribute {
+        String NAME = "name";
+        String TYPE = "type";
+        String VALUE = "value";
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
-        }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+    interface Value {
+        String VALUE = "value";
+        String TYPE = "type";
+    }
+
+    interface Values {
+        String VALUES = "values";
+        String TYPE = "type";
+    }
+
+    interface Function {
+        String FUNCTION = "function";
+        String NAME = "name";
+        String RETURN_TYPE = "returnType";
+        String PARAMETERS = "parameters";
+    }
+
+    interface Parameter {
+        String NAME = "name";
     }
 }

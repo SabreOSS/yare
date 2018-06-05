@@ -20,37 +20,35 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.mapper.rule;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.serializer.json.model.Action;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+import java.util.List;
+import java.util.stream.Collectors;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
+import static com.sabre.oss.yare.core.model.ExpressionFactory.actionOf;
 
-        registry.put(clazz, element);
+class ActionConverter {
+    private final NodeConverter nodeConverter;
+
+    ActionConverter(NodeConverter nodeConverter) {
+        this.nodeConverter = nodeConverter;
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
+    List<Expression.Action> convert(List<Action> actions) {
+        return actions.stream()
+                .map(this::convert)
+                .collect(Collectors.toList());
+    }
+
+    private Expression.Action convert(Action action) {
+        if (action == null) {
+            return null;
         }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+        return actionOf(action.getName(), action.getName(), nodeConverter.convert(action.getParameters()));
     }
 }

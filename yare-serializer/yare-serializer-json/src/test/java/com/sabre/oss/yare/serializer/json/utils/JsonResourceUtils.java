@@ -23,34 +23,34 @@
  *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.utils;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.io.IOUtils;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+import java.io.IOException;
+import java.io.InputStream;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-        registry.put(clazz, element);
+public final class JsonResourceUtils {
+    private JsonResourceUtils() {
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
+    public static String getJsonResourceAsString(String resource) {
+        try (InputStream is = getResourceAsStream(resource)) {
+            String content = IOUtils.toString(is, UTF_8);
+            return content.substring(content.indexOf('{'));
+        } catch (IOException e) {
+            throw new IllegalArgumentException(format("Cannot read %s", resource), e);
         }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+    }
+
+    private static InputStream getResourceAsStream(String resource) {
+        InputStream resourceAsStream = JsonResourceUtils.class.getResourceAsStream(resource);
+        if (resourceAsStream == null) {
+            throw new IllegalArgumentException(format("Cannot find %s", resource));
+        }
+        return resourceAsStream;
     }
 }

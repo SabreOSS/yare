@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.common.converter;
 
 import com.sabre.oss.yare.common.converter.aliases.TypeAliasResolver;
+import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.type.InternalParameterizedType;
 
 import java.lang.reflect.ParameterizedType;
@@ -33,8 +34,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.sabre.oss.yare.common.converter.StringTypeConverter.NULL_LITERAL;
 
 /**
  * {@link TypeTypeConverter} is able to fromString string to {@link Type}.
@@ -68,6 +67,9 @@ public class TypeTypeConverter implements TypeConverter {
 
     @Override
     public Object fromString(Type ignored, String value) {
+        if (value == null) {
+            return Expression.Undefined.class;
+        }
         Type result = stringToTypeCache.get(value);
         if (result == null) {
             result = convertString(value);
@@ -79,8 +81,8 @@ public class TypeTypeConverter implements TypeConverter {
 
     @Override
     public String toString(Type ignored, Object value) {
-        if (Objects.isNull(value)) {
-            return NULL_LITERAL;
+        if (value == null) {
+            return Expression.Undefined.class.getName();
         }
         String result = typeToStringCache.get(value);
         if (result == null) {

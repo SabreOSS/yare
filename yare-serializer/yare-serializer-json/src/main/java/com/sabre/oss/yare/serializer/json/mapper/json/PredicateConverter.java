@@ -20,37 +20,21 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.serializer.json.model.Operand;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+class PredicateConverter {
+    private final NodeConverter nodeConverter;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
-
-        registry.put(clazz, element);
+    PredicateConverter(NodeConverter nodeConverter) {
+        this.nodeConverter = nodeConverter;
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
-        }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+    Operand convert(Expression predicate) {
+        return nodeConverter.convert(predicate);
     }
 }

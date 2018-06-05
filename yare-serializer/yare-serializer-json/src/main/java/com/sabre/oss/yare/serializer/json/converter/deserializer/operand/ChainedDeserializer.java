@@ -20,37 +20,29 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.model.Operand;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+import java.util.List;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
+public class ChainedDeserializer {
+    private final List<Deserializer> deserializers;
 
-        registry.put(clazz, element);
+    public ChainedDeserializer(List<Deserializer> deserializers) {
+        this.deserializers = deserializers;
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
-        }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
+    public Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        Deserializer deserializer = deserializers.stream()
+                .filter(d -> d.isApplicable(jsonNode))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Node %s could not be deserialized to any known operand", jsonNode)));
+        return deserializer.deserialize(jsonNode, objectMapper);
     }
 }

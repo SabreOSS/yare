@@ -20,37 +20,35 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.sabre.oss.yare.core.model.Expression;
+import com.sabre.oss.yare.serializer.json.model.Action;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+import java.util.List;
+import java.util.stream.Collectors;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
+class ActionConverter {
+    private final NodeConverter nodeConverter;
 
-        registry.put(clazz, element);
+    ActionConverter(NodeConverter nodeConverter) {
+        this.nodeConverter = nodeConverter;
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
+    List<Action> convert(List<Expression.Action> actions) {
+        return actions.stream()
+                .map(this::convert)
+                .collect(Collectors.toList());
+    }
+
+    private Action convert(Expression.Action action) {
+        if (action == null) {
+            return null;
         }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+        return new Action()
+                .withName(action.getName())
+                .withParameters(nodeConverter.convertParameters(action.getArguments()));
     }
 }

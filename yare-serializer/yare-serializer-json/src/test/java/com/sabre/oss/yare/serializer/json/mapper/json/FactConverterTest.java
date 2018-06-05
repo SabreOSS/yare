@@ -20,37 +20,41 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.common.mapper;
+package com.sabre.oss.yare.serializer.json.mapper.json;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
+import com.sabre.oss.yare.serializer.json.model.Fact;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class ByClassRegistry<C extends Class<?>, E> {
-    private final Map<C, E> registry = new ConcurrentHashMap<>();
+import static org.assertj.core.api.Assertions.assertThat;
 
-    public void add(C clazz, E element) {
-        boolean isSuperclassRegistered = registry.entrySet().stream()
-                .map(Map.Entry::getKey)
-                .anyMatch(e -> e.isAssignableFrom(clazz));
-        if (isSuperclassRegistered) {
-            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
-        }
+class FactConverterTest {
+    private FactConverter factConverter;
 
-        registry.put(clazz, element);
+    @BeforeEach
+    void setUp() {
+        factConverter = new FactConverter(DefaultTypeConverters.getDefaultTypeConverter());
     }
 
-    public E get(C clazz) {
-        E element = registry.get(clazz);
-        if (element != null) {
-            return element;
-        }
-        return registry.entrySet().stream()
-                .filter(entry -> entry.getKey().isAssignableFrom(clazz))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
+    @Test
+    void shouldConvertToFact() {
+        com.sabre.oss.yare.core.model.Fact toConvert = new com.sabre.oss.yare.core.model.Fact("fact-name", String.class);
+
+        Fact fact = factConverter.convert(toConvert);
+
+        Fact expected = new Fact()
+                .withName("fact-name")
+                .withType("String");
+        assertThat(fact).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldConvertNullFact() {
+        Fact fact = factConverter.convert(null);
+
+        assertThat(fact).isNull();
     }
 }
