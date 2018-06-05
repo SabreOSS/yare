@@ -38,6 +38,7 @@ import com.sabre.oss.yare.serializer.json.model.Parameter;
 import java.io.IOException;
 
 public class ParameterDeserializer extends JsonDeserializer<Parameter> {
+
     @Override
     public Parameter deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();

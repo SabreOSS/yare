@@ -32,7 +32,7 @@ import com.sabre.oss.yare.serializer.json.model.Value;
 
 import java.io.IOException;
 
-public class UnwrappingValueSerializer extends JsonSerializer<Value> {
+class UnwrappingValueSerializer extends JsonSerializer<Value> {
     @Override
     public void serialize(Value value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeObjectField(JsonPropertyNames.Value.VALUE, value.getValue());

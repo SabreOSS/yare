@@ -32,7 +32,7 @@ import com.sabre.oss.yare.serializer.json.model.Function;
 
 import java.io.IOException;
 
-public class UnwrappingFunctionSerializer extends JsonSerializer<Function> {
+class UnwrappingFunctionSerializer extends JsonSerializer<Function> {
     @Override
     public void serialize(Function value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeFieldName(JsonPropertyNames.Function.FUNCTION);

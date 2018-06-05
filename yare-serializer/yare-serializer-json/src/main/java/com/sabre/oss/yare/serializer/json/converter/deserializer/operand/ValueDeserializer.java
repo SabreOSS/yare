@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sabre.oss.yare.common.converter.TypeTypeConverter;
+import com.sabre.oss.yare.common.converter.TypeConverter;
 import com.sabre.oss.yare.serializer.json.converter.JsonPropertyNames;
 import com.sabre.oss.yare.serializer.json.converter.utils.JsonNodeUtils;
 import com.sabre.oss.yare.serializer.json.model.Operand;
@@ -36,16 +36,20 @@ import com.sabre.oss.yare.serializer.json.model.Value;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-class ValueDeserializationHandler extends DeserializationHandler {
-    private final TypeTypeConverter typeConverter = new TypeTypeConverter();
+public class ValueDeserializer implements Deserializer {
+    private final TypeConverter typeConverter;
+
+    public ValueDeserializer(TypeConverter typeConverter) {
+        this.typeConverter = typeConverter;
+    }
 
     @Override
-    protected boolean isApplicable(JsonNode jsonNode) {
+    public boolean isApplicable(JsonNode jsonNode) {
         return jsonNode.has(JsonPropertyNames.Value.VALUE);
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+    public Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         String type = getType(jsonNode);
         Object value = getValue(jsonNode, type, objectMapper);
         return new Value()

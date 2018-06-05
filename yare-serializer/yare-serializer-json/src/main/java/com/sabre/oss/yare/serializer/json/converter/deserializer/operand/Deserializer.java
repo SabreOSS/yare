@@ -22,19 +22,16 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
-public final class DefaultDeserializationHandlers {
-    private static final DeserializationHandler defaultHandler =
-            new ValueDeserializationHandler()
-                    .withNext(new ValuesDeserializationHandler()
-                            .withNext(new FunctionDeserializationHandler()
-                                    .withNext(new OperatorDeserializationHandler())));
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.model.Operand;
 
-    public static DeserializationHandler getDefaultHandler() {
-        return defaultHandler;
-    }
+public interface Deserializer {
 
-    private DefaultDeserializationHandlers() {
-    }
+    boolean isApplicable(JsonNode jsonNode);
+
+    Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException;
 }

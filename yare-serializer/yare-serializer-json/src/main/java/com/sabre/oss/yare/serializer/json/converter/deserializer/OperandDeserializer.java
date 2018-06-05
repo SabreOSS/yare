@@ -29,18 +29,25 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sabre.oss.yare.serializer.json.converter.deserializer.handler.DefaultDeserializationHandlers;
-import com.sabre.oss.yare.serializer.json.converter.deserializer.handler.DeserializationHandler;
+import com.sabre.oss.yare.common.converter.TypeTypeConverter;
+import com.sabre.oss.yare.serializer.json.converter.deserializer.operand.*;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class OperandDeserializer extends JsonDeserializer<Operand> {
+    private static final ChainedDeserializer deserializer = new ChainedDeserializer(Arrays.asList(
+            new ValueDeserializer(new TypeTypeConverter()),
+            new ValuesDeserializer(),
+            new FunctionDeserializer(),
+            new OperatorDeserializer()
+    ));
+
     @Override
     public Operand deserialize(JsonParser jsonParser, DeserializationContext ctx) throws IOException {
         ObjectMapper objectMapper = (ObjectMapper) jsonParser.getCodec();
         JsonNode jsonNode = objectMapper.readTree(jsonParser);
-        DeserializationHandler defaultHandler = DefaultDeserializationHandlers.getDefaultHandler();
-        return defaultHandler.handle(jsonNode, objectMapper);
+        return deserializer.deserialize(jsonNode, objectMapper);
     }
 }

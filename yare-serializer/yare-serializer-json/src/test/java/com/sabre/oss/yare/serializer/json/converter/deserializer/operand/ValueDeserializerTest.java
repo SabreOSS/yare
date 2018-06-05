@@ -22,10 +22,12 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.common.converter.TypeTypeConverter;
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Value;
 import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
@@ -37,16 +39,16 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ValueDeserializationHandlerTest {
+class ValueDeserializerTest {
     private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/value";
 
     private ObjectMapper mapper;
-    private DeserializationHandler handler;
+    private Deserializer deserializer;
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
-        handler = new ValueDeserializationHandler();
+        mapper = RuleToJsonConverter.getObjectMapper();
+        deserializer = new ValueDeserializer(new TypeTypeConverter());
     }
 
     @Test
@@ -56,7 +58,7 @@ class ValueDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isTrue();
@@ -68,7 +70,7 @@ class ValueDeserializationHandlerTest {
         JsonNode node = mapper.readTree("{}");
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -81,7 +83,7 @@ class ValueDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
@@ -97,7 +99,7 @@ class ValueDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
@@ -113,7 +115,7 @@ class ValueDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Value.class, v -> {
@@ -130,7 +132,7 @@ class ValueDeserializationHandlerTest {
 
         // when / then
         String expectedMessage = "Can't convert 'java.lang.Unknown' into Java type";
-        assertThatThrownBy(() -> handler.deserialize(node, mapper))
+        assertThatThrownBy(() -> deserializer.deserialize(node, mapper))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedMessage);
     }

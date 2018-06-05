@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,14 +38,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-class FunctionDeserializationHandler extends DeserializationHandler {
+public class FunctionDeserializer implements Deserializer {
+
     @Override
-    protected boolean isApplicable(JsonNode jsonNode) {
+    public boolean isApplicable(JsonNode jsonNode) {
         return jsonNode.has(JsonPropertyNames.Function.FUNCTION);
     }
 
     @Override
-    protected Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+    public Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
         Optional<JsonNode> o = JsonNodeUtils.resolveChildNode(jsonNode, JsonPropertyNames.Function.FUNCTION);
         return o.isPresent() ? getFunction(o.get(), objectMapper) : null;
     }

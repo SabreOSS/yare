@@ -32,8 +32,11 @@ public class ByClassRegistry<C extends Class<?>, E> {
     private final Map<C, E> registry = new ConcurrentHashMap<>();
 
     public void add(C clazz, E element) {
-        if (registry.containsKey(clazz)) {
-            throw new IllegalArgumentException("Class " + clazz.getName() + " registered already");
+        boolean isSuperclassRegistered = registry.entrySet().stream()
+                .map(Map.Entry::getKey)
+                .anyMatch(e -> e.isAssignableFrom(clazz));
+        if (isSuperclassRegistered) {
+            throw new IllegalArgumentException(String.format("Superclass of %s is already registered", clazz.getName()));
         }
 
         registry.put(clazz, element);

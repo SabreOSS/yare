@@ -22,35 +22,27 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 
-public abstract class DeserializationHandler {
-    private DeserializationHandler next;
+import java.util.List;
 
-    DeserializationHandler withNext(DeserializationHandler next) {
-        this.next = next;
-        return this;
+public class ChainedDeserializer {
+    private final List<Deserializer> deserializers;
+
+    public ChainedDeserializer(List<Deserializer> deserializers) {
+        this.deserializers = deserializers;
     }
 
-    public Operand handle(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
-        if (jsonNode == null) {
-            return null;
-        }
-        if (isApplicable(jsonNode)) {
-            return deserialize(jsonNode, objectMapper);
-        }
-        if (next != null) {
-            return next.handle(jsonNode, objectMapper);
-        }
-        throw new IllegalArgumentException(String.format("Given node: %s could not be deserialized to any known operand model", jsonNode));
+    public Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException {
+        Deserializer deserializer = deserializers.stream()
+                .filter(d -> d.isApplicable(jsonNode))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Node %s could not be deserialized to any known operand", jsonNode)));
+        return deserializer.deserialize(jsonNode, objectMapper);
     }
-
-    protected abstract boolean isApplicable(JsonNode jsonNode);
-
-    protected abstract Operand deserialize(JsonNode jsonNode, ObjectMapper objectMapper) throws JsonProcessingException;
 }

@@ -22,10 +22,11 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.*;
 import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,16 +36,16 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ValuesDeserializationHandlerTest {
+class ValuesDeserializerTest {
     private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/values";
 
     private ObjectMapper mapper;
-    private DeserializationHandler handler;
+    private Deserializer deserializer;
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
-        handler = new ValuesDeserializationHandler();
+        mapper = RuleToJsonConverter.getObjectMapper();
+        deserializer = new ValuesDeserializer();
     }
 
     @Test
@@ -54,7 +55,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isTrue();
@@ -67,7 +68,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isTrue();
@@ -80,7 +81,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -93,7 +94,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -106,7 +107,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -119,7 +120,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
@@ -138,7 +139,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
@@ -157,7 +158,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
@@ -180,7 +181,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {
@@ -196,7 +197,7 @@ class ValuesDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Values.class, v -> {

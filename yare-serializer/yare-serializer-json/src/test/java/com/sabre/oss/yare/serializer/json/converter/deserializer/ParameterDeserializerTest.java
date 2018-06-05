@@ -26,6 +26,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 import com.sabre.oss.yare.serializer.json.model.Value;
@@ -47,7 +48,7 @@ class ParameterDeserializerTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
+        mapper = RuleToJsonConverter.getObjectMapper();
         deserializer = new ParameterDeserializer();
     }
 
@@ -114,9 +115,8 @@ class ParameterDeserializerTest {
         JsonNode node = mapper.readTree(json);
 
         // when / then
-        String expectedMessage = "Given node: {\"name\":null} could not be deserialized to any known operand model";
         assertThatThrownBy(() -> deserializer.deserialize(node.traverse(mapper), null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(expectedMessage);
+                .hasMessage("Node {\"name\":null} could not be deserialized to any known operand");
     }
 }

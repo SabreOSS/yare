@@ -22,10 +22,11 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json.converter.deserializer.handler;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.Operand;
 import com.sabre.oss.yare.serializer.json.model.Operator;
 import com.sabre.oss.yare.serializer.json.model.Value;
@@ -37,16 +38,16 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OperatorDeserializationHandlerTest {
+class OperatorDeserializerTest {
     private static final String TEST_RESOURCES_DIRECTORY = "/converter/deserializer/handler/operator";
 
     private ObjectMapper mapper;
-    private DeserializationHandler handler;
+    private Deserializer deserializer;
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
-        handler = new OperatorDeserializationHandler();
+        mapper = RuleToJsonConverter.getObjectMapper();
+        deserializer = new OperatorDeserializer();
     }
 
     @Test
@@ -56,7 +57,7 @@ class OperatorDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isTrue();
@@ -69,7 +70,7 @@ class OperatorDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -82,7 +83,7 @@ class OperatorDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -94,7 +95,7 @@ class OperatorDeserializationHandlerTest {
         JsonNode node = mapper.readTree("{}");
 
         // when
-        Boolean applicable = handler.isApplicable(node);
+        Boolean applicable = deserializer.isApplicable(node);
 
         // then
         assertThat(applicable).isFalse();
@@ -107,7 +108,7 @@ class OperatorDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Operator.class, o -> {
@@ -126,7 +127,7 @@ class OperatorDeserializationHandlerTest {
         JsonNode node = mapper.readTree(json);
 
         // when
-        Operand result = handler.deserialize(node, mapper);
+        Operand result = deserializer.deserialize(node, mapper);
 
         // then
         assertThat(result).isInstanceOfSatisfying(Operator.class, o -> {

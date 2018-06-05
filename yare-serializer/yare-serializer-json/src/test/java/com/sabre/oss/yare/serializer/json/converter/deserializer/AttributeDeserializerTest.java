@@ -26,6 +26,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.Attribute;
 import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,7 @@ class AttributeDeserializerTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
+        mapper = RuleToJsonConverter.getObjectMapper();
         deserializer = new AttributeDeserializer();
     }
 
