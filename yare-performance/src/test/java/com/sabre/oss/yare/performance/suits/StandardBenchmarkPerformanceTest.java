@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;

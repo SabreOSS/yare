@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.engine;
+package com.sabre.oss.yare.invoker.java;
 
 import com.google.common.base.Defaults;
 import com.sabre.oss.yare.core.call.ProcessingContext;
@@ -50,6 +50,7 @@ abstract class MethodCallMetadataFactory {
     @SuppressWarnings("unchecked")
     static <T> MethodCallMetadata method(T instance, CatchingInvocation<T> invocation) {
         Class<?> targetType = instance.getClass();
+        MethodCallMetadataValidator.validate(targetType);
         Class<?> proxyClass = proxies.computeIfAbsent(targetType, aClass -> {
             ProxyFactory proxy = new ProxyFactory();
             proxy.setSuperclass(targetType);
@@ -60,6 +61,7 @@ abstract class MethodCallMetadataFactory {
             AtomicReference<Method> calledMethod = new AtomicReference<>();
             Proxy proxy = (Proxy) proxyClass.<Proxy>newInstance();
             proxy.setHandler((self, method, proceed, args) -> {
+                MethodCallMetadataValidator.validate(method);
                 calledMethod.set(method);
                 return Defaults.defaultValue(method.getReturnType());
             });
@@ -67,7 +69,7 @@ abstract class MethodCallMetadataFactory {
             if (Objects.nonNull(calledMethod.get())) {
                 return MethodCallMetadata.method(instance, calledMethod.get());
             }
-            throw new IllegalStateException("No method call on instance could be caught!");
+            throw new IllegalArgumentException("No method call on instance could be caught!");
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

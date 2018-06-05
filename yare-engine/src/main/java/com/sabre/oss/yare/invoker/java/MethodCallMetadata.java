@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.engine;
+package com.sabre.oss.yare.invoker.java;
 
 import com.sabre.oss.yare.core.call.CallMetadata;
 import com.sabre.oss.yare.core.call.InvocationFactory;

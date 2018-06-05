@@ -35,10 +35,10 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
-import static com.sabre.oss.yare.engine.MethodCallMetadata.method;
+import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HotelMatchingTest {
+public class HotelMatchingTest {
 
     @Test
     void shouldMatchPreferredHotelBasedOnPropertyOrChainCode() {
