@@ -49,7 +49,7 @@ class AttributeSerializationTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = RuleToJsonConverter.getObjectMapper();
+        objectMapper = RuleToJsonConverter.createObjectMapper();
     }
 
     @ParameterizedTest

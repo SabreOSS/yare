@@ -70,7 +70,7 @@ We can do it using:
 ```java
 Rule rule = RuleDsl.ruleBuilder()
                 .name("Should match flight with first class of service")
-                .fact("flightFact", Flight.class)
+                .fact("flightFact", com.sabre.oss.yare.example.fact.Flight.class)
                 .predicate(
                         equal(
                                 value("${flightFact.classOfService}"),
@@ -87,10 +87,10 @@ Rule rule = RuleDsl.ruleBuilder()
 ```xml
 <Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
     <Attribute name="ruleName" value="Should match flight with first class of service" type="String"/>
-    <Fact name="flightFact" type="com.sabre.oss.yare.example.Flight"/>
+    <Fact name="flightFact" type="com.sabre.oss.yare.example.fact.Flight"/>
     <Predicate>
         <Operator type="equal">
-            <Value>${flight.classOfService}</Value>
+            <Value>${flightFact.classOfService}</Value>
             <Value>First Class</Value>
         </Operator>
     </Predicate>
@@ -99,7 +99,7 @@ Rule rule = RuleDsl.ruleBuilder()
             <Value>${ctx}</Value>
         </Parameter>
         <Parameter name="fact">
-            <Value>${flightFact"</Value>
+            <Value>${flightFact}"</Value>
         </Parameter>
     </Action>
 </Rule>
@@ -115,7 +115,7 @@ Rule rule = RuleDsl.ruleBuilder()
   } ],
   "facts" : [ {
     "name" : "flightFact",
-    "type" : "com.sabre.oss.yare.example.FlightMatchingTest.Flight"
+    "type" : "com.sabre.oss.yare.example.fact.Flight"
   } ],
   "predicate" : {
     "equal" : [ {

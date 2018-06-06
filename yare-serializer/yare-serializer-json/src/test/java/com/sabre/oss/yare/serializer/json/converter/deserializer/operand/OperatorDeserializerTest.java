@@ -46,7 +46,7 @@ class OperatorDeserializerTest {
 
     @BeforeEach
     void setUp() {
-        mapper = RuleToJsonConverter.getObjectMapper();
+        mapper = RuleToJsonConverter.createObjectMapper();
         deserializer = new OperatorDeserializer();
     }
 
