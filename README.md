@@ -39,7 +39,7 @@ Beyond the advantages of business rules engines YARE makes its own contribution 
 * YARE allows for sequential evaluation, which is useful when it comes to modifying facts during execution.
 * YARE allows for function evaluation in condition segment of rule.
 * YARE is using three-valued logic (true/false/null).
-* YARE provides a rule converter for XML.
+* YARE provides rule converters for XML and JSON.
 
 ## Getting Started
 
@@ -65,7 +65,8 @@ dependencies {
 
 First step towards evaluation using the rule engine is to define a rule.
 
-We can do it either using Java DSL:
+We can do it using:
+* Java DSL
 ```java
 Rule rule = RuleDsl.ruleBuilder()
                 .name("Should match flight with first class of service")
@@ -73,7 +74,7 @@ Rule rule = RuleDsl.ruleBuilder()
                 .predicate(
                         equal(
                                 value("${flightFact.classOfService}"),
-                                value(classOfService)
+                                value("First Class")
                         )
                 )
                 .action("collect",
@@ -82,7 +83,7 @@ Rule rule = RuleDsl.ruleBuilder()
                 .build();
 ```
 
-or using XML:
+* XML
 ```xml
 <Rule xmlns="http://www.sabre.com/schema/oss/yare/rules/v1">
     <Attribute name="ruleName" value="Should match flight with first class of service" type="String"/>
@@ -102,6 +103,38 @@ or using XML:
         </Parameter>
     </Action>
 </Rule>
+```
+
+* JSON
+```json
+{
+  "attributes" : [ {
+    "name" : "ruleName",
+    "value" : "Should match flight with first class of service",
+    "type" : "String"
+  } ],
+  "facts" : [ {
+    "name" : "flightFact",
+    "type" : "com.sabre.oss.yare.example.FlightMatchingTest.Flight"
+  } ],
+  "predicate" : {
+    "equal" : [ {
+      "value" : "${flightFact.classOfService}"
+    }, {
+      "value" : "First Class"
+    } ]
+  },
+  "actions" : [ {
+    "name" : "collect",
+    "parameters" : [ {
+      "name" : "context",
+      "value" : "${ctx}"
+    }, {
+      "name" : "fact",
+      "value" : "${flightFact}"
+    } ]
+  } ]
+}
 ```
 
 As you can see we operate on `Flight` fact so let's define it too.
