@@ -47,7 +47,7 @@ class ParameterSerializationTest {
 
     @BeforeEach
     void setUp() {
-        this.objectMapper = RuleToJsonConverter.getObjectMapper();
+        this.objectMapper = RuleToJsonConverter.createObjectMapper();
     }
 
     @ParameterizedTest

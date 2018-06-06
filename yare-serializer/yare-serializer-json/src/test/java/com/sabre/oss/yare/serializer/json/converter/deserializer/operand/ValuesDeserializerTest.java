@@ -44,7 +44,7 @@ class ValuesDeserializerTest {
 
     @BeforeEach
     void setUp() {
-        mapper = RuleToJsonConverter.getObjectMapper();
+        mapper = RuleToJsonConverter.createObjectMapper();
         deserializer = new ValuesDeserializer();
     }
 

@@ -48,7 +48,7 @@ class ParameterDeserializerTest {
 
     @BeforeEach
     void setUp() {
-        mapper = RuleToJsonConverter.getObjectMapper();
+        mapper = RuleToJsonConverter.createObjectMapper();
         deserializer = new ParameterDeserializer();
     }
 

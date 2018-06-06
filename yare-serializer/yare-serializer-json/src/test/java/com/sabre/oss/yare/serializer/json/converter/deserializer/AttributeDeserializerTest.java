@@ -45,7 +45,7 @@ class AttributeDeserializerTest {
 
     @BeforeEach
     void setUp() {
-        mapper = RuleToJsonConverter.getObjectMapper();
+        mapper = RuleToJsonConverter.createObjectMapper();
         deserializer = new AttributeDeserializer();
     }
 

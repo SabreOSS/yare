@@ -48,14 +48,14 @@ public class RuleToJsonConverter implements RuleConverter {
     private final ObjectMapper objectMapper;
 
     public RuleToJsonConverter() {
-        this.objectMapper = getObjectMapper();
+        this.objectMapper = createObjectMapper();
     }
 
     public RuleToJsonConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public static ObjectMapper getObjectMapper() {
+    public static ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
