@@ -28,6 +28,7 @@ import com.google.common.io.Resources;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.example.fact.Flight;
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.xml.RuleToXmlConverter;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +48,20 @@ class DifferentRuleFormatsTest {
 
         // when
         Rule deserialized = RuleToXmlConverter.getInstance().unmarshal(xmlRule);
+
+        // then
+        assertThat(deserialized).isEqualTo(rule);
+    }
+
+    @Test
+    void shouldMatchRuleWithJsonFormat() throws IOException {
+        // given
+        Rule rule = createExampleRule();
+        String jsonRule = getResourceFileContent("rules/validRule.json");
+        String jsonRuleWithoutComment = jsonRule.substring(jsonRule.indexOf('{'));
+
+        // when
+        Rule deserialized = new RuleToJsonConverter().unmarshal(jsonRuleWithoutComment);
 
         // then
         assertThat(deserialized).isEqualTo(rule);
