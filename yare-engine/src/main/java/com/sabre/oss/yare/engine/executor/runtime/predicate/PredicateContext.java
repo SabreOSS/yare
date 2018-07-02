@@ -37,6 +37,7 @@ public class PredicateContext implements ProcessingContext {
     private final Map<String, Object> facts;
     private final Map<String, Object> attributes;
 
+    // Do not pass merged maps due to performance implications.
     public PredicateContext(String ruleId, Object result, Map<String, Object> facts, Map<String, Object> attributes) {
         this.ruleId = ruleId;
         this.result = result;
