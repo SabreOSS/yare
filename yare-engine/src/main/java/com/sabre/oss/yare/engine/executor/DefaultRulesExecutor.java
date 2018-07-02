@@ -130,7 +130,7 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
 
     private void evaluateSequentially(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
         for (RuntimeRules.ExecutableRule executableRule : runtimeRules.getExecutableRules()) {
-            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, mergeReferenceMaps(factMap, executableRule.getAttributes()));
+            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes());
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
             if (Boolean.TRUE.equals(evaluationResult)) {
                 executableRule.getConsequence().proceed(context);
@@ -141,7 +141,7 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     private void evaluate(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
         List<Pair<Invocation<ProcessingContext, Void>, PredicateContext>> consequences = new LinkedList<>();
         for (RuntimeRules.ExecutableRule executableRule : runtimeRules.getExecutableRules()) {
-            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, mergeReferenceMaps(factMap, executableRule.getAttributes()));
+            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes());
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
             if (Boolean.TRUE.equals(evaluationResult)) {
                 consequences.add(Pair.of(executableRule.getConsequence(), context));
@@ -151,13 +151,6 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
         for (Pair<Invocation<ProcessingContext, Void>, PredicateContext> consequence : consequences) {
             consequence.getKey().proceed(consequence.getValue());
         }
-    }
-
-    private Map<String, Object> mergeReferenceMaps(Map<String, Object> factMap, Map<String, Object> attributeMap) {
-        Map<String, Object> referencesMap = new HashMap<>();
-        referencesMap.putAll(factMap);
-        referencesMap.putAll(attributeMap);
-        return referencesMap;
     }
 
     private LoadingCache<String, RuntimeRules> buildCachingContext(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder) {

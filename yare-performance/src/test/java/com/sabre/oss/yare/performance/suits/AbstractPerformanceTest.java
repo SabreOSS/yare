@@ -88,7 +88,6 @@ public abstract class AbstractPerformanceTest {
                 .result("benchmarks/performance-results.csv")
                 .resultFormat(ResultFormatType.CSV)
                 .jvmArgs("-server", "-Xms2048M", "-Xmx2048M", "-XX:+UseG1GC")
-
                 .build();
         new Runner(opt).run();
     }
