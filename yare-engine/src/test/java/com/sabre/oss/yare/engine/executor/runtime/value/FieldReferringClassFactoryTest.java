@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FieldReferringClassFactoryTest {
@@ -39,7 +40,7 @@ class FieldReferringClassFactoryTest {
         ValueProvider valueProvider = FieldReferringClassFactory.create(TestClass.class, "testClass", "aString");
 
         // when
-        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("testClass", testClass)));
+        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("testClass", testClass), emptyMap()));
 
         // then
         assertThat(result).isEqualTo("justDoIt");
@@ -52,7 +53,7 @@ class FieldReferringClassFactoryTest {
         ValueProvider valueProvider = FieldReferringClassFactory.create(SimpleGetterClass.class, "simpleGetterClass", "flag");
 
         // when
-        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("simpleGetterClass", simpleGetterClass)));
+        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("simpleGetterClass", simpleGetterClass), emptyMap()));
 
         // then
         assertThat(result).isEqualTo(true);
@@ -66,7 +67,7 @@ class FieldReferringClassFactoryTest {
         ValueProvider valueProvider = FieldReferringClassFactory.create(BooleanFieldGetterClass.class, "booleanFieldGetterClass", "flag");
 
         // when
-        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("booleanFieldGetterClass", booleanFieldGetterClass)));
+        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("booleanFieldGetterClass", booleanFieldGetterClass), emptyMap()));
 
         // then
         assertThat(result).isEqualTo(true);
@@ -80,7 +81,7 @@ class FieldReferringClassFactoryTest {
         ValueProvider valueProvider = FieldReferringClassFactory.create(BothBooleanGettersClass.class, "bothBooleanGettersClass", "flag");
 
         // when
-        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("bothBooleanGettersClass", bothBooleanGettersClass)));
+        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("bothBooleanGettersClass", bothBooleanGettersClass), emptyMap()));
 
         // then
         assertThat(result).isEqualTo(true);
@@ -95,7 +96,7 @@ class FieldReferringClassFactoryTest {
         ValueProvider valueProvider = FieldReferringClassFactory.create(BooleanWrapperBothBooleanGettersClass.class, "booleanWrapperBothBooleanGettersClass", "flag");
 
         // when
-        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("booleanWrapperBothBooleanGettersClass", booleanWrapperBothBooleanGettersClass)));
+        Object result = valueProvider.get(new PredicateContext("any", new Object(), ImmutableMap.of("booleanWrapperBothBooleanGettersClass", booleanWrapperBothBooleanGettersClass), emptyMap()));
 
         // then
         assertThat(result).isEqualTo(true);
