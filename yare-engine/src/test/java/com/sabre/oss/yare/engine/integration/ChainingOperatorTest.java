@@ -46,6 +46,7 @@ import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 public class ChainingOperatorTest {
     private static final String ACTION_NAME = "testAction";
     private static final String IS_NULL = "isNull";
+    private static final String CONTAINS_EXACTLY = "containsExactly";
     private static final String FLATTEN_AND_CONTAINS = "flattenAndContains";
 
     private RulesEngine createRuleEngine(RulesExecutionConfig config) {
@@ -54,6 +55,7 @@ public class ChainingOperatorTest {
                 .withRulesRepository(i -> config.getRules())
                 .withActionMapping(ACTION_NAME, method(new TestAction(), a -> a.execute(null, null)))
                 .withFunctionMapping(IS_NULL, method(testFunction, f -> f.isNull(null)))
+                .withFunctionMapping(CONTAINS_EXACTLY, method(testFunction, f -> f.containsExactly(null, null)))
                 .withFunctionMapping(FLATTEN_AND_CONTAINS, method(testFunction, f -> f.flattenAndContains(null, null)))
                 .withRulesExecutorBuilder(new DefaultRulesExecutorBuilder()
                         .withSequentialMode(config.isSequenceMode()))
@@ -302,6 +304,35 @@ public class ChainingOperatorTest {
     }
 
     @Test
+    void shouldPassCollectedValuesToCustomFunction() {
+        // given
+        OuterChainingFact invalidFact = getInvalidFact();
+        InnerChainingFact innerChainingFact = new InnerChainingFact(Arrays.asList("test", "test"));
+        MidChainingFact midChainingFact = new MidChainingFact();
+        midChainingFact.put("instance", innerChainingFact);
+        OuterChainingFact validFact = new OuterChainingFact(Arrays.asList(midChainingFact, midChainingFact));
+        List<Object> facts = Arrays.asList(invalidFact, validFact);
+
+        List<Rule> rule = getRule(
+                "Should match when outerChainingFact.collection.instance.collection[*] contains exactly given elements",
+                equal(
+                        function(CONTAINS_EXACTLY, boolean.class,
+                                param("leftCollection", value("${outerChainingFact.collection.instance.collection[*]}")),
+                                param("rightCollection", values(String.class, value("test"), value("test"), value("test"), value("test")))),
+                        value(true)
+                )
+        );
+
+        RuleSession ruleSession = createRuleSession(rule);
+
+        // when
+        List<Object> matchingFacts = ruleSession.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(matchingFacts).containsExactly(validFact);
+    }
+
+    @Test
     void shouldCollectNullsWithoutGroupingOperator() {
         // given
         OuterChainingFact invalidFact = getInvalidFact();
@@ -437,6 +468,10 @@ public class ChainingOperatorTest {
             } else {
                 return collection.stream().flatMap(Collection::stream).allMatch(s -> s.equals(value));
             }
+        }
+
+        public boolean containsExactly(List<String> leftCollection, List<String> rightCollection) {
+            return leftCollection.containsAll(rightCollection);
         }
     }
 }

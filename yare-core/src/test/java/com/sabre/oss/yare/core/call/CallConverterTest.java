@@ -33,13 +33,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CallConverterTest {
@@ -97,12 +93,12 @@ class CallConverterTest {
                         Argument.valueOf("escapedPlaceholder", "\\${placeholder}")
                 ),
                 Arguments.of(
-                        ExpressionFactory.valueOf("listOfNumbers", asList(1L, 2L)),
-                        Argument.valueOf("listOfNumbers", new InternalParameterizedType(null, List.class, Long.class), asList(Long.parseLong("1"), Long.parseLong("2")))
+                        ExpressionFactory.valueOf("listOfNumbers", Arrays.asList(1L, 2L)),
+                        Argument.valueOf("listOfNumbers", new InternalParameterizedType(null, List.class, Long.class), Arrays.asList(Long.parseLong("1"), Long.parseLong("2")))
                 ),
                 Arguments.of(
-                        ExpressionFactory.valueOf("listOfStrings", asList("one", "two")),
-                        Argument.valueOf("listOfStrings", new InternalParameterizedType(null, List.class, String.class), asList("one", "two"))
+                        ExpressionFactory.valueOf("listOfStrings", Arrays.asList("one", "two")),
+                        Argument.valueOf("listOfStrings", new InternalParameterizedType(null, List.class, String.class), Arrays.asList("one", "two"))
                 ),
                 Arguments.of(
                         ExpressionFactory.valueOf("factFieldReference", "${ruleName}"),
@@ -121,12 +117,28 @@ class CallConverterTest {
                         Argument.referenceOf("factFieldReference", UserFact.class, String.class, "fact.field")
                 ),
                 Arguments.of(
-                        ExpressionFactory.valueOf("factFieldReference", "${attribute.field}"),
-                        Argument.referenceOf("factFieldReference", UserAttribute.class, Long.class, "attribute.field")
+                        ExpressionFactory.valueOf("factFieldReference", "${fact.nestedFact.field}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, String.class, "fact.nestedFact.field")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact.nestedFact.list}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, new InternalParameterizedType(null, ArrayList.class, String.class), "fact.nestedFact.list")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact.nestedFacts.field}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, List.class, "fact.nestedFacts.field")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("factFieldReference", "${fact.nestedFacts.list}"),
+                        Argument.referenceOf("factFieldReference", UserFact.class, List.class, "fact.nestedFacts.list")
+                ),
+                Arguments.of(
+                        ExpressionFactory.valueOf("attributeFieldReference", "${attribute.field}"),
+                        Argument.referenceOf("attributeFieldReference", UserAttribute.class, Long.class, "attribute.field")
                 ),
                 Arguments.of(
                         ExpressionFactory.valueOf("factFieldListReference", "${fact.list}"),
-                        Argument.referenceOf("factFieldListReference", UserFact.class, new InternalParameterizedType(null, List.class, String.class), "fact.list")
+                        Argument.referenceOf("factFieldListReference", UserFact.class, new InternalParameterizedType(null, ArrayList.class, String.class), "fact.list")
                 ),
                 Arguments.of(
                         ExpressionFactory.valueOf("nonExistingReference", "${nonExisting}"),
@@ -188,7 +200,9 @@ class CallConverterTest {
 
     private static class UserFact {
         public String field;
-        public List<String> list;
+        public ArrayList<String> list;
+        public UserFact nestedFact;
+        public List<UserFact> nestedFacts;
     }
 
     private static class UserAttribute {
