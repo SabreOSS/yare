@@ -315,12 +315,9 @@ public class ChainingOperatorTest {
 
         List<Rule> rule = getRule(
                 "Should match when outerChainingFact.collection.instance.collection[*] contains exactly given elements",
-                equal(
-                        function(CONTAINS_EXACTLY, boolean.class,
-                                param("leftCollection", value("${outerChainingFact.collection.instance.collection[*]}")),
-                                param("rightCollection", values(String.class, value("test"), value("test"), value("test"), value("test")))),
-                        value(true)
-                )
+                function(CONTAINS_EXACTLY, Boolean.class,
+                        param("leftCollection", value("${outerChainingFact.collection.instance.collection[*]}")),
+                        param("rightCollection", values(String.class, value("test"), value("test"), value("test"), value("test"))))
         );
 
         RuleSession ruleSession = createRuleSession(rule);
@@ -470,7 +467,7 @@ public class ChainingOperatorTest {
             }
         }
 
-        public boolean containsExactly(List<String> leftCollection, List<String> rightCollection) {
+        public Boolean containsExactly(List<String> leftCollection, List<String> rightCollection) {
             return leftCollection.containsAll(rightCollection);
         }
     }
