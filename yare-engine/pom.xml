@@ -30,7 +30,7 @@
     <parent>
         <groupId>com.sabre.oss.yare</groupId>
         <artifactId>yare</artifactId>
-        <version>0.4</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>yare-engine</artifactId>
