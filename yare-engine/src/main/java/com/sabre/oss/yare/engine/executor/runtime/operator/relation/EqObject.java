@@ -32,8 +32,6 @@ import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateFactoryCont
 import com.sabre.oss.yare.engine.executor.runtime.value.ValueProvider;
 import org.apache.commons.lang3.reflect.TypeUtils;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * {@link EqObject} is a three-valued logic EQUALS operator, that behaves like the below:
  * <pre>
@@ -54,12 +52,12 @@ public class EqObject extends BiArgsPredicate {
     }
 
     @Override
-    protected final boolean applicable(@NotNull Object left, @NotNull Object right) {
+    protected final boolean applicable(Object left, Object right) {
         return true;
     }
 
     @Override
-    protected final Boolean evaluate(@NotNull Object left, @NotNull Object right) {
+    protected final Boolean evaluate(Object left, Object right) {
         return left.equals(right);
     }
 
