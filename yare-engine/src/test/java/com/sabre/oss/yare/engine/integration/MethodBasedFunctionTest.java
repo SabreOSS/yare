@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.engine.integration;
 
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
@@ -32,21 +33,68 @@ import com.sabre.oss.yare.dsl.RuleDsl;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class MethodBasedFunctionTest {
     private static final String RULE_NAME = "NAME";
 
     @Test
+    void shouldAllowUnboxedBooleanFunctionDirectlyInPredicate() {
+        // given
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
+        Rule rule = RuleDsl.ruleBuilder()
+                .name(RULE_NAME)
+                .fact("factOne", FactOne.class)
+                .predicate(
+                        function("unboxedTrue", boolean.class)
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("ruleName", value(RULE_NAME)))
+                .build();
+        RuleSession ruleSession = createRuleSession(rule);
+
+        // when
+        List<Object> results = ruleSession.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(results).containsExactly(RULE_NAME);
+    }
+
+    @Test
+    void shouldAllowBoxedBooleanFunctionDirectlyInPredicate() {
+        // given
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
+        Rule rule = RuleDsl.ruleBuilder()
+                .name(RULE_NAME)
+                .fact("factOne", FactOne.class)
+                .predicate(
+                        function("boxedTrue", Boolean.class)
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("ruleName", value(RULE_NAME)))
+                .build();
+        RuleSession ruleSession = createRuleSession(rule);
+
+        // when
+        List<Object> results = ruleSession.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(results).containsExactly(RULE_NAME);
+    }
+
+    @Test
     void shouldMatchFunctionResultToConstant() {
         // given
-        List<Object> facts = singletonList(new FactOne("the_value"));
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
         Rule rule = RuleDsl.ruleBuilder()
                 .name(RULE_NAME)
                 .fact("factOne", FactOne.class)
@@ -73,7 +121,7 @@ public class MethodBasedFunctionTest {
     @Test
     void shouldMatchFunctionResultToConstantInMuchComplexRule() {
         // given
-        List<Object> facts = singletonList(new FactOne("the_value"));
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
         Rule rule = RuleDsl.ruleBuilder()
                 .name(RULE_NAME)
                 .fact("factOne", FactOne.class)
@@ -105,7 +153,7 @@ public class MethodBasedFunctionTest {
     @Test
     void shouldMatchTwoFunctionCallsToConstants() {
         // given
-        List<Object> facts = singletonList(new FactOne("the_value"));
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
         Rule rule = RuleDsl.ruleBuilder()
                 .name(RULE_NAME)
                 .fact("factOne", FactOne.class)
@@ -133,7 +181,7 @@ public class MethodBasedFunctionTest {
     @Test
     void shouldPassWhenFunctionFromConstantOnly() {
         // given
-        List<Object> facts = singletonList(new FactOne("the_value"));
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
         Rule rule = RuleDsl.ruleBuilder()
                 .name(RULE_NAME)
                 .fact("factOne", FactOne.class)
@@ -161,7 +209,7 @@ public class MethodBasedFunctionTest {
     @Test
     void shouldMatchFunctionWithVariableFromContext() {
         // given
-        List<Object> facts = singletonList(new FactOne("the_value"));
+        List<Object> facts = Collections.singletonList(new FactOne("the_value"));
         Rule rule = RuleDsl.ruleBuilder()
                 .name(RULE_NAME)
                 .fact("factOne", FactOne.class)
@@ -219,10 +267,34 @@ public class MethodBasedFunctionTest {
         assertThat(results).containsExactly(RULE_NAME);
     }
 
+    @Test
+    void shouldFailWhenUsingNonBooleanFunctionDirectlyInPredicate() {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name(RULE_NAME)
+                .fact("factOne", FactOne.class)
+                .predicate(
+                        function("upperCase",
+                                param("value", value("the_value")))
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("ruleName", value(RULE_NAME)))
+                .build();
+        RuleSession ruleSession = createRuleSession(rule);
+
+        // when / then
+        assertThatThrownBy(() -> ruleSession.execute(null, Collections.emptyList()))
+                .isExactlyInstanceOf(UncheckedExecutionException.class)
+                .hasMessage("java.lang.IllegalArgumentException: Only boolean functions can be translated directly to predicate");
+    }
+
     private RuleSession createRuleSession(Rule rule) {
         RulesEngine rulesEngine = new RulesEngineBuilder()
-                .withRulesRepository(i -> singletonList(rule))
+                .withRulesRepository(i -> Collections.singletonList(rule))
                 .withActionMapping("collect", method(new TestAction(), action -> action.collect(null, null)))
+                .withFunctionMapping("unboxedTrue", method(new TestFunctions(), TestFunctions::unboxedTrue))
+                .withFunctionMapping("boxedTrue", method(new TestFunctions(), TestFunctions::boxedTrue))
                 .withFunctionMapping("upperCase", method(new TestFunctions(), function -> function.upperCase(null)))
                 .withFunctionMapping("concat", method(TestFunctions.class, "concat", String.class, String.class))
                 .build();
@@ -255,6 +327,14 @@ public class MethodBasedFunctionTest {
     }
 
     public static class TestFunctions {
+        public boolean unboxedTrue() {
+            return true;
+        }
+
+        public Boolean boxedTrue() {
+            return Boolean.TRUE;
+        }
+
         public static String concat(String a, String b) {
             return a + b;
         }

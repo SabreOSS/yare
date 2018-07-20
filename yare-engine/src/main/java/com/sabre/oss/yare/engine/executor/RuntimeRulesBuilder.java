@@ -93,7 +93,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
             return predicateFactory.create(context, operator);
         }
         if (expression instanceof Expression.Function) {
-            if (!Boolean.class.equals(expression.getType())) {
+            if (isNotBoolean(expression.getType())) {
                 throw new IllegalArgumentException("Only boolean functions can be translated directly to predicate");
             }
             return createValueProvider(context, expression);
@@ -145,6 +145,10 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
         return consequenceFactory.createConsequence(rule, rule.getActions());
     }
 
+    private static boolean isNotBoolean(Type type) {
+        return !(Boolean.class.equals(type) || boolean.class.equals(type));
+    }
+
     private static class ValueProviderReferenceFactory implements ReferenceFactory<ValueProvider> {
 
         @Override
@@ -170,7 +174,7 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
 
         @Override
         public ValueProvider create(String name, Type baseReferenceType, Type referenceType, String reference) {
-            if (!referenceType.equals(Boolean.class) && !referenceType.equals(Boolean.TYPE)) {
+            if (isNotBoolean(referenceType)) {
                 throw new IllegalArgumentException("Only references of boolean type can be translated directly to predicate");
             }
             return super.create(name, baseReferenceType, referenceType, reference);
@@ -185,14 +189,14 @@ public class RuntimeRulesBuilder implements RuleComponentsFactoryFacade {
         }
     }
 
-    private class PredicateValueFactory implements ValueFactory<Predicate> {
+    private static class PredicateValueFactory implements ValueFactory<Predicate> {
 
         @Override
         public Predicate create(String name, Type type, Object value) {
             if (value == null) {
                 return ValueProviderFactory.constantNull();
             }
-            if (!(value instanceof Boolean)) {
+            if (isNotBoolean(type)) {
                 throw new IllegalArgumentException("Only boolean values can be translated directly to predicate");
             }
             return (Boolean) value ? new True() : new False();

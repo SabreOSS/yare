@@ -93,6 +93,33 @@ public class ValuePredicateTest {
     }
 
     @Test
+    void shouldFailWhenUsingNonBooleanValueDirectlyInPredicate() {
+        // given
+        Rule rule = RuleDsl.ruleBuilder()
+                .name("Rule with String value directly in predicate")
+                .fact("fact", NamedFact.class)
+                .predicate(
+                        value("test")
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("fact", value("${fact}"))
+                )
+                .build();
+
+        RulesEngine engine = new RulesEngineBuilder()
+                .withRulesRepository(uri -> Collections.singletonList(rule))
+                .withActionMapping("collect", method(this, a -> a.collect(null, null)))
+                .build();
+        RuleSession session = engine.createSession("uri");
+
+        // when / then
+        assertThatThrownBy(() -> session.execute(null, Collections.emptyList()))
+                .isExactlyInstanceOf(UncheckedExecutionException.class)
+                .hasMessage("java.lang.IllegalArgumentException: Only boolean values can be translated directly to predicate");
+    }
+
+    @Test
     void shouldFailWithValuePlaceholderNotResolvedToBoolean() {
         // given
         Rule rule = RuleDsl.ruleBuilder()
@@ -155,7 +182,7 @@ public class ValuePredicateTest {
         RuleSession session = engine.createSession("uri");
 
         // when
-        ArrayList<String> result = session.execute(new ArrayList<>(), facts);
+        List<String> result = session.execute(new ArrayList<>(), facts);
 
         // then
         assertThat(result).containsExactly(
