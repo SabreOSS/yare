@@ -25,10 +25,7 @@
 package com.sabre.oss.yare.core.reference;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,11 +35,16 @@ public class ChainedTypeExtractor {
     public Type findPathType(Type type, String path) {
         String[] pathParts = path.split("\\.", -1);
         Type currentType = type;
-        for (String pathPart : pathParts) {
+        Iterator<String> iterator = Arrays.asList(pathParts).iterator();
+        while (iterator.hasNext()) {
+            String pathPart = iterator.next();
             Type finalCurrentType = currentType;
             currentType = typeCache
                     .computeIfAbsent(currentType, k -> new ConcurrentHashMap<>())
                     .computeIfAbsent(pathPart, s -> computeTypeFromProperty(finalCurrentType, s));
+            if (iterator.hasNext() && isCollection(currentType)) {
+                return List.class;
+            }
         }
         return currentType;
     }
