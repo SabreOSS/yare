@@ -30,6 +30,7 @@ import com.sabre.oss.yare.serializer.json.model.Function;
 import com.sabre.oss.yare.serializer.json.model.Parameter;
 import com.sabre.oss.yare.serializer.json.model.Value;
 import com.sabre.oss.yare.serializer.json.model.Values;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -38,10 +39,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public abstract class ParameterDeserializerTestCase {
-    protected ObjectMapper mapper;
-    protected ParameterDeserializer deserializer;
+    private ObjectMapper mapper;
+    private ParameterDeserializer deserializer;
+
+    protected abstract ObjectMapper createObjectMapper();
 
     protected abstract String getTestResource(String fileName);
+
+    @BeforeEach
+    void setUp() {
+        mapper = createObjectMapper();
+        deserializer = new ParameterDeserializer();
+    }
 
     @Test
     void shouldResolveParameterWithValueExpression() throws IOException {

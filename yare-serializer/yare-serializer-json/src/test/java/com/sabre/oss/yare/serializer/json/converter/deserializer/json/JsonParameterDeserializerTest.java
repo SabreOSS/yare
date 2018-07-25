@@ -24,21 +24,19 @@
 
 package com.sabre.oss.yare.serializer.json.converter.deserializer.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
-import com.sabre.oss.yare.serializer.json.converter.deserializer.ParameterDeserializer;
 import com.sabre.oss.yare.serializer.json.converter.deserializer.ParameterDeserializerTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class JsonParameterDeserializerTest extends ParameterDeserializerTestCase {
     @Override
-    protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/converter/deserializer/parameter/%s.json", fileName));
+    protected ObjectMapper createObjectMapper() {
+        return RuleToJsonConverter.createObjectMapper();
     }
 
-    @BeforeEach
-    void setUp() {
-        mapper = RuleToJsonConverter.createObjectMapper();
-        deserializer = new ParameterDeserializer();
+    @Override
+    protected String getTestResource(String fileName) {
+        return ResourceUtils.getJsonResourceAsString(String.format("/json/converter/deserializer/parameter/%s.json", fileName));
     }
 }

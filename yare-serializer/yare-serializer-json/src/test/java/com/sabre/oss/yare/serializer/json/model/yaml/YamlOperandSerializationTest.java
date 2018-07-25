@@ -24,15 +24,15 @@
 
 package com.sabre.oss.yare.serializer.json.model.yaml;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
 import com.sabre.oss.yare.serializer.json.model.OperandSerializationTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class YamlOperandSerializationTest extends OperandSerializationTestCase {
-    @BeforeEach
-    void setUp() {
-        objectMapper = RuleToYamlConverter.createObjectMapper();
+    @Override
+    protected ObjectMapper createObjectMapper() {
+        return RuleToYamlConverter.createObjectMapper();
     }
 
     @Override

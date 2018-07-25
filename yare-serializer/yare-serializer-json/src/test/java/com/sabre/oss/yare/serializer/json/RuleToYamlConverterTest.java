@@ -24,17 +24,17 @@
 
 package com.sabre.oss.yare.serializer.json;
 
+import com.sabre.oss.yare.model.converter.RuleConverter;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class RuleToYamlConverterTest extends RuleConverterTestCase {
     @Override
-    protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/%s.yml", fileName));
+    protected RuleConverter createRuleConverter() {
+        return new RuleToYamlConverter();
     }
 
-    @BeforeEach
-    void setUp() {
-        converter = new RuleToYamlConverter();
+    @Override
+    protected String getTestResource(String fileName) {
+        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/%s.yml", fileName));
     }
 }

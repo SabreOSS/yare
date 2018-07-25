@@ -24,21 +24,19 @@
 
 package com.sabre.oss.yare.serializer.json.converter.deserializer.operand.yaml;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
-import com.sabre.oss.yare.serializer.json.converter.deserializer.operand.ValuesDeserializer;
 import com.sabre.oss.yare.serializer.json.converter.deserializer.operand.ValuesDeserializerTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class YamlValuesDeserializerTest extends ValuesDeserializerTestCase {
     @Override
-    protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/converter/deserializer/handler/values/%s.yml", fileName));
+    protected ObjectMapper createObjectMapper() {
+        return RuleToYamlConverter.createObjectMapper();
     }
 
-    @BeforeEach
-    void setUp() {
-        mapper = RuleToYamlConverter.createObjectMapper();
-        deserializer = new ValuesDeserializer();
+    @Override
+    protected String getTestResource(String fileName) {
+        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/converter/deserializer/handler/values/%s.yml", fileName));
     }
 }

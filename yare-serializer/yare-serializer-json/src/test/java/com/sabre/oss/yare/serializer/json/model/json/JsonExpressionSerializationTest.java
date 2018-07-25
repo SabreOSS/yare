@@ -24,19 +24,19 @@
 
 package com.sabre.oss.yare.serializer.json.model.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.ExpressionSerializationTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class JsonExpressionSerializationTest extends ExpressionSerializationTestCase {
     @Override
-    protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/model/expression/%s.json", fileName));
+    protected ObjectMapper createObjectMapper() {
+        return RuleToJsonConverter.createObjectMapper();
     }
 
-    @BeforeEach
-    void setUp() {
-        objectMapper = RuleToJsonConverter.createObjectMapper();
+    @Override
+    protected String getTestResource(String fileName) {
+        return ResourceUtils.getJsonResourceAsString(String.format("/json/model/expression/%s.json", fileName));
     }
 }

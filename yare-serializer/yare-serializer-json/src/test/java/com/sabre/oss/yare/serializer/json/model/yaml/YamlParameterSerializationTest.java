@@ -24,19 +24,19 @@
 
 package com.sabre.oss.yare.serializer.json.model.yaml;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
 import com.sabre.oss.yare.serializer.json.model.ParameterSerializationTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class YamlParameterSerializationTest extends ParameterSerializationTestCase {
     @Override
-    protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/model/parameter/%s.yml", fileName));
+    protected ObjectMapper createObjectMapper() {
+        return RuleToYamlConverter.createObjectMapper();
     }
 
-    @BeforeEach
-    void setUp() {
-        objectMapper = RuleToYamlConverter.createObjectMapper();
+    @Override
+    protected String getTestResource(String fileName) {
+        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/model/parameter/%s.yml", fileName));
     }
 }

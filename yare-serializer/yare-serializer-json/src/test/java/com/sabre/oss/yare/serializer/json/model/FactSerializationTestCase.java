@@ -26,6 +26,7 @@ package com.sabre.oss.yare.serializer.json.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -33,9 +34,16 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class FactSerializationTestCase {
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
+
+    protected abstract ObjectMapper createObjectMapper();
 
     protected abstract String getTestResource(String fileName);
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = createObjectMapper();
+    }
 
     @Test
     void shouldSerializeFact() throws JsonProcessingException {

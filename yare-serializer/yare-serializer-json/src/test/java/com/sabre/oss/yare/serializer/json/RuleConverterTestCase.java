@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
 import com.sabre.oss.yare.model.converter.RuleConverter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -36,9 +37,16 @@ import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class RuleConverterTestCase {
-    protected RuleConverter converter;
+    private RuleConverter converter;
+
+    protected abstract RuleConverter createRuleConverter();
 
     protected abstract String getTestResource(String fileName);
+
+    @BeforeEach
+    void setUp() {
+        converter = createRuleConverter();
+    }
 
     @Test
     void shouldSerializeRule() {

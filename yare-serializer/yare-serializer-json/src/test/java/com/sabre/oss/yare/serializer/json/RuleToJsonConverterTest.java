@@ -24,17 +24,17 @@
 
 package com.sabre.oss.yare.serializer.json;
 
+import com.sabre.oss.yare.model.converter.RuleConverter;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
-import org.junit.jupiter.api.BeforeEach;
 
 class RuleToJsonConverterTest extends RuleConverterTestCase {
     @Override
-    protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+    protected RuleConverter createRuleConverter() {
+        return new RuleToJsonConverter();
     }
 
-    @BeforeEach
-    void setUp() {
-        converter = new RuleToJsonConverter();
+    @Override
+    protected String getTestResource(String fileName) {
+        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
     }
 }

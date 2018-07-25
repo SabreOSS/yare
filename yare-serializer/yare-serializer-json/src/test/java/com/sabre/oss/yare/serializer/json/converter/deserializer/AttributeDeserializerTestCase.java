@@ -27,6 +27,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.model.Attribute;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -35,10 +36,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public abstract class AttributeDeserializerTestCase {
-    protected ObjectMapper mapper;
-    protected AttributeDeserializer deserializer;
+    private ObjectMapper mapper;
+    private AttributeDeserializer deserializer;
+
+    protected abstract ObjectMapper createObjectMapper();
 
     protected abstract String getTestResource(String fileName);
+
+    @BeforeEach
+    void setUp() {
+        mapper = createObjectMapper();
+        deserializer = new AttributeDeserializer();
+    }
 
     @Test
     void shouldResolveAttribute() throws IOException {
