@@ -22,19 +22,21 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.yaml;
 
-import com.sabre.oss.yare.model.converter.RuleConverter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
+import com.sabre.oss.yare.serializer.json.converter.deserializer.AttributeDeserializerTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
 
-class RuleToJsonConverterTest extends RuleConverterTestCase {
+class YamlAttributeDeserializerTest extends AttributeDeserializerTestCase {
     @Override
-    protected RuleConverter createRuleConverter() {
-        return new RuleToJsonConverter();
+    protected ObjectMapper createObjectMapper() {
+        return RuleToYamlConverter.createObjectMapper();
     }
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/converter/deserializer/attribute/%s.yml", fileName));
     }
 }

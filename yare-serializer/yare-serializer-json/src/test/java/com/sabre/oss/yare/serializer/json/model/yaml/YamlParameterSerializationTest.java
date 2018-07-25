@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright 2018 Sabre GLBL Inc.
+ * Copyright 2018 Sabre GLBL c.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,21 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json;
+package com.sabre.oss.yare.serializer.json.model.yaml;
 
-import com.sabre.oss.yare.model.converter.RuleConverter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
+import com.sabre.oss.yare.serializer.json.model.ParameterSerializationTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
 
-class RuleToJsonConverterTest extends RuleConverterTestCase {
+class YamlParameterSerializationTest extends ParameterSerializationTestCase {
     @Override
-    protected RuleConverter createRuleConverter() {
-        return new RuleToJsonConverter();
+    protected ObjectMapper createObjectMapper() {
+        return RuleToYamlConverter.createObjectMapper();
     }
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/model/parameter/%s.yml", fileName));
     }
 }
