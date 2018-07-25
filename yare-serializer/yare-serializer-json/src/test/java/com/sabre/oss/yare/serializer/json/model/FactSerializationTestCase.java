@@ -22,29 +22,48 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json;
+package com.sabre.oss.yare.serializer.json.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.junit.jupiter.api.Test;
 
-public class RuleToJsonConverter extends AbstractJacksonRuleConverter {
-    public RuleToJsonConverter() {
-        super(createObjectMapper());
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public abstract class FactSerializationTestCase {
+    protected ObjectMapper objectMapper;
+
+    protected abstract String getTestResource(String fileName);
+
+    @Test
+    void shouldSerializeFact() throws JsonProcessingException {
+        Fact fact = getFactModel();
+
+        String serialized = objectMapper.writeValueAsString(fact);
+
+        String expected = getSerializedFact();
+        assertThat(serialized).isEqualToIgnoringWhitespace(expected);
     }
 
-    public RuleToJsonConverter(ObjectMapper objectMapper) {
-        super(objectMapper);
+    @Test
+    void shouldDeserializeFact() throws IOException {
+        String json = getSerializedFact();
+
+        Fact fact = objectMapper.readValue(json, Fact.class);
+
+        Fact expected = getFactModel();
+        assertThat(fact).isEqualTo(expected);
     }
 
-    public static ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
-        return objectMapper;
+    private Fact getFactModel() {
+        return new Fact()
+                .withName("fact-name")
+                .withType("fact-type");
+    }
+
+    private String getSerializedFact() {
+        return getTestResource("fact");
     }
 }

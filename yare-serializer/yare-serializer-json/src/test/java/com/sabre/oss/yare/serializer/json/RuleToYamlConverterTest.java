@@ -27,14 +27,14 @@ package com.sabre.oss.yare.serializer.json;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 
-class RuleToJsonConverterTest extends RuleConverterTestCase {
+class RuleToYamlConverterTest extends RuleConverterTestCase {
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/%s.yml", fileName));
     }
 
     @BeforeEach
     void setUp() {
-        converter = new RuleToJsonConverter();
+        converter = new RuleToYamlConverter();
     }
 }

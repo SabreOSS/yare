@@ -28,18 +28,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 
-public class RuleToJsonConverter extends AbstractJacksonRuleConverter {
-    public RuleToJsonConverter() {
+public class RuleToYamlConverter extends AbstractJacksonRuleConverter {
+    public RuleToYamlConverter() {
         super(createObjectMapper());
     }
 
-    public RuleToJsonConverter(ObjectMapper objectMapper) {
+    public RuleToYamlConverter(ObjectMapper objectMapper) {
         super(objectMapper);
     }
 
     public static ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        YAMLFactory yamlFactory = new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+        ObjectMapper objectMapper = new ObjectMapper(yamlFactory);
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);

@@ -22,19 +22,23 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json;
+package com.sabre.oss.yare.serializer.json.converter.deserializer.operand.json;
 
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.converter.deserializer.operand.FunctionDeserializer;
+import com.sabre.oss.yare.serializer.json.converter.deserializer.operand.FunctionDeserializerTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 
-class RuleToJsonConverterTest extends RuleConverterTestCase {
+class JsonFunctionDeserializerTest extends FunctionDeserializerTestCase {
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+        return ResourceUtils.getJsonResourceAsString(String.format("/json/converter/deserializer/handler/function/%s.json", fileName));
     }
 
     @BeforeEach
     void setUp() {
-        converter = new RuleToJsonConverter();
+        mapper = RuleToJsonConverter.createObjectMapper();
+        deserializer = new FunctionDeserializer();
     }
 }

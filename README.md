@@ -39,7 +39,7 @@ Beyond the advantages of business rules engines YARE makes its own contribution 
 * YARE allows for sequential evaluation, which is useful when it comes to modifying facts during execution.
 * YARE allows for function evaluation in condition segment of rule.
 * YARE is using three-valued logic (true/false/null).
-* YARE provides rule converters for XML and JSON.
+* YARE provides rule converters for XML, JSON and YAML.
 
 ## Getting Started
 
@@ -135,6 +135,28 @@ Rule rule = RuleDsl.ruleBuilder()
     } ]
   } ]
 }
+```
+
+* YAML
+```yaml
+attributes:
+- name: "ruleName"
+  value: "Should match flight with first class of service"
+  type: "String"
+facts:
+- name: "flightFact"
+  type: "com.sabre.oss.yare.example.fact.Flight"
+predicate:
+  equal:
+  - value: "${flightFact.classOfService}"
+  - value: "First Class"
+actions:
+- name: "collect"
+  parameters:
+  - name: "context"
+    value: "${ctx}"
+  - name: "fact"
+    value: "${flightFact}"
 ```
 
 As you can see we operate on `Flight` fact so let's define it too.

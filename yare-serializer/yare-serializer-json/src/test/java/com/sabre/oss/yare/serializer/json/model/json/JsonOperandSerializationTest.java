@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright 2018 Sabre GLBL Inc.
+ * Copyright 2018 Sabre GLBL c.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,21 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer.json;
+package com.sabre.oss.yare.serializer.json.model.json;
 
+import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
+import com.sabre.oss.yare.serializer.json.model.OperandSerializationTestCase;
 import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 
-class RuleToJsonConverterTest extends RuleConverterTestCase {
+class JsonOperandSerializationTest extends OperandSerializationTestCase {
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+        return ResourceUtils.getJsonResourceAsString(String.format("/json/model/operand/%s.json", fileName));
     }
 
     @BeforeEach
     void setUp() {
-        converter = new RuleToJsonConverter();
+        objectMapper = RuleToJsonConverter.createObjectMapper();
     }
 }
