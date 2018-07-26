@@ -38,7 +38,7 @@ predicate:
   - equal:
     - function:
         name: "getAmountOfMoney"
-        returnType: "java.math.BigDecimal"
+        returnType: "BigDecimal"
         parameters:
         - name: "amount"
           value: "${hotel.roomRate}"
@@ -47,7 +47,7 @@ predicate:
         - name: "outputCurrency"
           value: "USD"
     - value: 100
-      type: "java.math.BigDecimal"
+      type: "BigDecimal"
 actions:
 - name: "collect"
   parameters:

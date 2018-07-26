@@ -100,7 +100,7 @@ class ToJsonConverterTest {
                                 .withType("Character"),
                         new Fact()
                                 .withName("fact-name-2")
-                                .withType(BigDecimal.class.getName())
+                                .withType("BigDecimal")
                 )
                 .withPredicate(
                         new Operator()
