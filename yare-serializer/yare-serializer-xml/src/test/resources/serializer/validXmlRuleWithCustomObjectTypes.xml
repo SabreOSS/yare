@@ -29,7 +29,7 @@
         <yare:Value type="String">ruleOperatingOnCustomObjectTypes</yare:Value>
     </yare:Attribute>
     <yare:Attribute name="customObject">
-        <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.Isbn">
+        <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.Isbn">
             <custom:Isbn>
                 <code>000000000001</code>
             </custom:Isbn>
@@ -43,14 +43,14 @@
         <yare:Or>
             <yare:Function name="functionTakingCustomObjectsAsArguments" returnType="Object">
                 <yare:Parameter name="object">
-                    <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.Isbn">
+                    <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.Isbn">
                         <custom:Isbn>
                             <code>000000000001</code>
                         </custom:Isbn>
                     </yare:CustomValue>
                 </yare:Parameter>
                 <yare:Parameter name="wrappedList">
-                    <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyList">
+                    <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyList">
                         <custom:MyList>
                             <Item>
                                 <code>000000000021</code>
@@ -62,7 +62,7 @@
                     </yare:CustomValue>
                 </yare:Parameter>
                 <yare:Parameter name="wrappedMap">
-                    <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyMap">
+                    <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyMap">
                         <custom:MyMap>
                             <map>
                                 <entry>
@@ -83,7 +83,7 @@
                 </yare:Parameter>
             </yare:Function>
             <yare:Operator type="contains">
-                <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyList">
+                <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyList">
                     <custom:MyList>
                         <Item>
                             <code>000000000021</code>
@@ -93,14 +93,14 @@
                         </Item>
                     </custom:MyList>
                 </yare:CustomValue>
-                <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.Isbn">
+                <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.Isbn">
                     <custom:Isbn>
                         <code>000000000001</code>
                     </custom:Isbn>
                 </yare:CustomValue>
             </yare:Operator>
             <yare:Operator type="anyOtherOperator">
-                <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyList">
+                <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyList">
                     <custom:MyList>
                         <Item>
                             <code>000000000021</code>
@@ -110,7 +110,7 @@
                         </Item>
                     </custom:MyList>
                 </yare:CustomValue>
-                <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyMap">
+                <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyMap">
                     <custom:MyMap>
                         <map>
                             <entry>
@@ -133,14 +133,14 @@
     </yare:Predicate>
     <yare:Action name="actionTakingCustomObjectsAsArguments">
         <yare:Parameter name="object">
-            <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.Isbn">
+            <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.Isbn">
                 <custom:Isbn>
                     <code>000000000001</code>
                 </custom:Isbn>
             </yare:CustomValue>
         </yare:Parameter>
         <yare:Parameter name="wrappedList">
-            <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyList">
+            <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyList">
                 <custom:MyList>
                     <Item>
                         <code>000000000021</code>
@@ -152,7 +152,7 @@
             </yare:CustomValue>
         </yare:Parameter>
         <yare:Parameter name="wrappedMap">
-            <yare:CustomValue type="com.sabre.oss.yare.serializer.ConverterTest.MyMap">
+            <yare:CustomValue type="com.sabre.oss.yare.serializer.xml.TestRuleFactory.MyMap">
                 <custom:MyMap>
                     <map>
                         <entry>

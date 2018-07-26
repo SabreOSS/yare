@@ -25,7 +25,7 @@
 @XmlSchema(namespace = "http://example.sabre.com/custom/schema", elementFormDefault = XmlNsForm.UNQUALIFIED, xmlns = {
         @XmlNs(namespaceURI = "http://example.sabre.com/custom/schema", prefix = "custom")
 })
-package com.sabre.oss.yare.serializer;
+package com.sabre.oss.yare.serializer.xml;
 
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlNsForm;
