@@ -44,7 +44,7 @@
     },
     {
       "name": "fact-2",
-      "type": "java.math.BigDecimal"
+      "type": "BigDecimal"
     }
   ],
   "predicate": {
@@ -139,7 +139,7 @@
         {
           "name": "param-1",
           "value": 100,
-          "type": "java.math.BigDecimal"
+          "type": "BigDecimal"
         },
         {
           "name": "param-2",

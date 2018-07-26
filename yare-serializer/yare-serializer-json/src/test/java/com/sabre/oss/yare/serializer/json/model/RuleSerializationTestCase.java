@@ -123,7 +123,7 @@ public abstract class RuleSerializationTestCase {
                                                 .withOperands(
                                                         new Function()
                                                                 .withName("getAmountOfMoney")
-                                                                .withReturnType(BigDecimal.class.getName())
+                                                                .withReturnType("BigDecimal")
                                                                 .withParameters(
                                                                         new Parameter()
                                                                                 .withName("amount")
@@ -139,7 +139,7 @@ public abstract class RuleSerializationTestCase {
                                                                 ),
                                                         new Value()
                                                                 .withValue(new BigDecimal(100))
-                                                                .withType(BigDecimal.class.getName())
+                                                                .withType("BigDecimal")
                                                 )
                                 )
                 )

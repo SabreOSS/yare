@@ -28,6 +28,7 @@ import org.assertj.core.data.MapEntry;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,7 @@ class TypeAliasesTest {
                         getEntryWithNameKey("float", float.class),
                         getEntryWithNameKey("void", void.class),
                         getEntryWithNameKey("ZonedDateTime", ZonedDateTime.class),
+                        getEntryWithNameKey("BigDecimal", BigDecimal.class),
                         getEntryWithNameKey("List", List.class),
                         getEntryWithNameKey("Map", Map.class),
                         getEntryWithNameKey("Set", Set.class));
@@ -96,6 +98,7 @@ class TypeAliasesTest {
                         getEntryWithTypeKey("float", float.class),
                         getEntryWithTypeKey("void", void.class),
                         getEntryWithTypeKey("ZonedDateTime", ZonedDateTime.class),
+                        getEntryWithTypeKey("BigDecimal", BigDecimal.class),
                         getEntryWithTypeKey("List", List.class),
                         getEntryWithTypeKey("Map", Map.class),
                         getEntryWithTypeKey("Set", Set.class));
