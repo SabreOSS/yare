@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer;
+package com.sabre.oss.yare.serializer.xml.fact;
 
 public class OtherFact {
     public Object otherField;

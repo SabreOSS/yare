@@ -22,14 +22,13 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer;
+package com.sabre.oss.yare.serializer.xml;
 
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.model.converter.RuleConversionException;
 import com.sabre.oss.yare.serializer.model.ObjectFactory;
 import com.sabre.oss.yare.serializer.model.RuleSer;
-import com.sabre.oss.yare.serializer.xml.RuleToXmlConverter;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.xml.ToXmlConverter;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +48,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
 
-import static com.sabre.oss.yare.serializer.ResourceUtils.getResourceAsString;
+import static com.sabre.oss.yare.serializer.xml.utils.ResourceUtils.getResourceAsString;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -66,13 +65,13 @@ class RuleToXmlConverterTest {
 
     @BeforeEach
     void setUp() {
-        converter = RuleToXmlConverter.getInstance(ConverterTest.Isbn.class, ConverterTest.MyList.class, ConverterTest.MyMap.class);
+        converter = RuleToXmlConverter.getInstance(TestRuleFactory.Isbn.class, TestRuleFactory.MyList.class, TestRuleFactory.MyMap.class);
     }
 
     @Test
     void shouldMarshallValidRuleWithBuildInObjectTypes() {
         // given
-        Rule ruleObject = toRuleConverter.map(ConverterTest.constructValidRuleWithBuildInObjectTypes());
+        Rule ruleObject = toRuleConverter.map(TestRuleFactory.constructValidRuleWithBuildInObjectTypes());
 
         // when
         String ruleAsString = converter.marshal(ruleObject);
@@ -84,7 +83,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldMarshallValidRuleWithCustomObjectTypes() {
         // given
-        Rule ruleObject = toRuleConverter.map(ConverterTest.constructValidRuleWithCustomObjectTypes());
+        Rule ruleObject = toRuleConverter.map(TestRuleFactory.constructValidRuleWithCustomObjectTypes());
 
         // when
         String ruleAsString = converter.marshal(ruleObject);
@@ -96,7 +95,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldUnmarshalValidRuleWithBuildInObjectTypes() {
         // given
-        Rule validRule = toRuleConverter.map(ConverterTest.constructValidRuleWithBuildInObjectTypes());
+        Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithBuildInObjectTypes());
 
         // when
         Rule ruleObject = converter.unmarshal(validXmlRuleWithBuildInObjectTypes);
@@ -109,7 +108,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldUnmarshalValidRuleWithCustomObjectTypes() {
         // given
-        Rule validRule = toRuleConverter.map(ConverterTest.constructValidRuleWithCustomObjectTypes());
+        Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithCustomObjectTypes());
 
         // when
         Rule ruleObject = converter.unmarshal(validXmlRuleWithCustomObjectTypes);
@@ -122,7 +121,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldProperlyMarshalAndUnmarshalValidRuleWithCustomObjectTypes() {
         // given
-        Rule validRule = toRuleConverter.map(ConverterTest.constructValidRuleWithCustomObjectTypes());
+        Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithCustomObjectTypes());
 
         // when
         Rule rule = converter.unmarshal(converter.marshal(validRule));
@@ -134,9 +133,9 @@ class RuleToXmlConverterTest {
     @Test
     void shouldCheckValidRuleAgainstSchema() throws Exception {
         // given
-        RuleSer ruleObject = ConverterTest.constructValidRuleWithBuildInObjectTypes();
+        RuleSer ruleObject = TestRuleFactory.constructValidRuleWithBuildInObjectTypes();
 
-        JAXBContext jc = JAXBContext.newInstance(RuleSer.class, ConverterTest.Isbn.class);
+        JAXBContext jc = JAXBContext.newInstance(RuleSer.class, TestRuleFactory.Isbn.class);
         JAXBSource source = new JAXBSource(jc, objectFactory.createRule(ruleObject));
         Validator validator = getSchema().newValidator();
         validator.setErrorHandler(new ThrowingErrorHandler());
@@ -148,7 +147,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldCheckInvalidRuleAgainstSchema() throws Exception {
         // given
-        Rule ruleObject = ConverterTest.constructInvalidRule();
+        Rule ruleObject = TestRuleFactory.constructInvalidRule();
 
         JAXBContext jc = JAXBContext.newInstance(Rule.class);
         JAXBSource source = new JAXBSource(jc, objectFactory.createRule(toXmlConverter.map(ruleObject)));
@@ -164,7 +163,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldMarshallRuleConsistentWithSchema() {
         // given
-        Rule ruleObject = toRuleConverter.map(ConverterTest.constructValidRuleWithCustomObjectTypes());
+        Rule ruleObject = toRuleConverter.map(TestRuleFactory.constructValidRuleWithCustomObjectTypes());
         // when
         String ruleAsString = converter.marshal(ruleObject);
         // then
@@ -174,7 +173,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldNotMarshallRuleInconsistentWithSchema() {
         // given
-        Rule ruleObject = ConverterTest.constructInvalidRule();
+        Rule ruleObject = TestRuleFactory.constructInvalidRule();
         // when
         assertThatThrownBy(() -> converter.marshal(ruleObject))
                 // then
@@ -184,7 +183,7 @@ class RuleToXmlConverterTest {
     @Test
     void shouldMarshalAndUnmarshalRule() {
         // given
-        Rule validRule = toRuleConverter.map(ConverterTest.constructValidRuleWithCustomObjectTypes());
+        Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithCustomObjectTypes());
         // when
         String data = converter.marshal(validRule);
         Rule rule = converter.unmarshal(data);
@@ -198,7 +197,7 @@ class RuleToXmlConverterTest {
         // when
         Rule ruleObject = converter.unmarshal(validXmlRuleWithBuildInObjectTypes);
         // then
-        assertThat(ruleObject).isEqualTo(toRuleConverter.map(ConverterTest.constructValidRuleWithBuildInObjectTypes()));
+        assertThat(ruleObject).isEqualTo(toRuleConverter.map(TestRuleFactory.constructValidRuleWithBuildInObjectTypes()));
     }
 
     @Test

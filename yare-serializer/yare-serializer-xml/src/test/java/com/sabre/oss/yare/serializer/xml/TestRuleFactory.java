@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.serializer;
+package com.sabre.oss.yare.serializer.xml;
 
 import com.google.common.collect.ImmutableMap;
 import com.sabre.oss.yare.core.model.Rule;
@@ -39,15 +39,18 @@ import static java.time.ZonedDateTime.of;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 import static java.util.Arrays.asList;
 
-abstract class ConverterTest {
+final class TestRuleFactory {
+    private TestRuleFactory() {
+    }
+
     static Rule constructInvalidRule() {
         return new Rule(Collections.emptySet(), Collections.emptyList(), null, Collections.emptyList());
     }
 
     static RuleSer constructValidRuleWithBuildInObjectTypes() {
         return new RuleSer()
-                .withFact(new FactSer().withName("fact").withType("com.sabre.oss.yare.serializer.SimpleFact"))
-                .withFact(new FactSer().withName("otherFact").withType("com.sabre.oss.yare.serializer.OtherFact"))
+                .withFact(new FactSer().withName("fact").withType("com.sabre.oss.yare.serializer.xml.fact.SimpleFact"))
+                .withFact(new FactSer().withName("otherFact").withType("com.sabre.oss.yare.serializer.xml.fact.OtherFact"))
                 .withAttribute(new AttributeSer()
                         .withName("ruleName")
                         .withValue(new ValueSer()

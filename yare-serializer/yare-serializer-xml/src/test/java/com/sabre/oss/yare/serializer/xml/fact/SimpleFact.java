@@ -20,36 +20,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.sabre.oss.yare.serializer;
+package com.sabre.oss.yare.serializer.xml.fact;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public final class ResourceUtils {
-    private ResourceUtils() {
-    }
-
-    public static InputStream getResourceAsStream(String resource) {
-        InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(resource);
-        if (resourceAsStream == null) {
-            throw new IllegalArgumentException(format("Cannot find %s", resource));
-        }
-        return resourceAsStream;
-    }
-
-    public static String getResourceAsString(String resource) {
-        try (InputStream is = getResourceAsStream(resource)) {
-            return IOUtils.toString(is, UTF_8);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(format("Cannot read %s", resource), e);
-        }
-    }
+public class SimpleFact {
+    public Boolean boolField;
+    public String stringField;
 }

@@ -41,8 +41,8 @@
     <yare:Attribute name="someVariable">
         <yare:Value type="Boolean">true</yare:Value>
     </yare:Attribute>
-    <yare:Fact name="fact" type="com.sabre.oss.yare.serializer.SimpleFact"/>
-    <yare:Fact name="otherFact" type="com.sabre.oss.yare.serializer.OtherFact"/>
+    <yare:Fact name="fact" type="com.sabre.oss.yare.serializer.xml.fact.SimpleFact"/>
+    <yare:Fact name="otherFact" type="com.sabre.oss.yare.serializer.xml.fact.OtherFact"/>
     <yare:Predicate>
         <yare:And>
             <yare:And>
