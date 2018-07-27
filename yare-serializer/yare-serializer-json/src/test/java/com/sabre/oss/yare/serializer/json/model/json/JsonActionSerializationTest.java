@@ -27,7 +27,7 @@ package com.sabre.oss.yare.serializer.json.model.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToJsonConverter;
 import com.sabre.oss.yare.serializer.json.model.ActionSerializationTestCase;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class JsonActionSerializationTest extends ActionSerializationTestCase {
     @Override
@@ -37,6 +37,6 @@ class JsonActionSerializationTest extends ActionSerializationTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/model/action/%s.json", fileName));
+        return JsonResourceUtils.getJsonResourceAsString(String.format("/json/model/action/%s.json", fileName));
     }
 }

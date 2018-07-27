@@ -27,7 +27,7 @@ package com.sabre.oss.yare.serializer.json.model.yaml;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
 import com.sabre.oss.yare.serializer.json.model.ExpressionSerializationTestCase;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class YamlExpressionSerializationTest extends ExpressionSerializationTestCase {
     @Override
@@ -37,6 +37,6 @@ class YamlExpressionSerializationTest extends ExpressionSerializationTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/model/expression/%s.yml", fileName));
+        return JsonResourceUtils.getYamlResourceAsString(String.format("/yaml/model/expression/%s.yml", fileName));
     }
 }

@@ -27,7 +27,7 @@ package com.sabre.oss.yare.serializer.json.converter.deserializer.yaml;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabre.oss.yare.serializer.json.RuleToYamlConverter;
 import com.sabre.oss.yare.serializer.json.converter.deserializer.AttributeDeserializerTestCase;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class YamlAttributeDeserializerTest extends AttributeDeserializerTestCase {
     @Override
@@ -37,6 +37,6 @@ class YamlAttributeDeserializerTest extends AttributeDeserializerTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/converter/deserializer/attribute/%s.yml", fileName));
+        return JsonResourceUtils.getYamlResourceAsString(String.format("/yaml/converter/deserializer/attribute/%s.yml", fileName));
     }
 }

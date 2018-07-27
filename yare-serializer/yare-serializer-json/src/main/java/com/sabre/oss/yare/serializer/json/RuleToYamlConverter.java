@@ -41,7 +41,8 @@ public class RuleToYamlConverter extends AbstractJacksonRuleConverter {
     }
 
     public static ObjectMapper createObjectMapper() {
-        YAMLFactory yamlFactory = new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+        YAMLFactory yamlFactory = new YAMLFactory();
+        yamlFactory.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
         ObjectMapper objectMapper = new ObjectMapper(yamlFactory);
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

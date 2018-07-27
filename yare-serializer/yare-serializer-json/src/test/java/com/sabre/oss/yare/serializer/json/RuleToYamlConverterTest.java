@@ -25,7 +25,7 @@
 package com.sabre.oss.yare.serializer.json;
 
 import com.sabre.oss.yare.model.converter.RuleConverter;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class RuleToYamlConverterTest extends RuleConverterTestCase {
     @Override
@@ -35,6 +35,6 @@ class RuleToYamlConverterTest extends RuleConverterTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getYamlResourceAsString(String.format("/yaml/%s.yml", fileName));
+        return JsonResourceUtils.getYamlResourceAsString(String.format("/yaml/%s.yml", fileName));
     }
 }

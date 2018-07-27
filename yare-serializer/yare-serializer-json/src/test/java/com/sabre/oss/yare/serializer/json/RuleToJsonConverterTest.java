@@ -25,7 +25,7 @@
 package com.sabre.oss.yare.serializer.json;
 
 import com.sabre.oss.yare.model.converter.RuleConverter;
-import com.sabre.oss.yare.serializer.json.utils.ResourceUtils;
+import com.sabre.oss.yare.serializer.json.utils.JsonResourceUtils;
 
 class RuleToJsonConverterTest extends RuleConverterTestCase {
     @Override
@@ -35,6 +35,6 @@ class RuleToJsonConverterTest extends RuleConverterTestCase {
 
     @Override
     protected String getTestResource(String fileName) {
-        return ResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
+        return JsonResourceUtils.getJsonResourceAsString(String.format("/json/%s.json", fileName));
     }
 }
