@@ -84,6 +84,7 @@ class JsonSchemaTest {
                 Arguments.of("ruleWithValueOperand.json"),
                 Arguments.of("ruleWithValuesOperand.json"),
                 Arguments.of("ruleWithFunctionOperand.json"),
+                Arguments.of("ruleWithFunctionOperandWithDefaultReturnType.json"),
 
                 Arguments.of("ruleWithValueParameter.json"),
                 Arguments.of("ruleWithValuesParameter.json"),
@@ -142,7 +143,14 @@ class JsonSchemaTest {
                 Arguments.of("ruleWithInvalidPredicateOperand.json", "#/predicate/equal: expected type: JSONArray, found: JSONObject"),
                 Arguments.of("ruleWithInvalidPredicateOperand.json", "#/predicate: #: 0 subschemas matched instead of one"),
 
-                Arguments.of("ruleWithMissingPredicateSection.json", "#: required key [predicate] not found")
+                Arguments.of("ruleWithMissingPredicateSection.json", "#: required key [predicate] not found"),
+
+                Arguments.of("ruleWithInvalidValueOperatorType.json", "#/predicate: extraneous key [value] is not permitted"),
+                Arguments.of("ruleWithInvalidValueOperatorType.json", "#/predicate: #: 0 subschemas matched instead of one"),
+                Arguments.of("ruleWithInvalidValuesOperatorType.json", "#/predicate: extraneous key [values] is not permitted"),
+                Arguments.of("ruleWithInvalidValuesOperatorType.json", "#/predicate: #: 0 subschemas matched instead of one"),
+                Arguments.of("ruleWithInvalidFunctionOperatorType.json", "#/predicate: extraneous key [function] is not permitted"),
+                Arguments.of("ruleWithInvalidFunctionOperatorType.json", "#/predicate: #: 0 subschemas matched instead of one")
         );
     }
 }

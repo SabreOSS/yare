@@ -138,8 +138,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/parameter"
-          },
-          "uniqueItems": true
+          }
         }
       },
       "required": [
@@ -221,9 +220,7 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/expression"
-          },
-          "minItems": 1,
-          "uniqueItems": true
+          }
         },
         "type": {
           "type": "string"
@@ -245,19 +242,18 @@
               "type": "string"
             },
             "returnType": {
-              "type": "string"
+              "type": "string",
+              "default": "java.lang.Object"
             },
             "parameters": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/parameter"
-              },
-              "uniqueItems": true
+              }
             }
           },
           "required": [
             "name",
-            "returnType",
             "parameters"
           ],
           "additionalProperties": false
@@ -271,13 +267,11 @@
       "description": "Rule predicate operator",
       "type": "object",
       "patternProperties": {
-        "^(?!value\\s|values\\s|function\\s).*$": {
+        "^(?!value$|values$|function$).*": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/operand"
-          },
-          "minItems": 1,
-          "uniqueItems": true
+          }
         }
       },
       "additionalProperties": false
