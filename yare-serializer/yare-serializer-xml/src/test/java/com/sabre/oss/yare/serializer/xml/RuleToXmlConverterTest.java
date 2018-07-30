@@ -216,7 +216,7 @@ class RuleToXmlConverterTest {
 
     private Schema getSchema() throws SAXException {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        return sf.newSchema(new StreamSource(getResourceAsStream("/schema/yare-rules.xsd")));
+        return sf.newSchema(new StreamSource(getResourceAsStream("/schema/v1.0/yare-rules.xsd")));
     }
 
     private InputStream getResourceAsStream(String resource) {
