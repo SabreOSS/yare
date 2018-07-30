@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JsonSchemaValidator implements SchemaValidator {
-    private static final String SCHEMA_RESOURCE_FILE = "/schema/v0.1/yare-rules.json";
+    private static final String SCHEMA_RESOURCE_FILE = "/schema/v1.0/yare-rules.json";
     private static final JSONObject schema = new JSONObject(JsonResourceUtils.getJsonResourceAsString(SCHEMA_RESOURCE_FILE));
 
     @Override
