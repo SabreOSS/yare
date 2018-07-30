@@ -173,8 +173,8 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <extension>true</extension>
-                                    <bindingFile>${basedir}/src/main/resources/schema/yare-rules.xjb</bindingFile>
-                                    <xsd>${basedir}/src/main/resources/schema/yare-rules.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schema/v1.0/yare-rules.xjb</bindingFile>
+                                    <xsd>${basedir}/src/main/resources/schema/v1.0/yare-rules.xsd</xsd>
                                     <extensionArgs>
                                         <extensionArg>-Xnamespace-prefix</extensionArg>
                                         <extensionArg>-Xfluent-api</extensionArg>

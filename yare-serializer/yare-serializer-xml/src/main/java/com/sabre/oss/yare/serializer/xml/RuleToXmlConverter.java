@@ -91,7 +91,7 @@ public final class RuleToXmlConverter implements RuleConverter {
     private static Schema loadSchemaDefinition() {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
-            return schemaFactory.newSchema(Resources.getResource("schema/yare-rules.xsd"));
+            return schemaFactory.newSchema(Resources.getResource("schema/v1.0/yare-rules.xsd"));
         } catch (SAXException e) {
             throw new RuleConversionException("Rule Schema cannot be initialized", e);
         }

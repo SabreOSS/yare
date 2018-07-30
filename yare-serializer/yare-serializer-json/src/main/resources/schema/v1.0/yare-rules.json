@@ -23,13 +23,13 @@
  */
 
 {
-  "title": "YARE Rules model 0.1",
+  "title": "YARE Rules model 1.0",
   "description": "JSON Schema for YARE rule",
   "cmm": {
-    "projectName": "SabreOSS/yare 0.1",
+    "projectName": "SabreOSS/yare 1.0",
     "modelUnits": [
       {
-        "modelName": "YARE Rules model 0.1"
+        "modelName": "YARE Rules model 1.0"
       }
     ]
   },
