@@ -73,7 +73,7 @@ class JsonSchemaTest {
         // then
         assertThat(results).isNotNull();
         assertThat(results.getResults()).contains(
-                SchemaValidationError.ofViolation(expectedViolation)
+                SchemaValidationError.of(expectedViolation)
         );
     }
 

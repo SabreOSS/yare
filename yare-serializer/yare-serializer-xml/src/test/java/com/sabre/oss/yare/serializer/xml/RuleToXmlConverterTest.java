@@ -29,6 +29,7 @@ import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.model.converter.RuleConversionException;
 import com.sabre.oss.yare.serializer.model.ObjectFactory;
 import com.sabre.oss.yare.serializer.model.RuleSer;
+import com.sabre.oss.yare.serializer.validator.SchemaValidationException;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.xml.ToXmlConverter;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,6 @@ import org.xml.sax.SAXParseException;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.MarshalException;
-import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -201,17 +201,23 @@ class RuleToXmlConverterTest {
     }
 
     @Test
-    void shouldNotUnmarshalRuleInconsistentWithSchema() {
+    void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchema() {
         // given
         String invalidXmlRule = "" +
                 "<yare:Rule xmlns:yare=\"http://www.sabre.com/schema/oss/yare/rules/v1\">\n" +
                 "    <yare:unexpectedElement/>\n" +
                 "</yare:Rule>";
 
-        // when
+        // when / then
         assertThatThrownBy(() -> converter.unmarshal(invalidXmlRule))
-                // then
-                .isInstanceOf(RuleConversionException.class).hasCauseExactlyInstanceOf(UnmarshalException.class);
+                .isInstanceOf(SchemaValidationException.class)
+                .hasMessage("Given XML rule does not satisfy schema. Errors:\n" +
+                        "Line: 2. Column: 30. " +
+                        "Error: cvc-complex-type.2.4.a: Invalid content was found starting with element '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":unexpectedElement}'. " +
+                        "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Attribute, " +
+                        "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, " +
+                        "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' " +
+                        "is expected.");
     }
 
     private Schema getSchema() throws SAXException {

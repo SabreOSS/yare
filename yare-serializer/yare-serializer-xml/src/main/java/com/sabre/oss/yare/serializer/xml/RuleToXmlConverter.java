@@ -33,8 +33,11 @@ import com.sabre.oss.yare.model.converter.RuleConversionException;
 import com.sabre.oss.yare.model.converter.RuleConverter;
 import com.sabre.oss.yare.serializer.model.ObjectFactory;
 import com.sabre.oss.yare.serializer.model.RuleSer;
+import com.sabre.oss.yare.serializer.validator.SchemaValidationException;
+import com.sabre.oss.yare.serializer.validator.SchemaValidationResults;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.xml.ToXmlConverter;
+import com.sabre.oss.yare.serializer.xml.validator.XsdValidator;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.*;
@@ -63,6 +66,7 @@ public final class RuleToXmlConverter implements RuleConverter {
     private final TypeConverter defaultTypeConverter = DefaultTypeConverters.getDefaultTypeConverter();
     private final ToXmlConverter toXmlConverter = new ToXmlConverter(defaultTypeConverter);
     private final ToRuleConverter toRuleConverter = new ToRuleConverter(defaultTypeConverter);
+    private final XsdValidator validator = new XsdValidator();
     private final JAXBContext jaxbContext;
 
     private RuleToXmlConverter(Class<?>... extraClasses) {
@@ -121,12 +125,12 @@ public final class RuleToXmlConverter implements RuleConverter {
      */
     @Override
     public Rule unmarshal(String value) throws RuleConversionException {
+        validateAgainstSchema(value);
         try {
             Unmarshaller unmarshaller = createUnmarshaller();
             XMLInputFactory xmlInputFactory = getXmlInputFactory();
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(new StringReader(value));
             RuleSer ruleSer = ((JAXBElement<RuleSer>) unmarshaller.unmarshal(xmlStreamReader)).getValue();
-
             return toRuleConverter.map(ruleSer);
         } catch (Exception e) {
             throw new RuleConversionException(String.format("Rule cannot be converted to Object:\n%s", value), e);
@@ -142,6 +146,13 @@ public final class RuleToXmlConverter implements RuleConverter {
             return marshaller;
         } catch (Exception e) {
             throw new RuleConversionException("Rule marshaller cannot be initialized", e);
+        }
+    }
+
+    private void validateAgainstSchema(String value) {
+        SchemaValidationResults results = validator.validate(value);
+        if (results.hasErrors()) {
+            throw new SchemaValidationException("Given XML rule does not satisfy schema", results.getResults());
         }
     }
 

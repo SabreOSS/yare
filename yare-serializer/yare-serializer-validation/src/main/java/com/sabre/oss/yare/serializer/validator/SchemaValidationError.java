@@ -27,18 +27,38 @@ package com.sabre.oss.yare.serializer.validator;
 import java.util.Objects;
 
 public final class SchemaValidationError {
-    private final String violation;
+    public static final int UNKNOWN = -1;
 
-    private SchemaValidationError(String violation) {
-        this.violation = violation;
+    private final int line;
+    private final int column;
+    private final String reason;
+
+    private SchemaValidationError(int line, int column, String reason) {
+        this.line = line;
+        this.column = column;
+        this.reason = reason;
     }
 
-    public static SchemaValidationError ofViolation(String violation) {
-        return new SchemaValidationError(violation);
+    public static SchemaValidationError of(int line, int column, String reason) {
+        int lineValue = line > 0 ? line : UNKNOWN;
+        int columnValue = column > 0 ? column : UNKNOWN;
+        return new SchemaValidationError(lineValue, columnValue, reason);
     }
 
-    public String getViolation() {
-        return violation;
+    public static SchemaValidationError of(String reason) {
+        return new SchemaValidationError(UNKNOWN, UNKNOWN, reason);
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public String getReason() {
+        return reason;
     }
 
     @Override
@@ -50,16 +70,13 @@ public final class SchemaValidationError {
             return false;
         }
         SchemaValidationError that = (SchemaValidationError) o;
-        return Objects.equals(violation, that.violation);
+        return line == that.line &&
+                column == that.column &&
+                Objects.equals(reason, that.reason);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(violation);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("SchemaValidationError{violation='%s'}", violation);
+        return Objects.hash(line, column, reason);
     }
 }

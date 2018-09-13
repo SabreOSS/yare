@@ -66,7 +66,7 @@ class JsonSchemaValidatorTest {
         assertThat(results).isNotNull();
         assertThat(results.hasErrors()).isTrue();
         assertThat(results.getResults()).containsExactly(
-                SchemaValidationError.ofViolation("#: required key [actions] not found")
+                SchemaValidationError.of("#: required key [actions] not found")
         );
     }
 
@@ -82,10 +82,10 @@ class JsonSchemaValidatorTest {
         assertThat(results).isNotNull();
         assertThat(results.hasErrors()).isTrue();
         assertThat(results.getResults()).containsExactlyInAnyOrder(
-                SchemaValidationError.ofViolation("#: required key [attributes] not found"),
-                SchemaValidationError.ofViolation("#: required key [actions] not found"),
-                SchemaValidationError.ofViolation("#: extraneous key [unknown] is not permitted"),
-                SchemaValidationError.ofViolation("#/facts/0: required key [name] not found")
+                SchemaValidationError.of("#: required key [attributes] not found"),
+                SchemaValidationError.of("#: required key [actions] not found"),
+                SchemaValidationError.of("#: extraneous key [unknown] is not permitted"),
+                SchemaValidationError.of("#/facts/0: required key [name] not found")
         );
     }
 
@@ -100,7 +100,7 @@ class JsonSchemaValidatorTest {
         // then
         assertThat(results).isNotNull();
         assertThat(results.getResults()).containsExactly(
-                SchemaValidationError.ofViolation("Could not validate JSON. Exception JSONException has been thrown with message: " +
+                SchemaValidationError.of("Could not validate JSON. Exception JSONException has been thrown with message: " +
                         "A JSONObject text must begin with '{' at 1 [character 2 line 1]")
         );
     }
