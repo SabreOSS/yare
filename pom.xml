@@ -421,6 +421,9 @@
                             <include>**/*.xml</include>
                             <include>**/*.properties</include>
                         </includes>
+                        <excludes>
+                            <exclude>.mvn/wrapper/MavenWrapperDownloader.java</exclude>
+                        </excludes>
                         <mapping>
                             <java>SLASHSTAR_STYLE</java>
                             <properties>SCRIPT_STYLE</properties>

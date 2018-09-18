@@ -29,7 +29,7 @@ source ".travis/release.properties"
 function perform_regular_build() {
     echo "Performing regular build..."
 
-    mvn clean verify
+    ./mvnw clean verify
 }
 
 function perform_release_build() {
@@ -37,7 +37,7 @@ function perform_release_build() {
 
     setup
 
-    mvn release:clean release:prepare release:perform \
+    ./mvnw release:clean release:prepare release:perform \
             --errors \
             --batch-mode \
             --settings .travis/release.settings.xml \
