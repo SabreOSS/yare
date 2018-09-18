@@ -23,6 +23,8 @@
 
 language: java
 sudo: false
+before_install:
+- chmod +x mvnw
 script: chmod +x ./.travis/build.sh && ./.travis/build.sh
 
 jdk:
