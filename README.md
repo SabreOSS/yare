@@ -213,4 +213,6 @@ See [CONTRIBUTING](CONTRIBUTING.md) document for more details.
 
 Copyright 2018 Sabre GLBL Inc.
 
-Code is under the [MIT license](LICENSE).
+Output artifacts are under the [MIT license](LICENSE).
+
+Apache License Version 2.0 is utilized for project's tooling only (Maven Wrapper) and is not a part of output artifacts.
