@@ -34,6 +34,8 @@ import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.xml.ToXmlConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -201,7 +203,29 @@ class RuleToXmlConverterTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchema() {
+    @EnabledOnJre(JRE.JAVA_8)
+    void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchemaOnJdk8() {
+        // given
+        String invalidXmlRule = "" +
+                "<yare:Rule xmlns:yare=\"http://www.sabre.com/schema/oss/yare/rules/v1\">\n" +
+                "    <yare:unexpectedElement/>\n" +
+                "</yare:Rule>";
+
+        // when / then
+        assertThatThrownBy(() -> converter.unmarshal(invalidXmlRule))
+                .isInstanceOf(SchemaValidationException.class)
+                .hasMessage("Given XML rule does not satisfy schema. Errors:\n" +
+                        "Line: 2. Column: 30. " +
+                        "Error: cvc-complex-type.2.4.a: Invalid content was found starting with element 'yare:unexpectedElement'. " +
+                        "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Attribute, " +
+                        "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, " +
+                        "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' " +
+                        "is expected.");
+    }
+
+    @Test
+    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10})
+    void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchemaOnJdk9And10() {
         // given
         String invalidXmlRule = "" +
                 "<yare:Rule xmlns:yare=\"http://www.sabre.com/schema/oss/yare/rules/v1\">\n" +

@@ -28,7 +28,10 @@ import com.sabre.oss.yare.serializer.validator.SchemaValidationError;
 import com.sabre.oss.yare.serializer.validator.SchemaValidationResults;
 import com.sabre.oss.yare.serializer.xml.utils.ResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,53 +56,6 @@ class XsdValidatorTest {
     }
 
     @Test
-    void shouldReturnErrorResultsForInvalidXmlRuleWithSingleViolation() {
-        // given
-        String xml = ResourceUtils.getResourceAsString("/validator/invalidRuleWithOneViolation.xml");
-
-        // when
-        SchemaValidationResults result = validator.validate(xml);
-
-        // then
-        assertThat(result.hasErrors()).isTrue();
-        assertThat(result.getResults()).containsExactly(
-                SchemaValidationError.of(
-                        31,
-                        36,
-                        "cvc-complex-type.2.4.a: Invalid content was found starting with element '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Action}'. " +
-                                "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, \"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' is expected."
-                )
-        );
-    }
-
-    @Test
-    void shouldReturnErrorResultsForInvalidXmlRuleWithMultipleViolations() {
-        // given
-        String xml = ResourceUtils.getResourceAsString("/validator/invalidRuleWithMultipleViolations.xml");
-
-        // when
-        SchemaValidationResults result = validator.validate(xml);
-
-        // then
-        assertThat(result.hasErrors()).isTrue();
-        assertThat(result.getResults()).containsExactly(
-                SchemaValidationError.of(
-                        27,
-                        40,
-                        "cvc-complex-type.2.4.a: Invalid content was found starting with element '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":unknown}'. " +
-                                "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Attribute, " +
-                                "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, " +
-                                "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' is expected."
-                ),
-                SchemaValidationError.of(
-                        30,
-                        31,
-                        "cvc-complex-type.4: Attribute 'name' must appear on element 'yare:Fact'."
-                )
-        );
-    }
-
-    @Test
     void shouldReturnErrorResultsForParsingError() {
         // given
         String invalidXml = "!@#$";
@@ -109,8 +65,110 @@ class XsdValidatorTest {
 
         // then
         assertThat(result.hasErrors()).isTrue();
-        assertThat(result.getResults()).containsExactly(
+        assertThat(result.getResults()).containsExactlyInAnyOrder(
                 SchemaValidationError.of(1, 1, "Content is not allowed in prolog.")
         );
+    }
+
+    @Nested
+    @EnabledOnJre(JRE.JAVA_8)
+    class ValidationMessagesOnJdk8Test {
+        @Test
+        void shouldReturnErrorResultsForInvalidXmlRuleWithSingleViolation() {
+            // given
+            String xml = ResourceUtils.getResourceAsString("/validator/invalidRuleWithOneViolation.xml");
+
+            // when
+            SchemaValidationResults result = validator.validate(xml);
+
+            // then
+            assertThat(result.hasErrors()).isTrue();
+            assertThat(result.getResults()).containsExactly(
+                    SchemaValidationError.of(
+                            31,
+                            36,
+                            "cvc-complex-type.2.4.a: Invalid content was found starting with element 'yare:Action'. " +
+                                    "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, \"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' is expected."
+                    )
+            );
+        }
+
+        @Test
+        void shouldReturnErrorResultsForInvalidXmlRuleWithMultipleViolations() {
+            // given
+            String xml = ResourceUtils.getResourceAsString("/validator/invalidRuleWithMultipleViolations.xml");
+
+            // when
+            SchemaValidationResults result = validator.validate(xml);
+
+            // then
+            assertThat(result.hasErrors()).isTrue();
+            assertThat(result.getResults()).containsExactly(
+                    SchemaValidationError.of(
+                            27,
+                            40,
+                            "cvc-complex-type.2.4.a: Invalid content was found starting with element 'yare:unknown'. " +
+                                    "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Attribute, " +
+                                    "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, " +
+                                    "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' is expected."
+                    ),
+                    SchemaValidationError.of(
+                            30,
+                            31,
+                            "cvc-complex-type.4: Attribute 'name' must appear on element 'yare:Fact'."
+                    )
+            );
+        }
+    }
+
+    @Nested
+    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10})
+    class ValidationMessagesOnJdk9And10Test {
+        @Test
+        void shouldReturnErrorResultsForInvalidXmlRuleWithSingleViolation() {
+            // given
+            String xml = ResourceUtils.getResourceAsString("/validator/invalidRuleWithOneViolation.xml");
+
+            // when
+            SchemaValidationResults result = validator.validate(xml);
+
+            // then
+            assertThat(result.hasErrors()).isTrue();
+            assertThat(result.getResults()).containsExactly(
+                    SchemaValidationError.of(
+                            31,
+                            36,
+                            "cvc-complex-type.2.4.a: Invalid content was found starting with element '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Action}'. " +
+                                    "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, \"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' is expected."
+                    )
+            );
+        }
+
+        @Test
+        void shouldReturnErrorResultsForInvalidXmlRuleWithMultipleViolations() {
+            // given
+            String xml = ResourceUtils.getResourceAsString("/validator/invalidRuleWithMultipleViolations.xml");
+
+            // when
+            SchemaValidationResults result = validator.validate(xml);
+
+            // then
+            assertThat(result.hasErrors()).isTrue();
+            assertThat(result.getResults()).containsExactly(
+                    SchemaValidationError.of(
+                            27,
+                            40,
+                            "cvc-complex-type.2.4.a: Invalid content was found starting with element '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":unknown}'. " +
+                                    "One of '{\"http://www.sabre.com/schema/oss/yare/rules/v1\":Attribute, " +
+                                    "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Fact, " +
+                                    "\"http://www.sabre.com/schema/oss/yare/rules/v1\":Predicate}' is expected."
+                    ),
+                    SchemaValidationError.of(
+                            30,
+                            31,
+                            "cvc-complex-type.4: Attribute 'name' must appear on element 'yare:Fact'."
+                    )
+            );
+        }
     }
 }
