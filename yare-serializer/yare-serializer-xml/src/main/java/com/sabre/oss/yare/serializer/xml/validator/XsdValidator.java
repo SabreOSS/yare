@@ -50,12 +50,11 @@ public class XsdValidator implements SchemaValidator {
 
     @Override
     public SchemaValidationResults validate(String rule) {
-        ValidationHandler errorHandler = new ValidationHandler();
-        Set<SchemaValidationError> validationErrors = errorHandler.validationErrors;
+        Set<SchemaValidationError> validationErrors = new LinkedHashSet<>();
         try {
             Source source = new StreamSource(new StringReader(rule));
             Validator validator = schema.newValidator();
-            validator.setErrorHandler(errorHandler);
+            validator.setErrorHandler(new ValidationHandler(validationErrors));
             validator.validate(source);
         } catch (SAXParseException e) {
             validationErrors.add(saxParseExceptionToSchemaValidationError(e));
@@ -80,8 +79,12 @@ public class XsdValidator implements SchemaValidator {
         return SchemaValidationError.of(exception.getLineNumber(), exception.getColumnNumber(), exception.getMessage());
     }
 
-    private static class ValidationHandler implements ErrorHandler {
-        private final Set<SchemaValidationError> validationErrors = new LinkedHashSet<>();
+    private static final class ValidationHandler implements ErrorHandler {
+        private final Set<SchemaValidationError> validationErrors;
+
+        private ValidationHandler(Set<SchemaValidationError> validationErrors) {
+            this.validationErrors = validationErrors;
+        }
 
         @Override
         public void warning(SAXParseException exception) {

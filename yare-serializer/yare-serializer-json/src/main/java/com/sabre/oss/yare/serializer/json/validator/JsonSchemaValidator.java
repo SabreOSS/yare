@@ -54,7 +54,8 @@ public class JsonSchemaValidator implements SchemaValidator {
 
     private SchemaValidationResults mapAsSchemaValidationResults(ValidationException e) {
         Set<SchemaValidationError> results = e.getCausingExceptions().stream()
-                .map(c -> SchemaValidationError.of(c.getMessage()))
+                .map(ValidationException::getMessage)
+                .map(SchemaValidationError::of)
                 .collect(Collectors.toSet());
         return results.isEmpty()
                 ? SchemaValidationResults.ofError(SchemaValidationError.of(e.getMessage()))
