@@ -24,33 +24,32 @@
 
 package com.sabre.oss.yare.serializer.validator;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public final class SchemaValidationResults {
-    private static final SchemaValidationResults okResult = new SchemaValidationResults(Collections.emptyList());
+    private static final SchemaValidationResults okResult = new SchemaValidationResults(Collections.emptySet());
 
-    private final List<SchemaValidationError> results;
+    private final Set<SchemaValidationError> results;
 
-    private SchemaValidationResults(List<SchemaValidationError> results) {
-        this.results = Collections.unmodifiableList(new ArrayList<>(results));
+    private SchemaValidationResults(Set<SchemaValidationError> results) {
+        this.results = Collections.unmodifiableSet(results);
     }
 
     public static SchemaValidationResults success() {
         return okResult;
     }
 
-    public static SchemaValidationResults ofErrors(List<SchemaValidationError> results) {
+    public static SchemaValidationResults ofErrors(Set<SchemaValidationError> results) {
         return new SchemaValidationResults(results);
     }
 
     public static SchemaValidationResults ofError(SchemaValidationError result) {
-        return new SchemaValidationResults(Collections.singletonList(result));
+        return new SchemaValidationResults(Collections.singleton(result));
     }
 
-    public List<SchemaValidationError> getResults() {
+    public Set<SchemaValidationError> getResults() {
         return results;
     }
 
@@ -73,10 +72,5 @@ public final class SchemaValidationResults {
     @Override
     public int hashCode() {
         return Objects.hash(results);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("SchemaValidationResults{results=%s}", results);
     }
 }

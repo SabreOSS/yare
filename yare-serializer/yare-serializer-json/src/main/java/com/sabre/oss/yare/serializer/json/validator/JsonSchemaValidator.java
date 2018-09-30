@@ -32,7 +32,7 @@ import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JsonSchemaValidator implements SchemaValidator {
@@ -53,17 +53,18 @@ public class JsonSchemaValidator implements SchemaValidator {
     }
 
     private SchemaValidationResults mapAsSchemaValidationResults(ValidationException e) {
-        List<SchemaValidationError> results = e.getCausingExceptions().stream()
-                .map(c -> SchemaValidationError.ofViolation(c.getMessage()))
-                .collect(Collectors.toList());
+        Set<SchemaValidationError> results = e.getCausingExceptions().stream()
+                .map(ValidationException::getMessage)
+                .map(SchemaValidationError::of)
+                .collect(Collectors.toSet());
         return results.isEmpty()
-                ? SchemaValidationResults.ofError(SchemaValidationError.ofViolation(e.getMessage()))
+                ? SchemaValidationResults.ofError(SchemaValidationError.of(e.getMessage()))
                 : SchemaValidationResults.ofErrors(results);
     }
 
     private SchemaValidationResults mapAsSchemaValidationResults(Exception e) {
         String violationMessage = String.format("Could not validate JSON. Exception %s has been thrown with message: %s",
                 e.getClass().getSimpleName(), e.getMessage());
-        return SchemaValidationResults.ofError(SchemaValidationError.ofViolation(violationMessage));
+        return SchemaValidationResults.ofError(SchemaValidationError.of(violationMessage));
     }
 }
