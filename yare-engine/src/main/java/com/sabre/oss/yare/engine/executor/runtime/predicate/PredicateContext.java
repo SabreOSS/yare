@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.engine.executor.runtime.predicate;
 
+import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.call.ProcessingContext;
 
 import java.util.Map;
@@ -36,13 +37,15 @@ public class PredicateContext implements ProcessingContext {
     private final Object result;
     private final Map<String, Object> facts;
     private final Map<String, Object> attributes;
+    private final EngineController engineController;
 
     // Do not pass merged maps due to performance implications.
-    public PredicateContext(String ruleId, Object result, Map<String, Object> facts, Map<String, Object> attributes) {
+    public PredicateContext(String ruleId, Object result, Map<String, Object> facts, Map<String, Object> attributes, EngineController engineController) {
         this.ruleId = ruleId;
         this.result = result;
         this.facts = facts;
         this.attributes = attributes;
+        this.engineController = engineController;
     }
 
     @Override
@@ -63,6 +66,10 @@ public class PredicateContext implements ProcessingContext {
         if ("ruleName".equals(identifier)) {
             return ruleId;
         }
+        if ("engineController".equals(identifier)) {
+            return engineController;
+        }
+
         return attributes.getOrDefault(identifier, facts.get(identifier));
     }
 
@@ -73,6 +80,6 @@ public class PredicateContext implements ProcessingContext {
     }
 
     public PredicateContext copy(String ruleId) {
-        return new PredicateContext(ruleId, result, facts, attributes);
+        return new PredicateContext(ruleId, result, facts, attributes, engineController);
     }
 }

@@ -25,6 +25,7 @@
 package com.sabre.oss.yare.model.validator;
 
 import com.google.common.collect.Streams;
+import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.core.model.Fact;
@@ -41,6 +42,7 @@ import java.util.stream.Stream;
 
 public class ReferenceValidator extends BaseValidator {
     private static final String CONTEXT = "ctx";
+    private static final String ENGINE_CONTROLLER = "engineController";
 
     private final ChainedTypeExtractor chainedTypeExtractor;
 
@@ -68,14 +70,15 @@ public class ReferenceValidator extends BaseValidator {
         for (Attribute attribute : rule.getAttributes()) {
             localReferences.put(attribute.getName(), attribute.getType());
         }
-        localReferences.put("ctx", Object.class);
+        localReferences.put(CONTEXT, Object.class);
+        localReferences.put(ENGINE_CONTROLLER, EngineController.class);
         return localReferences;
     }
 
     private void checkNamesValidity(Rule rule, ValidationResults results) {
         List<String> names = resolveNames(rule);
         checkNamesAreNotDuplicated(names, results);
-        checkReservedNamesAreNotUsed(names, results);
+        checkReservedNamesAreNotUsed(names, results, CONTEXT, ENGINE_CONTROLLER);
     }
 
     private void checkReferencesInPredicate(Rule rule, ValidationResults results, Map<String, Type> localReferences) {
@@ -115,10 +118,12 @@ public class ReferenceValidator extends BaseValidator {
         }
     }
 
-    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
-        if (names.contains(CONTEXT)) {
-            append(results, ValidationResult.error("rule.ref.reserved-names",
-                    String.format("Naming Error: Reserved names are used -> [%s]", CONTEXT)));
+    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results, String... reservedNames) {
+        for (String reservedName : reservedNames) {
+            if (names.contains(reservedName)) {
+                append(results, ValidationResult.error("rule.ref.reserved-names",
+                        String.format("Naming Error: Reserved names are used -> [%s]", reservedName)));
+            }
         }
     }
 

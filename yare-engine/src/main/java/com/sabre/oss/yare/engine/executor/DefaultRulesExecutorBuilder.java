@@ -24,10 +24,7 @@
 
 package com.sabre.oss.yare.engine.executor;
 
-import com.sabre.oss.yare.core.ErrorHandler;
-import com.sabre.oss.yare.core.RulesExecutor;
-import com.sabre.oss.yare.core.RulesExecutorBuilder;
-import com.sabre.oss.yare.core.RulesRepository;
+import com.sabre.oss.yare.core.*;
 import com.sabre.oss.yare.core.call.CallMetadata;
 import com.sabre.oss.yare.core.call.ConsequenceFactory;
 import com.sabre.oss.yare.core.call.FunctionFactory;
@@ -48,6 +45,7 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
     private Map<String, CallMetadata> functionMappings = new HashMap<>();
     private RulesRepository rulesRepository;
     private ErrorHandler errorHandler;
+    private EngineController engineController;
     private CallInvocationResultCache invocationCache;
 
     /**
@@ -89,6 +87,15 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
     @Override
     public DefaultRulesExecutorBuilder withErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RulesExecutorBuilder withEngineController(EngineController engineController) {
+        this.engineController = engineController;
         return this;
     }
 
@@ -203,6 +210,6 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
         ConsequenceFactory consequenceFactory = new ConsequenceFactory(actionInvocationFactory, errorHandler);
         RuntimeRulesBuilder runtimeRulesBuilder = new RuntimeRulesBuilder(new DefaultPredicateFactory(), functionFactory, consequenceFactory);
 
-        return new DefaultRulesExecutor(rulesRepository, runtimeRulesBuilder, configuration);
+        return new DefaultRulesExecutor(rulesRepository, runtimeRulesBuilder, configuration, engineController);
     }
 }

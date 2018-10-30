@@ -673,7 +673,7 @@ class ReferenceValidatorTest {
     }
 
     @Test
-    void shoudlFailWhenReservedCtxNameIsUsed() {
+    void shouldFailWhenReservedCtxNameIsUsed() {
         // given
         Rule rule = new Rule(Collections.emptySet(),
                 Collections.singletonList(new Fact("ctx", null)),
@@ -686,6 +686,23 @@ class ReferenceValidatorTest {
         // then
         assertThat(results.getResults()).containsExactly(
                 ValidationResult.error("rule.ref.reserved-names", "Naming Error: Reserved names are used -> [ctx]")
+        );
+    }
+
+    @Test
+    void shouldFailWhenReservedEngineControllerNameIsUsed() {
+        // given
+        Rule rule = new Rule(Collections.emptySet(),
+                Collections.singletonList(new Fact("engineController", null)),
+                valueOf(null, Boolean.class, true),
+                Collections.emptyList());
+
+        // when
+        ValidationResults results = validator.validate(rule);
+
+        // then
+        assertThat(results.getResults()).containsExactly(
+                ValidationResult.error("rule.ref.reserved-names", "Naming Error: Reserved names are used -> [engineController]")
         );
     }
 

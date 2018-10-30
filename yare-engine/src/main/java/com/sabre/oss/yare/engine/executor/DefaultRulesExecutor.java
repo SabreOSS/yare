@@ -45,19 +45,32 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCache {
+public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCache, EngineListener {
     private static final Logger log = LoggerFactory.getLogger(DefaultRulesExecutor.class);
 
     private final Map<Class<?>, String> typeNames = new ConcurrentHashMap<>();
     private final LoadingCache<String, RuntimeRules> runtimeRulesCache;
     private final ExecutorConfiguration configuration;
+    private final EngineController engineController;
 
-    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration) {
+    private AtomicBoolean stopEvaluation = new AtomicBoolean(false);
+
+    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration, EngineController engineController) {
         this.configuration = configuration;
         this.runtimeRulesCache = buildCachingContext(rulesRepository, runtimeRulesBuilder);
+        this.engineController = createEngineController(engineController);
+
+    }
+
+    private EngineController createEngineController(EngineController engineController) {
+        if (engineController != null) {
+            engineController.registerEngineListener(this);
+        }
+        return engineController;
     }
 
     @Override
@@ -85,11 +98,11 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
                 : configuration.isCrossProductMode() ? new CrossProductFactTupleIterator(groupedFact) : new SingleInstanceFactTupleIterator(groupedFact);
 
         if (configuration.isSequentialMode()) {
-            while (iterator.hasNext()) {
+            while (iterator.hasNext() && !stopEvaluation.get()) {
                 evaluateSequentially(runtimeRules, result, iterator.next());
             }
         } else {
-            while (iterator.hasNext()) {
+            while (iterator.hasNext() && !stopEvaluation.get()) {
                 evaluate(runtimeRules, result, iterator.next());
             }
         }
@@ -115,6 +128,11 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
         return true;
     }
 
+    @Override
+    public void onStopProcessing() {
+        stopEvaluation.set(true);
+    }
+
     private Map<String, List<Object>> groupFacts(Collection<?> inFacts, Map<Type, String> factNames) {
         Map<Class<?>, List<Object>> facts = new HashMap<>();
         for (Object fact : inFacts) {
@@ -129,8 +147,10 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     }
 
     private void evaluateSequentially(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
-        for (RuntimeRules.ExecutableRule executableRule : runtimeRules.getExecutableRules()) {
-            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes());
+        List<RuntimeRules.ExecutableRule> executableRules = runtimeRules.getExecutableRules();
+        for (int i = 0; i < executableRules.size() && !stopEvaluation.get(); ++i) {
+            RuntimeRules.ExecutableRule executableRule = executableRules.get(i);
+            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes(), engineController);
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
             if (Boolean.TRUE.equals(evaluationResult)) {
                 executableRule.getConsequence().proceed(context);
@@ -141,14 +161,15 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     private void evaluate(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
         List<Pair<Invocation<ProcessingContext, Void>, PredicateContext>> consequences = new LinkedList<>();
         for (RuntimeRules.ExecutableRule executableRule : runtimeRules.getExecutableRules()) {
-            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes());
+            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes(), engineController);
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
             if (Boolean.TRUE.equals(evaluationResult)) {
                 consequences.add(Pair.of(executableRule.getConsequence(), context));
             }
         }
 
-        for (Pair<Invocation<ProcessingContext, Void>, PredicateContext> consequence : consequences) {
+        for (int i = 0; i < consequences.size() && !stopEvaluation.get(); ++i) {
+            Pair<Invocation<ProcessingContext, Void>, PredicateContext> consequence = consequences.get(i);
             consequence.getKey().proceed(consequence.getValue());
         }
     }

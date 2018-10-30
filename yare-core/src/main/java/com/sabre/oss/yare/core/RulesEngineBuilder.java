@@ -45,6 +45,7 @@ public class RulesEngineBuilder {
     private RulesRepository rulesRepository;
     private RulesExecutorBuilder rulesExecutorBuilder;
     private ErrorHandler errorHandler;
+    private EngineController engineController;
 
     /**
      * Specify {@link RulesRepository} used by the rules engine.
@@ -151,6 +152,17 @@ public class RulesEngineBuilder {
     }
 
     /**
+     * Specify {@link EngineController} used by the rules engine.
+     *
+     * @param engineController engine controller
+     * @return this rulesEngineBuilder instance
+     */
+    public RulesEngineBuilder withEngineController(EngineController engineController) {
+        this.engineController = engineController;
+        return this;
+    }
+
+    /**
      * Builds previously configured {@link RulesEngine} instance.
      *
      * @return rules engine instance
@@ -171,6 +183,7 @@ public class RulesEngineBuilder {
                 .withActionMappings(actionMappings)
                 .withFunctionMappings(functionMappings)
                 .withErrorHandler(errorHandler)
+                .withEngineController(engineController)
                 .build();
         return new DefaultRulesEngine(rulesExecutor, fixedInterceptors);
     }

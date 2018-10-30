@@ -30,11 +30,14 @@ import com.sabre.oss.yare.core.model.Fact;
 import com.sabre.oss.yare.core.model.Rule;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class ValueConverter<R> {
     private static final ChainedTypeExtractor chainedTypeExtractor = new ChainedTypeExtractor();
-    private static final String CONTEXT_PATH = "ctx";
+    private static final List<String> SPECIAL_REFERENCES = Collections.unmodifiableList(Arrays.asList("ctx", "engineController"));
 
     private final ReferenceFactory<? extends R> referenceFactory;
     private final ValueFactory<? extends R> valueFactory;
@@ -62,7 +65,7 @@ public class ValueConverter<R> {
     private R createReference(Rule rule, String expressionName, String path) {
         return extractType(rule, path)
                 .map(type -> tryCreateRuleBasedReference(expressionName, path, type))
-                .orElseGet(() -> tryCreateContextReference(expressionName, path));
+                .orElseGet(() -> tryCreateSpecialReference(expressionName, path));
     }
 
     private Optional<Type> extractType(Rule rule, String path) {
@@ -85,8 +88,8 @@ public class ValueConverter<R> {
         return null;
     }
 
-    private R tryCreateContextReference(String expressionName, String path) {
-        if (CONTEXT_PATH.equals(path)) {
+    private R tryCreateSpecialReference(String expressionName, String path) {
+        if (SPECIAL_REFERENCES.contains(path)) {
             return referenceFactory.create(expressionName, Expression.UNDEFINED, Expression.UNDEFINED, path);
         }
         return null;
