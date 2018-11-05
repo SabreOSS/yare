@@ -28,6 +28,7 @@ import com.sabre.oss.yare.core.call.CallMetadata;
 import com.sabre.oss.yare.core.feature.Feature;
 import com.sabre.oss.yare.core.feature.FeaturedObject;
 import com.sabre.oss.yare.core.interceptor.ErrorHandlerSetUpInterceptor;
+import com.sabre.oss.yare.core.internal.DefaultEngineController;
 import com.sabre.oss.yare.core.internal.DefaultRulesEngine;
 import com.sabre.oss.yare.core.invocation.Interceptor;
 
@@ -173,6 +174,10 @@ public class RulesEngineBuilder {
 
         if (rulesExecutorBuilder == null) {
             rulesExecutorBuilder = createDefaultRulesExecutorBuilder();
+        }
+
+        if ( engineController == null ) {
+            engineController = new DefaultEngineController();
         }
 
         List<Interceptor<ExecutionContext, ExecutionContext>> fixedInterceptors = new ArrayList<>(this.interceptors);

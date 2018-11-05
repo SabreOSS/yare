@@ -44,7 +44,7 @@ class PredicateContextTest {
     void shouldResolveCtxToResult() {
         // given
         Object result = new Object();
-        PredicateContext predicateContext = new PredicateContext(null, result, null, null, null);
+        PredicateContext predicateContext = new PredicateContext(null, result, Collections.emptyMap(), Collections.emptyMap(), null);
         String identifier = "ctx";
 
         // when
@@ -58,7 +58,7 @@ class PredicateContextTest {
     void shouldResolveRuleNameToRuleId() {
         // given
         String ruleId = "testRuleId";
-        PredicateContext predicateContext = new PredicateContext(ruleId, null, null, null, null);
+        PredicateContext predicateContext = new PredicateContext(ruleId, null, Collections.emptyMap(), Collections.emptyMap(), null);
         String identifier = "ruleName";
 
         // when
@@ -72,7 +72,7 @@ class PredicateContextTest {
     void shouldResolveEngineControllerToEngineController() {
         // given
         EngineController engineController = new DefaultEngineController();
-        PredicateContext predicateContext = new PredicateContext(null, null, null, null, engineController);
+        PredicateContext predicateContext = new PredicateContext(null, null, Collections.emptyMap(), Collections.emptyMap(), engineController);
         String identifier = "engineController";
 
         // when

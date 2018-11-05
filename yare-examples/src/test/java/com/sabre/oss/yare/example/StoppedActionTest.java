@@ -28,7 +28,6 @@ import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.RuleSession;
 import com.sabre.oss.yare.core.RulesEngine;
 import com.sabre.oss.yare.core.RulesEngineBuilder;
-import com.sabre.oss.yare.core.internal.DefaultEngineController;
 import com.sabre.oss.yare.core.model.Rule;
 import com.sabre.oss.yare.dsl.RuleDsl;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StoppedActionTest {
 
     @Test
-    void shouldEvaluateUpToMatchingFact() {
+    void shouldEvaluatingUpToTwoMatchingFacts() {
         // given
         List<Rule> rules = Collections.singletonList(RuleDsl.ruleBuilder()
                 .name("Should match airline when airline codes contain given")
@@ -74,8 +73,7 @@ public class StoppedActionTest {
 
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> rules)
-                .withEngineController(new DefaultEngineController())
-                .withActionMapping("collect", method(new StoppedActionTest.Actions(), (action) -> action.collectUpToTwo(null, null, null)))
+                .withActionMapping("collect", method(new StoppedActionTest.Actions(2), (action) -> action.collectUpToTwo(null, null, null)))
                 .build();
         RuleSession session = engine.createSession("airlines");
 
@@ -87,6 +85,56 @@ public class StoppedActionTest {
         assertThat(matching).containsExactly(
                 new Airline().withAirlineCodes(Arrays.asList("AAU", "AAW", "AAV", "AFU")),
                 new Airline().withAirlineCodes(Collections.singletonList("AAU"))
+        );
+    }
+
+    @Test
+    void shouldNotStopFlow() {
+        // given
+        List<Rule> rules = Collections.singletonList(RuleDsl.ruleBuilder()
+                .name("Should match airline when airline codes contain given")
+                .fact("airline", Airline.class)
+                .predicate(
+                        contains(
+                                castToCollection(value("${airline.airlineCodes}"), String.class),
+                                values(String.class, "AAU")
+                        )
+                )
+                .action("collect",
+                        param("context", value("${ctx}")),
+                        param("fact", value("${airline}")),
+                        param("engineController", value("${engineController}")))
+                .build());
+        List<Airline> facts = Arrays.asList(
+                new Airline().withAirlineCodes(
+                        Arrays.asList("AAU", "AAW", "AAV", "AFU")
+                ),
+                new Airline().withAirlineCodes(
+                        Collections.singletonList("AAU")
+                ),
+                new Airline().withAirlineCodes(
+                        Arrays.asList("PIU", "BRO")
+                ),
+                new Airline().withAirlineCodes(
+                        Arrays.asList("AAU", "PIU", "BRO")
+                ));
+
+        RulesEngine engine = new RulesEngineBuilder()
+                .withRulesRepository(i -> rules)
+                .withActionMapping("collect", method(new StoppedActionTest.Actions(4), (action) -> action.collectUpToTwo(null, null, null)))
+                .build();
+
+        RuleSession session = engine.createSession("airlines");
+
+        // when
+        List<Airline> matching = session.execute(new ArrayList<>(), facts);
+
+        // then
+        assertThat(matching).hasSize(3);
+        assertThat(matching).containsExactly(
+                new Airline().withAirlineCodes(Arrays.asList("AAU", "AAW", "AAV", "AFU")),
+                new Airline().withAirlineCodes(Collections.singletonList("AAU")),
+                new Airline().withAirlineCodes(Arrays.asList("AAU", "PIU", "BRO"))
         );
     }
 
@@ -121,9 +169,19 @@ public class StoppedActionTest {
     }
 
     public static class Actions {
+
+        private int maxMatchFacts;
+
+        public Actions() {
+        }
+
+        public Actions(int maxMatchFacts) {
+            this.maxMatchFacts = maxMatchFacts;
+        }
+
         public void collectUpToTwo(List<Object> results, Object fact, EngineController engineController) {
             results.add(fact);
-            if (results.size() == 2) {
+            if (results.size() == maxMatchFacts) {
                 engineController.stopProcessing();
             }
         }
