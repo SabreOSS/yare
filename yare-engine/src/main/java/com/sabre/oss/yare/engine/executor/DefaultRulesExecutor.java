@@ -49,28 +49,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCache, EngineListener {
+public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCache {
     private static final Logger log = LoggerFactory.getLogger(DefaultRulesExecutor.class);
 
     private final Map<Class<?>, String> typeNames = new ConcurrentHashMap<>();
     private final LoadingCache<String, RuntimeRules> runtimeRulesCache;
     private final ExecutorConfiguration configuration;
     private final EngineController engineController;
+    private final StopProcessingListener stopProcessingListener;
 
-    private AtomicBoolean stopEvaluation = new AtomicBoolean(false);
-
-    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration, EngineController engineController) {
+    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration, EngineControllerObservable engineController) {
         this.configuration = configuration;
         this.runtimeRulesCache = buildCachingContext(rulesRepository, runtimeRulesBuilder);
-        this.engineController = createEngineController(engineController);
-
-    }
-
-    private EngineController createEngineController(EngineController engineController) {
-        if (engineController != null) {
-            engineController.registerEngineListener(this);
-        }
-        return engineController;
+        this.engineController = engineController;
+        this.stopProcessingListener = new StopProcessingListener(engineController);
     }
 
     @Override
@@ -98,11 +90,11 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
                 : configuration.isCrossProductMode() ? new CrossProductFactTupleIterator(groupedFact) : new SingleInstanceFactTupleIterator(groupedFact);
 
         if (configuration.isSequentialMode()) {
-            while (iterator.hasNext() && !stopEvaluation.get()) {
+            while (iterator.hasNext() && !stopProcessingListener.isEvaluationTerminated()) {
                 evaluateSequentially(runtimeRules, result, iterator.next());
             }
         } else {
-            while (iterator.hasNext() && !stopEvaluation.get()) {
+            while (iterator.hasNext() && !stopProcessingListener.isEvaluationTerminated()) {
                 evaluate(runtimeRules, result, iterator.next());
             }
         }
@@ -128,11 +120,6 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
         return true;
     }
 
-    @Override
-    public void onStopProcessing() {
-        stopEvaluation.set(true);
-    }
-
     private Map<String, List<Object>> groupFacts(Collection<?> inFacts, Map<Type, String> factNames) {
         Map<Class<?>, List<Object>> facts = new HashMap<>();
         for (Object fact : inFacts) {
@@ -148,7 +135,7 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
 
     private void evaluateSequentially(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
         List<RuntimeRules.ExecutableRule> executableRules = runtimeRules.getExecutableRules();
-        for (int i = 0; i < executableRules.size() && !stopEvaluation.get(); ++i) {
+        for (int i = 0; i < executableRules.size() && !stopProcessingListener.isEvaluationTerminated(); ++i) {
             RuntimeRules.ExecutableRule executableRule = executableRules.get(i);
             PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes(), engineController);
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
@@ -168,7 +155,7 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
             }
         }
 
-        for (int i = 0; i < consequences.size() && !stopEvaluation.get(); ++i) {
+        for (int i = 0; i < consequences.size() && !stopProcessingListener.isEvaluationTerminated(); ++i) {
             Pair<Invocation<ProcessingContext, Void>, PredicateContext> consequence = consequences.get(i);
             consequence.getKey().proceed(consequence.getValue());
         }
@@ -203,6 +190,32 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     private long getPriority(Rule a) {
         Attribute attribute = a.getAttribute("priority");
         return attribute != null ? (Long) attribute.getValue() : 0L;
+    }
+
+    private static class StopProcessingListener implements EngineListener {
+        private static final Logger log = LoggerFactory.getLogger(StopProcessingListener.class);
+
+        private final AtomicBoolean evaluationTerminated;
+
+        StopProcessingListener(EngineControllerObservable engineController) {
+            evaluationTerminated = new AtomicBoolean(false);
+            if (engineController != null) {
+                engineController.register(this);
+            }
+        }
+
+        boolean isEvaluationTerminated() {
+            return evaluationTerminated.get();
+        }
+
+        @Override
+        public void onEvent(EngineControllerEvent event) {
+            Objects.requireNonNull(event, "event cannot be null");
+            if (EngineControllerEventType.STOP_PROCESSING_ALL_FACTS.equals(event.getType())) {
+                log.warn("Stopping processing...");
+                evaluationTerminated.set(true);
+            }
+        }
     }
 
     static class SingleInstanceFactTupleIterator implements Iterator<Map<String, Object>> {

@@ -22,29 +22,11 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.core.internal;
+package com.sabre.oss.yare.core;
 
-import com.sabre.oss.yare.core.EngineControllerEvent;
-import com.sabre.oss.yare.core.EngineControllerEventType;
-import com.sabre.oss.yare.core.EngineControllerObservable;
-import com.sabre.oss.yare.core.EngineListener;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-
-public class DefaultEngineController implements EngineControllerObservable {
-    private final List<EngineListener> listeners = new CopyOnWriteArrayList<>();
-
-    @Override
-    public void stopProcessing() {
-        for (EngineListener listener : listeners) {
-            listener.onEvent(EngineControllerEvent.of(EngineControllerEventType.STOP_PROCESSING_ALL_FACTS));
-        }
-    }
-
-    @Override
-    public void register(EngineListener listener) {
-        listeners.add(listener);
-    }
+public enum EngineControllerEventType {
+    /**
+     * Evaluation facts will be terminated immediately.
+     */
+    STOP_PROCESSING_ALL_FACTS
 }

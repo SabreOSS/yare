@@ -78,7 +78,7 @@ public class ReferenceValidator extends BaseValidator {
     private void checkNamesValidity(Rule rule, ValidationResults results) {
         List<String> names = resolveNames(rule);
         checkNamesAreNotDuplicated(names, results);
-        checkReservedNamesAreNotUsed(names, results, CONTEXT, ENGINE_CONTROLLER);
+        checkReservedNamesAreNotUsed(names, results);
     }
 
     private void checkReferencesInPredicate(Rule rule, ValidationResults results, Map<String, Type> localReferences) {
@@ -118,13 +118,11 @@ public class ReferenceValidator extends BaseValidator {
         }
     }
 
-    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results, String... reservedNames) {
-        for (String reservedName : reservedNames) {
-            if (names.contains(reservedName)) {
-                append(results, ValidationResult.error("rule.ref.reserved-names",
-                        String.format("Naming Error: Reserved names are used -> [%s]", reservedName)));
-            }
-        }
+    private void checkReservedNamesAreNotUsed(List<String> names, ValidationResults results) {
+        Stream.of(CONTEXT, ENGINE_CONTROLLER)
+                .filter(names::contains)
+                .forEach(reservedName -> append(results, ValidationResult.error("rule.ref.reserved-names",
+                    String.format("Naming Error: Reserved names are used -> [%s]", reservedName))));
     }
 
     private void checkExpression(Expression expression, ValidationResults results, Map<String, Type> localReferences) {

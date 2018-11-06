@@ -45,7 +45,7 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
     private Map<String, CallMetadata> functionMappings = new HashMap<>();
     private RulesRepository rulesRepository;
     private ErrorHandler errorHandler;
-    private EngineController engineController;
+    private EngineControllerObservable engineController;
     private CallInvocationResultCache invocationCache;
 
     /**
@@ -94,7 +94,7 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
      * {@inheritDoc}
      */
     @Override
-    public RulesExecutorBuilder withEngineController(EngineController engineController) {
+    public RulesExecutorBuilder withEngineControllerObservable(EngineControllerObservable engineController) {
         this.engineController = engineController;
         return this;
     }

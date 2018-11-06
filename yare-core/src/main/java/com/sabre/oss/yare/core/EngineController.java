@@ -33,10 +33,4 @@ public interface EngineController {
      */
     void stopProcessing();
 
-    /**
-     * Register provided engine listener {@link EngineListener}
-     *
-     * @param engineListener engine listener
-     */
-    void registerEngineListener(EngineListener engineListener);
 }

@@ -28,5 +28,5 @@ public interface EngineListener {
     /**
      * This method is called after an {@link EngineController} sends notification {@link EngineController#stopProcessing()} to registered {@link EngineListener}.
      */
-    void onStopProcessing();
+    void onEvent(EngineControllerEvent event);
 }

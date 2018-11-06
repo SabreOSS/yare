@@ -66,12 +66,12 @@ public interface RulesExecutorBuilder {
     RulesExecutorBuilder withErrorHandler(ErrorHandler errorHandler);
 
     /**
-     * Specify {@link EngineController} used by the rules executor.
+     * Specify {@link EngineControllerObservable} used by the rules executor.
      *
-     * @param engineController engine handler
+     * @param engineController engine controller
      * @return this rulesExecutorBuilder instance
      */
-    RulesExecutorBuilder withEngineController(EngineController engineController);
+    RulesExecutorBuilder withEngineControllerObservable(EngineControllerObservable engineController);
 
     /**
      * Builds previously configured {@link RulesExecutor} instance.

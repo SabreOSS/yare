@@ -81,7 +81,6 @@ public class StoppedActionTest {
         List<Airline> matching = session.execute(new ArrayList<>(), facts);
 
         // then
-        assertThat(matching).hasSize(2);
         assertThat(matching).containsExactly(
                 new Airline().withAirlineCodes(Arrays.asList("AAU", "AAW", "AAV", "AFU")),
                 new Airline().withAirlineCodes(Collections.singletonList("AAU"))
@@ -130,7 +129,6 @@ public class StoppedActionTest {
         List<Airline> matching = session.execute(new ArrayList<>(), facts);
 
         // then
-        assertThat(matching).hasSize(3);
         assertThat(matching).containsExactly(
                 new Airline().withAirlineCodes(Arrays.asList("AAU", "AAW", "AAV", "AFU")),
                 new Airline().withAirlineCodes(Collections.singletonList("AAU")),
