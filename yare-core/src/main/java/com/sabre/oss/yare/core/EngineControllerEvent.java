@@ -29,17 +29,16 @@ import java.util.Objects;
 public final class EngineControllerEvent {
     private final EngineControllerEventType type;
 
+    public static EngineControllerEvent of(EngineControllerEventType type) {
+        return new EngineControllerEvent(type);
+    }
+
     private EngineControllerEvent(EngineControllerEventType type) {
-        Objects.requireNonNull(type, "type cannot be null");
-        this.type = type;
+        this.type = Objects.requireNonNull(type, "type cannot be null");
     }
 
     public EngineControllerEventType getType() {
         return type;
-    }
-
-    public static EngineControllerEvent of(EngineControllerEventType type) {
-        return new EngineControllerEvent(type);
     }
 
 }

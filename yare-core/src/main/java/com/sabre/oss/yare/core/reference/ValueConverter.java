@@ -37,7 +37,7 @@ import java.util.Optional;
 
 public class ValueConverter<R> {
     private static final ChainedTypeExtractor chainedTypeExtractor = new ChainedTypeExtractor();
-    private static final List<String> SPECIAL_REFERENCES = Collections.unmodifiableList(Arrays.asList("ctx", "engineController"));
+    private static final List<String> RESERVED_REFERENCES = Collections.unmodifiableList(Arrays.asList("ctx", "engineController"));
 
     private final ReferenceFactory<? extends R> referenceFactory;
     private final ValueFactory<? extends R> valueFactory;
@@ -89,7 +89,7 @@ public class ValueConverter<R> {
     }
 
     private R tryCreateSpecialReference(String expressionName, String path) {
-        if (SPECIAL_REFERENCES.contains(path)) {
+        if (RESERVED_REFERENCES.contains(path)) {
             return referenceFactory.create(expressionName, Expression.UNDEFINED, Expression.UNDEFINED, path);
         }
         return null;

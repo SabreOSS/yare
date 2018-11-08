@@ -29,7 +29,7 @@ package com.sabre.oss.yare.core;
  */
 public interface EngineController {
     /**
-     * Sends notification to registered engine listeners.
+     * Stop processing facts and rules.
      */
     void stopProcessing();
 

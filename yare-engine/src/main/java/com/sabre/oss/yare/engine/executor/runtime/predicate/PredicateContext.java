@@ -24,13 +24,10 @@
 
 package com.sabre.oss.yare.engine.executor.runtime.predicate;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.call.ProcessingContext;
 
-import java.util.Arrays;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,7 +39,7 @@ public class PredicateContext implements ProcessingContext {
     private final Map<String, Object> facts;
     private final Map<String, Object> attributes;
     private final EngineController engineController;
-    private final EnumMap<ReservedIdentifier, Object> reservedIdentifiers;
+    private final Map<String, Object> reservedIdentifiers;
 
     // Do not pass merged maps due to performance implications.
     public PredicateContext(String ruleId, Object result, Map<String, Object> facts, Map<String, Object> attributes, EngineController engineController) {
@@ -54,24 +51,11 @@ public class PredicateContext implements ProcessingContext {
         this.reservedIdentifiers = createResolveIdentifiers();
     }
 
-    private EnumMap<ReservedIdentifier, Object> createResolveIdentifiers() {
-        EnumMap<ReservedIdentifier, Object> reservedIdentifiers = new EnumMap<>(ReservedIdentifier.class);
-
-        for (ReservedIdentifier identifier : ReservedIdentifier.values()) {
-            switch (identifier) {
-                case CTX:
-                    reservedIdentifiers.put(identifier, result);
-                    break;
-                case RULE_NAME:
-                    reservedIdentifiers.put(identifier, ruleId);
-                    break;
-                case ENGINE_CONTROLLER:
-                    reservedIdentifiers.put(identifier, engineController);
-                    break;
-                default:
-                    throw new IllegalStateException(String.format("Unknown case: %s", identifier));
-            }
-        }
+    private Map<String, Object> createResolveIdentifiers() {
+        Map<String, Object> reservedIdentifiers = new HashMap<>();
+        reservedIdentifiers.put("ctx", result);
+        reservedIdentifiers.put("ruleName", ruleId);
+        reservedIdentifiers.put("engineController", engineController);
 
         return reservedIdentifiers;
     }
@@ -88,41 +72,13 @@ public class PredicateContext implements ProcessingContext {
 
     @Override
     public Object resolve(String identifier) {
-        ReservedIdentifier reservedIdentifier = ReservedIdentifier.fromString(identifier);
-        return reservedIdentifiers.getOrDefault(reservedIdentifier,
-                attributes.getOrDefault(identifier, facts.get(identifier)));
+        return reservedIdentifiers.getOrDefault(identifier, attributes.getOrDefault(identifier, facts.get(identifier)));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T resolve(String identifier, T defaultValue) {
         return (T) attributes.getOrDefault(identifier, facts.getOrDefault(identifier, defaultValue));
-    }
-
-    private enum ReservedIdentifier {
-        CTX("ctx"), ENGINE_CONTROLLER("engineController"), RULE_NAME("ruleName");
-
-        private static ImmutableMap<String, ReservedIdentifier> reverseLookup =
-                Maps.uniqueIndex(Arrays.asList(ReservedIdentifier.values()), ReservedIdentifier::getIdentifier);
-
-        private final String identifier;
-
-        ReservedIdentifier(String identifier) {
-            this.identifier = identifier;
-        }
-
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        public static ReservedIdentifier fromString(String identifier) {
-            return reverseLookup.getOrDefault(identifier, null);
-        }
-
-        @Override
-        public String toString() {
-            return "Identifier='" + identifier + '\'';
-        }
     }
 
     public PredicateContext copy(String ruleId) {

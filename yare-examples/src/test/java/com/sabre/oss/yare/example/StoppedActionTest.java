@@ -167,7 +167,6 @@ public class StoppedActionTest {
     }
 
     public static class Actions {
-
         private int maxMatchFacts;
 
         public Actions() {

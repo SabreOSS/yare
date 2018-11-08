@@ -29,12 +29,10 @@ import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.internal.DefaultEngineController;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,15 +41,15 @@ class PredicateContextTest {
     @Test
     void shouldResolveCtxToResult() {
         // given
-        Object result = new Object();
-        PredicateContext predicateContext = new PredicateContext(null, result, Collections.emptyMap(), Collections.emptyMap(), null);
+        Object expected = new Object();
+        PredicateContext predicateContext = new PredicateContext(null, expected, Collections.emptyMap(), Collections.emptyMap(), null);
         String identifier = "ctx";
 
         // when
         Object resolved = predicateContext.resolve(identifier);
 
         // then
-        assertThat(resolved).isEqualTo(result);
+        assertThat(resolved).isEqualTo(expected);
     }
 
     @Test
@@ -128,7 +126,11 @@ class PredicateContextTest {
     }
 
     @ParameterizedTest(name = "{index} => identifier={0}, expectedValue={1}")
-    @MethodSource("resolvedIdentifierProvider")
+    @CsvSource({
+            "key, attributeValue",
+            "factKey, factValue",
+            "unknownIdentifier, defaultValue"
+    })
     void shouldResolveAttributeOrFactOrDefaultValue(String identifier, String expectedValue) {
         // given
         Map<String, Object> attributes = Collections.singletonMap("key", "attributeValue");
@@ -142,11 +144,4 @@ class PredicateContextTest {
         assertThat(resolved).isEqualTo(expectedValue);
     }
 
-    private static Stream<Arguments> resolvedIdentifierProvider() {
-        return Stream.of(
-                Arguments.of("key", "attributeValue"),
-                Arguments.of("factKey", "factValue"),
-                Arguments.of("unknownIdentifier", "defaultValue")
-        );
-    }
 }
