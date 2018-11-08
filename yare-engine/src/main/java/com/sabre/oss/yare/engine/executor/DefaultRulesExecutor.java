@@ -30,7 +30,10 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.sabre.oss.yare.core.*;
 import com.sabre.oss.yare.core.call.ProcessingContext;
+import com.sabre.oss.yare.core.internal.DefaultEngineController;
 import com.sabre.oss.yare.core.invocation.Invocation;
+import com.sabre.oss.yare.core.listener.StopProcessingContext;
+import com.sabre.oss.yare.core.listener.StopProcessingListener;
 import com.sabre.oss.yare.core.management.EvictableCache;
 import com.sabre.oss.yare.core.model.Attribute;
 import com.sabre.oss.yare.core.model.Rule;
@@ -56,13 +59,13 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     private final LoadingCache<String, RuntimeRules> runtimeRulesCache;
     private final ExecutorConfiguration configuration;
     private final EngineController engineController;
-    private final StopProcessingListener stopProcessingListener;
+    private final EngineListener stopProcessingListener;
 
-    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration, EngineControllerObservable engineController) {
+    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration, DefaultEngineController engineController) {
         this.configuration = configuration;
         this.runtimeRulesCache = buildCachingContext(rulesRepository, runtimeRulesBuilder);
         this.engineController = engineController;
-        this.stopProcessingListener = new StopProcessingListener(engineController);
+        this.stopProcessingListener = new EngineListener(engineController);
     }
 
     @Override
@@ -192,12 +195,12 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
         return attribute != null ? (Long) attribute.getValue() : 0L;
     }
 
-    private static class StopProcessingListener implements EngineListener {
-        private static final Logger log = LoggerFactory.getLogger(StopProcessingListener.class);
+    private static class EngineListener implements StopProcessingListener {
+        private static final Logger log = LoggerFactory.getLogger(EngineListener.class);
 
         private final AtomicBoolean evaluationTerminated;
 
-        StopProcessingListener(EngineControllerObservable engineController) {
+        EngineListener(DefaultEngineController engineController) {
             evaluationTerminated = new AtomicBoolean(false);
             if (engineController != null) {
                 engineController.register(this);
@@ -209,13 +212,11 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
         }
 
         @Override
-        public void onEvent(EngineControllerEvent event) {
-            Objects.requireNonNull(event, "event cannot be null");
-            if (EngineControllerEventType.STOP_PROCESSING_ALL_FACTS.equals(event.getType())) {
-                log.warn("Stopping processing...");
-                evaluationTerminated.set(true);
-            }
+        public void onStopProcessing(StopProcessingContext context) {
+            log.warn("Stopping processing...");
+            evaluationTerminated.set(true);
         }
+
     }
 
     static class SingleInstanceFactTupleIterator implements Iterator<Map<String, Object>> {

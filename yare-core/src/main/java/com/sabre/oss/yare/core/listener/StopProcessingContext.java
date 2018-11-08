@@ -22,23 +22,11 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.core;
+package com.sabre.oss.yare.core.listener;
 
-import java.util.Objects;
-
-public final class EngineControllerEvent {
-    private final EngineControllerEventType type;
-
-    public static EngineControllerEvent of(EngineControllerEventType type) {
-        return new EngineControllerEvent(type);
-    }
-
-    private EngineControllerEvent(EngineControllerEventType type) {
-        this.type = Objects.requireNonNull(type, "type cannot be null");
-    }
-
-    public EngineControllerEventType getType() {
-        return type;
-    }
+/**
+ * Provide context for {@link StopProcessingListener}
+ */
+public interface StopProcessingContext {
 
 }

@@ -24,27 +24,51 @@
 
 package com.sabre.oss.yare.core.internal;
 
-import com.sabre.oss.yare.core.EngineControllerEvent;
-import com.sabre.oss.yare.core.EngineControllerEventType;
-import com.sabre.oss.yare.core.EngineControllerObservable;
-import com.sabre.oss.yare.core.EngineListener;
+import com.sabre.oss.yare.core.EngineController;
+import com.sabre.oss.yare.core.listener.Listener;
+import com.sabre.oss.yare.core.listener.StopProcessingContext;
+import com.sabre.oss.yare.core.listener.StopProcessingListener;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 
-
-public class DefaultEngineController implements EngineControllerObservable {
-    private final List<EngineListener> listeners = new CopyOnWriteArrayList<>();
+public class DefaultEngineController implements EngineController {
+    private final AtomicReference<StopProcessingListener> stopProcessingListener = new AtomicReference<>();
 
     @Override
     public void stopProcessing() {
-        for (EngineListener listener : listeners) {
-            listener.onEvent(EngineControllerEvent.of(EngineControllerEventType.STOP_PROCESSING_ALL_FACTS));
+        execute(stopProcessingListener, StopProcessingListener::onStopProcessing, new StopProcessingContext() {
+        });
+    }
+
+    public void register(Listener listener) {
+        Objects.requireNonNull(listener, "Listener can not be null");
+        tryToRegister(StopProcessingListener.class, listener, stopProcessingListener);
+    }
+
+    private <T, C> void execute(AtomicReference<T> listener, BiConsumer<T, C> callback, C context) {
+        T l = listener.get();
+        if (l != null) {
+            callback.accept(l, context);
         }
     }
 
-    @Override
-    public void register(EngineListener listener) {
-        listeners.add(listener);
+    @SuppressWarnings({"SameParameterValue", "unchecked"})
+    private <T> void tryToRegister(Class<T> clazz, Listener listener, AtomicReference<T> destination) {
+        if (clazz.isAssignableFrom(listener.getClass())) {
+            boolean wasUninitialized = destination.compareAndSet(null, (T) listener);
+            if (!wasUninitialized) {
+                throw new AlreadyRegisteredListenerException("Listener is already registered");
+            }
+        }
     }
+
+    static class AlreadyRegisteredListenerException extends RuntimeException {
+
+        AlreadyRegisteredListenerException(String message) {
+            super(message);
+        }
+    }
+
 }

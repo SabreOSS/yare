@@ -22,13 +22,10 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.core;
+package com.sabre.oss.yare.core.listener;
 
-public interface EngineControllerObservable extends EngineController {
-    /**
-     * Register provided engine listener {@link EngineListener}
-     *
-     * @param engineListener engine listener
-     */
-    void register(EngineListener engineListener);
+/**
+ * Listener controller.
+ */
+public interface Listener {
 }

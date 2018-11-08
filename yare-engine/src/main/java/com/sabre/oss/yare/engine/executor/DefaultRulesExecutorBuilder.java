@@ -30,6 +30,7 @@ import com.sabre.oss.yare.core.call.ConsequenceFactory;
 import com.sabre.oss.yare.core.call.FunctionFactory;
 import com.sabre.oss.yare.core.call.ProcessingInvocationFactory;
 import com.sabre.oss.yare.core.feature.FeaturedObject;
+import com.sabre.oss.yare.core.internal.DefaultEngineController;
 import com.sabre.oss.yare.engine.*;
 import com.sabre.oss.yare.engine.feature.DefaultEngineFeature;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,7 +46,7 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
     private Map<String, CallMetadata> functionMappings = new HashMap<>();
     private RulesRepository rulesRepository;
     private ErrorHandler errorHandler;
-    private EngineControllerObservable engineController;
+    private DefaultEngineController engineController;
     private CallInvocationResultCache invocationCache;
 
     /**
@@ -94,7 +95,7 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
      * {@inheritDoc}
      */
     @Override
-    public RulesExecutorBuilder withEngineControllerObservable(EngineControllerObservable engineController) {
+    public RulesExecutorBuilder withEngineController(DefaultEngineController engineController) {
         this.engineController = engineController;
         return this;
     }

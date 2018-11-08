@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.core;
+package com.sabre.oss.yare.core.listener;
 
-public enum EngineControllerEventType {
+import com.sabre.oss.yare.core.EngineController;
+
+public interface StopProcessingListener extends Listener {
     /**
-     * Evaluation facts will be terminated immediately.
+     * This method is called after an {@link EngineController} sends notification {@link EngineController#stopProcessing()} to registered {@link StopProcessingListener}.
      */
-    STOP_PROCESSING_ALL_FACTS
+    void onStopProcessing(StopProcessingContext context);
 }
