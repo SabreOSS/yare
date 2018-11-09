@@ -52,7 +52,7 @@ public class StoppedActionTest {
                                 values(String.class, "AAU")
                         )
                 )
-                .action("collect",
+                .action("collectUpToTwoMatchFacts",
                         param("context", value("${ctx}")),
                         param("fact", value("${airline}")),
                         param("engineController", value("${engineController}")))
@@ -73,7 +73,7 @@ public class StoppedActionTest {
 
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> rules)
-                .withActionMapping("collect", method(new StoppedActionTest.Actions(2), (action) -> action.collectUpToTwo(null, null, null)))
+                .withActionMapping("collectUpToTwoMatchFacts", method(new StoppedActionTest.Actions(2), (action) -> action.collectUpToMaxMatchFacts(null, null, null)))
                 .build();
         RuleSession session = engine.createSession("airlines");
 
@@ -99,7 +99,7 @@ public class StoppedActionTest {
                                 values(String.class, "AAU")
                         )
                 )
-                .action("collect",
+                .action("collectUpToFourMatchFacts",
                         param("context", value("${ctx}")),
                         param("fact", value("${airline}")),
                         param("engineController", value("${engineController}")))
@@ -120,7 +120,7 @@ public class StoppedActionTest {
 
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> rules)
-                .withActionMapping("collect", method(new StoppedActionTest.Actions(4), (action) -> action.collectUpToTwo(null, null, null)))
+                .withActionMapping("collectUpToFourMatchFacts", method(new StoppedActionTest.Actions(4), (action) -> action.collectUpToMaxMatchFacts(null, null, null)))
                 .build();
 
         RuleSession session = engine.createSession("airlines");
@@ -176,7 +176,7 @@ public class StoppedActionTest {
             this.maxMatchFacts = maxMatchFacts;
         }
 
-        public void collectUpToTwo(List<Object> results, Object fact, EngineController engineController) {
+        public void collectUpToMaxMatchFacts(List<Object> results, Object fact, EngineController engineController) {
             results.add(fact);
             if (results.size() == maxMatchFacts) {
                 engineController.stopProcessing();
