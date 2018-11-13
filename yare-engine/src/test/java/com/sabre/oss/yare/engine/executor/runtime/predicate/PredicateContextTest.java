@@ -43,7 +43,7 @@ class PredicateContextTest {
         // given
         Object expected = new Object();
         PredicateContext predicateContext = new PredicateContext(null, expected, Collections.emptyMap(), Collections.emptyMap(), null);
-        String identifier = "ctx";
+        String identifier = PredicateContext.CTX;
 
         // when
         Object resolved = predicateContext.resolve(identifier);
@@ -57,7 +57,7 @@ class PredicateContextTest {
         // given
         String ruleId = "testRuleId";
         PredicateContext predicateContext = new PredicateContext(ruleId, null, Collections.emptyMap(), Collections.emptyMap(), null);
-        String identifier = "ruleName";
+        String identifier = PredicateContext.RULE_NAME;
 
         // when
         Object resolved = predicateContext.resolve(identifier);
@@ -71,7 +71,7 @@ class PredicateContextTest {
         // given
         EngineController engineController = new DefaultEngineController(Collections.emptyMap());
         PredicateContext predicateContext = new PredicateContext(null, null, Collections.emptyMap(), Collections.emptyMap(), engineController);
-        String identifier = "engineController";
+        String identifier = PredicateContext.ENGINE_CONTROLLER;
 
         // when
         Object resolved = predicateContext.resolve(identifier);

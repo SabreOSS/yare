@@ -34,6 +34,10 @@ import java.util.Map;
  * Predicate evaluation context.
  */
 public class PredicateContext implements ProcessingContext {
+    static final String CTX = "ctx";
+    static final String RULE_NAME = "ruleName";
+    static final String ENGINE_CONTROLLER = "engineController";
+
     private final String ruleId;
     private final Object result;
     private final Map<String, Object> facts;
@@ -53,9 +57,9 @@ public class PredicateContext implements ProcessingContext {
 
     private Map<String, Object> createResolveIdentifiers() {
         Map<String, Object> reservedIdentifiers = new HashMap<>();
-        reservedIdentifiers.put("ctx", result);
-        reservedIdentifiers.put("ruleName", ruleId);
-        reservedIdentifiers.put("engineController", engineController);
+        reservedIdentifiers.put(CTX, result);
+        reservedIdentifiers.put(RULE_NAME, ruleId);
+        reservedIdentifiers.put(ENGINE_CONTROLLER, engineController);
 
         return reservedIdentifiers;
     }
