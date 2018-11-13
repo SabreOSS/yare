@@ -24,33 +24,9 @@
 
 package com.sabre.oss.yare.core.internal;
 
-import com.sabre.oss.yare.core.EngineController;
-import com.sabre.oss.yare.core.listener.Listener;
-import com.sabre.oss.yare.core.listener.StopProcessingContext;
-import com.sabre.oss.yare.core.listener.StopProcessingListener;
+public class AlreadyRegisteredListenerException extends RuntimeException {
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.BiConsumer;
-
-public class DefaultEngineController implements EngineController {
-    private final Map<Class, Listener> listeners;
-
-    public DefaultEngineController(Map<Class, Listener> listeners) {
-        this.listeners = Collections.unmodifiableMap(listeners);
-    }
-
-    @Override
-    public void stopProcessing() {
-        execute(StopProcessingListener.class, StopProcessingListener::onStopProcessing, new StopProcessingContext() {
-        });
-    }
-
-    @SuppressWarnings({"SameParameterValue", "unchecked"})
-    private <T, C> void execute(Class<T> clazz, BiConsumer<T, C> callback, C context) {
-        T listener = (T) listeners.get(clazz);
-        if (listener != null) {
-            callback.accept(listener, context);
-        }
+    public AlreadyRegisteredListenerException(String message) {
+        super(message);
     }
 }

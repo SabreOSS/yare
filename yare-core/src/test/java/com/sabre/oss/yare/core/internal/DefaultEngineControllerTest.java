@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.core.internal;
 
+import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.listener.Listener;
 import com.sabre.oss.yare.core.listener.StopProcessingContext;
 import com.sabre.oss.yare.core.listener.StopProcessingListener;
@@ -37,9 +38,8 @@ class DefaultEngineControllerTest {
     @Test
     void shouldRegisterListener() {
         //given
-        DefaultEngineController engineController = new DefaultEngineController();
         TestListener testListener = new TestListener();
-        engineController.register(testListener);
+        EngineController engineController = EngineControllerFactory.createDefaultFrom(testListener);
 
         //when
         engineController.stopProcessing();
@@ -51,36 +51,22 @@ class DefaultEngineControllerTest {
     @Test
     void shouldThrowExceptionWhenListenerAlreadyRegistered() {
         //given
-        DefaultEngineController engineController = new DefaultEngineController();
+        TestListener testListener = new TestListener();
 
         //when/then
-        engineController.register(new TestListener());
-        assertThatThrownBy(() -> engineController.register(new TestListener()))
-                .isInstanceOf(DefaultEngineController.AlreadyRegisteredListenerException.class)
+        assertThatThrownBy(() -> EngineControllerFactory.createDefaultFrom(testListener, testListener))
+                .isInstanceOf(AlreadyRegisteredListenerException.class)
                 .hasMessage("Listener is already registered");
-    }
-
-    @Test
-    void shouldThrowExceptionWhenNullListener() {
-        //given
-        DefaultEngineController engineController = new DefaultEngineController();
-
-        //when/then
-        assertThatThrownBy(() -> engineController.register(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Listener can not be null");
-
     }
 
     @Test
     void shouldRegisterOnlyStopProcessingListener() {
         //given
-        DefaultEngineController engineController = new DefaultEngineController();
         TestListener testListener = new TestListener();
+        UnknownListener unknownListener = new UnknownListener();
+        EngineController engineController = EngineControllerFactory.createDefaultFrom(unknownListener, testListener, unknownListener);
 
         //when
-        engineController.register(new UnknownListener());
-        engineController.register(testListener);
         engineController.stopProcessing();
 
         //then

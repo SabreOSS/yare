@@ -22,35 +22,28 @@
  * SOFTWARE.
  */
 
-package com.sabre.oss.yare.core.internal;
+package com.sabre.oss.yare.engine.executor;
 
-import com.sabre.oss.yare.core.EngineController;
-import com.sabre.oss.yare.core.listener.Listener;
 import com.sabre.oss.yare.core.listener.StopProcessingContext;
 import com.sabre.oss.yare.core.listener.StopProcessingListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class DefaultEngineController implements EngineController {
-    private final Map<Class, Listener> listeners;
+public class EngineListener implements StopProcessingListener {
+    private static final Logger log = LoggerFactory.getLogger(EngineListener.class);
 
-    public DefaultEngineController(Map<Class, Listener> listeners) {
-        this.listeners = Collections.unmodifiableMap(listeners);
+    private final AtomicBoolean evaluationTerminated = new AtomicBoolean(false);
+
+    boolean isEvaluationTerminated() {
+        return evaluationTerminated.get();
     }
 
     @Override
-    public void stopProcessing() {
-        execute(StopProcessingListener.class, StopProcessingListener::onStopProcessing, new StopProcessingContext() {
-        });
+    public void onStopProcessing(StopProcessingContext context) {
+        log.warn("Stopping processing...");
+        evaluationTerminated.set(true);
     }
 
-    @SuppressWarnings({"SameParameterValue", "unchecked"})
-    private <T, C> void execute(Class<T> clazz, BiConsumer<T, C> callback, C context) {
-        T listener = (T) listeners.get(clazz);
-        if (listener != null) {
-            callback.accept(listener, context);
-        }
-    }
 }

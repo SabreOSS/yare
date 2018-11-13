@@ -69,7 +69,7 @@ class PredicateContextTest {
     @Test
     void shouldResolveEngineControllerToEngineController() {
         // given
-        EngineController engineController = new DefaultEngineController();
+        EngineController engineController = new DefaultEngineController(Collections.emptyMap());
         PredicateContext predicateContext = new PredicateContext(null, null, Collections.emptyMap(), Collections.emptyMap(), engineController);
         String identifier = "engineController";
 
@@ -115,7 +115,7 @@ class PredicateContextTest {
         // given
         Map<String, Object> attributes = Collections.singletonMap("attributeKey", "attributeValue");
         Map<String, Object> facts = Collections.singletonMap("factKey", "factValue");
-        PredicateContext predicateContext = new PredicateContext("ruleId", "result", facts, attributes, new DefaultEngineController());
+        PredicateContext predicateContext = new PredicateContext("ruleId", "result", facts, attributes, new DefaultEngineController(Collections.emptyMap()));
         String identifier = "unknownIdentifier";
 
         // when
@@ -135,7 +135,7 @@ class PredicateContextTest {
         // given
         Map<String, Object> attributes = Collections.singletonMap("key", "attributeValue");
         Map<String, Object> facts = ImmutableMap.of("key", "factValue", "factKey", "factValue");
-        PredicateContext predicateContext = new PredicateContext("ruleId", "result", facts, attributes, new DefaultEngineController());
+        PredicateContext predicateContext = new PredicateContext("ruleId", "result", facts, attributes, new DefaultEngineController(Collections.emptyMap()));
 
         // when
         String resolved = predicateContext.resolve(identifier, "defaultValue");

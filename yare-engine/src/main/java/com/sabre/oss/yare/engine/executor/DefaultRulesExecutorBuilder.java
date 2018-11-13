@@ -30,7 +30,7 @@ import com.sabre.oss.yare.core.call.ConsequenceFactory;
 import com.sabre.oss.yare.core.call.FunctionFactory;
 import com.sabre.oss.yare.core.call.ProcessingInvocationFactory;
 import com.sabre.oss.yare.core.feature.FeaturedObject;
-import com.sabre.oss.yare.core.internal.DefaultEngineController;
+import com.sabre.oss.yare.core.internal.EngineControllerFactory;
 import com.sabre.oss.yare.engine.*;
 import com.sabre.oss.yare.engine.feature.DefaultEngineFeature;
 import org.apache.commons.lang3.ArrayUtils;
@@ -46,7 +46,6 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
     private Map<String, CallMetadata> functionMappings = new HashMap<>();
     private RulesRepository rulesRepository;
     private ErrorHandler errorHandler;
-    private DefaultEngineController engineController;
     private CallInvocationResultCache invocationCache;
 
     /**
@@ -88,15 +87,6 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
     @Override
     public DefaultRulesExecutorBuilder withErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RulesExecutorBuilder withEngineController(DefaultEngineController engineController) {
-        this.engineController = engineController;
         return this;
     }
 
@@ -211,6 +201,8 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
         ConsequenceFactory consequenceFactory = new ConsequenceFactory(actionInvocationFactory, errorHandler);
         RuntimeRulesBuilder runtimeRulesBuilder = new RuntimeRulesBuilder(new DefaultPredicateFactory(), functionFactory, consequenceFactory);
 
-        return new DefaultRulesExecutor(rulesRepository, runtimeRulesBuilder, configuration, engineController);
+        EngineListener engineListener = new EngineListener();
+        EngineController engineController = EngineControllerFactory.createDefaultFrom(engineListener);
+        return new DefaultRulesExecutor(rulesRepository, runtimeRulesBuilder, configuration, engineController, engineListener);
     }
 }

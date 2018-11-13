@@ -26,7 +26,6 @@ package com.sabre.oss.yare.core;
 
 import com.sabre.oss.yare.core.call.CallMetadata;
 import com.sabre.oss.yare.core.feature.FeaturedObject;
-import com.sabre.oss.yare.core.internal.DefaultEngineController;
 
 import java.util.Map;
 
@@ -65,14 +64,6 @@ public interface RulesExecutorBuilder {
      * @return this rulesExecutorBuilder instance
      */
     RulesExecutorBuilder withErrorHandler(ErrorHandler errorHandler);
-
-    /**
-     * Specify {@link DefaultEngineController} used by the rules executor.
-     *
-     * @param engineController engine controller
-     * @return this rulesExecutorBuilder instance
-     */
-    RulesExecutorBuilder withEngineController(DefaultEngineController engineController);
 
     /**
      * Builds previously configured {@link RulesExecutor} instance.

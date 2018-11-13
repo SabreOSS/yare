@@ -28,7 +28,6 @@ import com.sabre.oss.yare.core.call.CallMetadata;
 import com.sabre.oss.yare.core.feature.Feature;
 import com.sabre.oss.yare.core.feature.FeaturedObject;
 import com.sabre.oss.yare.core.interceptor.ErrorHandlerSetUpInterceptor;
-import com.sabre.oss.yare.core.internal.DefaultEngineController;
 import com.sabre.oss.yare.core.internal.DefaultRulesEngine;
 import com.sabre.oss.yare.core.invocation.Interceptor;
 
@@ -46,7 +45,6 @@ public class RulesEngineBuilder {
     private RulesRepository rulesRepository;
     private RulesExecutorBuilder rulesExecutorBuilder;
     private ErrorHandler errorHandler;
-    private DefaultEngineController engineController;
 
     /**
      * Specify {@link RulesRepository} used by the rules engine.
@@ -165,10 +163,6 @@ public class RulesEngineBuilder {
             rulesExecutorBuilder = createDefaultRulesExecutorBuilder();
         }
 
-        if ( engineController == null ) {
-            engineController = new DefaultEngineController();
-        }
-
         List<Interceptor<ExecutionContext, ExecutionContext>> fixedInterceptors = new ArrayList<>(this.interceptors);
         fixedInterceptors.add(0, new ErrorHandlerSetUpInterceptor(errorHandler));
 
@@ -177,7 +171,6 @@ public class RulesEngineBuilder {
                 .withActionMappings(actionMappings)
                 .withFunctionMappings(functionMappings)
                 .withErrorHandler(errorHandler)
-                .withEngineController(engineController)
                 .build();
         return new DefaultRulesEngine(rulesExecutor, fixedInterceptors);
     }

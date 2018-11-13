@@ -26,31 +26,27 @@ package com.sabre.oss.yare.core.internal;
 
 import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.listener.Listener;
-import com.sabre.oss.yare.core.listener.StopProcessingContext;
 import com.sabre.oss.yare.core.listener.StopProcessingListener;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultEngineController implements EngineController {
-    private final Map<Class, Listener> listeners;
-
-    public DefaultEngineController(Map<Class, Listener> listeners) {
-        this.listeners = Collections.unmodifiableMap(listeners);
+public final class EngineControllerFactory {
+    private EngineControllerFactory() {
     }
 
-    @Override
-    public void stopProcessing() {
-        execute(StopProcessingListener.class, StopProcessingListener::onStopProcessing, new StopProcessingContext() {
-        });
+    public static EngineController createDefaultFrom(Listener... listeners) {
+        Map<Class, Listener> registeredListeners = new ConcurrentHashMap<>();
+        Arrays.stream(listeners).forEach(l -> tryToRegister(registeredListeners, StopProcessingListener.class, l));
+        return new DefaultEngineController(registeredListeners);
     }
 
-    @SuppressWarnings({"SameParameterValue", "unchecked"})
-    private <T, C> void execute(Class<T> clazz, BiConsumer<T, C> callback, C context) {
-        T listener = (T) listeners.get(clazz);
-        if (listener != null) {
-            callback.accept(listener, context);
+    private static <T> void tryToRegister(Map<Class, Listener> registeredListeners, Class<T> clazz, Listener listener) {
+        if (clazz.isAssignableFrom(listener.getClass())) {
+            if (registeredListeners.containsKey(clazz)) {
+                throw new AlreadyRegisteredListenerException("Listener is already registered");
+            }
+            registeredListeners.put(clazz, listener);
         }
     }
 }
