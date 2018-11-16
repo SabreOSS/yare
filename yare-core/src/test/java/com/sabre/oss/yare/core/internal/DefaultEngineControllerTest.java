@@ -26,8 +26,8 @@ package com.sabre.oss.yare.core.internal;
 
 import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.listener.Listener;
-import com.sabre.oss.yare.core.listener.StopProcessingContext;
-import com.sabre.oss.yare.core.listener.StopProcessingListener;
+import com.sabre.oss.yare.core.listener.CloseSessionContext;
+import com.sabre.oss.yare.core.listener.CloseSessionListener;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +42,7 @@ class DefaultEngineControllerTest {
         EngineController engineController = EngineControllerFactory.createDefaultFrom(testListener);
 
         //when
-        engineController.stopProcessing();
+        engineController.closeSession();
 
         //then
         assertThat(testListener.isEvaluationTerminated()).isTrue();
@@ -60,20 +60,20 @@ class DefaultEngineControllerTest {
     }
 
     @Test
-    void shouldRegisterOnlyStopProcessingListener() {
+    void shouldRegisterOnlyCloseSessionListener() {
         //given
         TestListener testListener = new TestListener();
         UnknownListener unknownListener = new UnknownListener();
         EngineController engineController = EngineControllerFactory.createDefaultFrom(unknownListener, testListener, unknownListener);
 
         //when
-        engineController.stopProcessing();
+        engineController.closeSession();
 
         //then
         assertThat(testListener.isEvaluationTerminated()).isTrue();
     }
 
-    private static class TestListener implements StopProcessingListener {
+    private static class TestListener implements CloseSessionListener {
         private boolean evaluationTerminated;
 
         TestListener() {
@@ -85,7 +85,7 @@ class DefaultEngineControllerTest {
         }
 
         @Override
-        public void onStopProcessing(StopProcessingContext context) {
+        public void onCloseSession(CloseSessionContext context) {
             evaluationTerminated = true;
         }
     }

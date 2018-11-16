@@ -26,8 +26,8 @@ package com.sabre.oss.yare.core.internal;
 
 import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.listener.Listener;
-import com.sabre.oss.yare.core.listener.StopProcessingContext;
-import com.sabre.oss.yare.core.listener.StopProcessingListener;
+import com.sabre.oss.yare.core.listener.CloseSessionContext;
+import com.sabre.oss.yare.core.listener.CloseSessionListener;
 
 import java.util.Collections;
 import java.util.Map;
@@ -41,8 +41,8 @@ public class DefaultEngineController implements EngineController {
     }
 
     @Override
-    public void stopProcessing() {
-        execute(StopProcessingListener.class, StopProcessingListener::onStopProcessing, new StopProcessingContext() {
+    public void closeSession() {
+        execute(CloseSessionListener.class, CloseSessionListener::onCloseSession, new CloseSessionContext() {
         });
     }
 

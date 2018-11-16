@@ -29,8 +29,8 @@ package com.sabre.oss.yare.core;
  */
 public interface EngineController {
     /**
-     * Stop processing facts and rules.
+     * Closes current processing session.
      */
-    void stopProcessing();
+    void closeSession();
 
 }

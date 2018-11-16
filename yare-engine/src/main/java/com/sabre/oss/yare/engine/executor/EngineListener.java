@@ -24,14 +24,14 @@
 
 package com.sabre.oss.yare.engine.executor;
 
-import com.sabre.oss.yare.core.listener.StopProcessingContext;
-import com.sabre.oss.yare.core.listener.StopProcessingListener;
+import com.sabre.oss.yare.core.listener.CloseSessionContext;
+import com.sabre.oss.yare.core.listener.CloseSessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class EngineListener implements StopProcessingListener {
+public class EngineListener implements CloseSessionListener {
     private static final Logger log = LoggerFactory.getLogger(EngineListener.class);
 
     private final AtomicBoolean evaluationTerminated = new AtomicBoolean(false);
@@ -41,8 +41,8 @@ public class EngineListener implements StopProcessingListener {
     }
 
     @Override
-    public void onStopProcessing(StopProcessingContext context) {
-        log.warn("Stopping processing...");
+    public void onCloseSession(CloseSessionContext context) {
+        log.warn("Closing session...");
         evaluationTerminated.set(true);
     }
 

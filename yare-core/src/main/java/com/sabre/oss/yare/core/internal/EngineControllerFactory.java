@@ -26,7 +26,7 @@ package com.sabre.oss.yare.core.internal;
 
 import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.listener.Listener;
-import com.sabre.oss.yare.core.listener.StopProcessingListener;
+import com.sabre.oss.yare.core.listener.CloseSessionListener;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +37,7 @@ public final class EngineControllerFactory {
 
     public static EngineController createDefaultFrom(Listener... listeners) {
         Map<Class, Listener> registeredListeners = new ConcurrentHashMap<>();
-        Arrays.stream(listeners).forEach(l -> tryToRegister(registeredListeners, StopProcessingListener.class, l));
+        Arrays.stream(listeners).forEach(listener -> tryToRegister(registeredListeners, CloseSessionListener.class, listener));
         return new DefaultEngineController(registeredListeners);
     }
 

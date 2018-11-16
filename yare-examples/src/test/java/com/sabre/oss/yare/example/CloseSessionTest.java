@@ -38,7 +38,7 @@ import static com.sabre.oss.yare.dsl.RuleDsl.*;
 import static com.sabre.oss.yare.invoker.java.MethodCallMetadata.method;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StoppedActionTest {
+public class CloseSessionTest {
 
     @Test
     void shouldEvaluatingUpToTwoMatchingFacts() {
@@ -73,7 +73,7 @@ public class StoppedActionTest {
 
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> rules)
-                .withActionMapping("collectUpToTwoMatchFacts", method(new StoppedActionTest.Actions(2), (action) -> action.collectUpToMaxMatchFacts(null, null, null)))
+                .withActionMapping("collectUpToTwoMatchFacts", method(new CloseSessionTest.Actions(2), (action) -> action.collectUpToMaxMatchFacts(null, null, null)))
                 .build();
         RuleSession session = engine.createSession("airlines");
 
@@ -120,7 +120,7 @@ public class StoppedActionTest {
 
         RulesEngine engine = new RulesEngineBuilder()
                 .withRulesRepository(i -> rules)
-                .withActionMapping("collectUpToFourMatchFacts", method(new StoppedActionTest.Actions(4), (action) -> action.collectUpToMaxMatchFacts(null, null, null)))
+                .withActionMapping("collectUpToFourMatchFacts", method(new CloseSessionTest.Actions(4), (action) -> action.collectUpToMaxMatchFacts(null, null, null)))
                 .build();
 
         RuleSession session = engine.createSession("airlines");
@@ -179,7 +179,7 @@ public class StoppedActionTest {
         public void collectUpToMaxMatchFacts(List<Object> results, Object fact, EngineController engineController) {
             results.add(fact);
             if (results.size() == maxMatchFacts) {
-                engineController.stopProcessing();
+                engineController.closeSession();
             }
         }
     }

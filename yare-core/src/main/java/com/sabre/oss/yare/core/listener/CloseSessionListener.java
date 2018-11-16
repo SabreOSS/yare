@@ -24,9 +24,11 @@
 
 package com.sabre.oss.yare.core.listener;
 
-/**
- * Provide context for {@link StopProcessingListener}
- */
-public interface StopProcessingContext {
+import com.sabre.oss.yare.core.EngineController;
 
+public interface CloseSessionListener extends Listener {
+    /**
+     * This method is called after an {@link EngineController} sends notification {@link EngineController#closeSession()} to registered {@link CloseSessionListener}.
+     */
+    void onCloseSession(CloseSessionContext context);
 }
