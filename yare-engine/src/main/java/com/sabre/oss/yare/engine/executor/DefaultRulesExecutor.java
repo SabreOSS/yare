@@ -54,10 +54,15 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     private final Map<Class<?>, String> typeNames = new ConcurrentHashMap<>();
     private final LoadingCache<String, RuntimeRules> runtimeRulesCache;
     private final ExecutorConfiguration configuration;
+    private final EngineController engineController;
+    private final EngineListener engineListener;
 
-    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder, ExecutorConfiguration configuration) {
+    public DefaultRulesExecutor(RulesRepository rulesRepository, RuntimeRulesBuilder runtimeRulesBuilder,
+                                ExecutorConfiguration configuration, EngineController engineController, EngineListener engineListener) {
         this.configuration = configuration;
         this.runtimeRulesCache = buildCachingContext(rulesRepository, runtimeRulesBuilder);
+        this.engineController = engineController;
+        this.engineListener = engineListener;
     }
 
     @Override
@@ -85,11 +90,11 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
                 : configuration.isCrossProductMode() ? new CrossProductFactTupleIterator(groupedFact) : new SingleInstanceFactTupleIterator(groupedFact);
 
         if (configuration.isSequentialMode()) {
-            while (iterator.hasNext()) {
+            while (iterator.hasNext() && !engineListener.isEvaluationTerminated()) {
                 evaluateSequentially(runtimeRules, result, iterator.next());
             }
         } else {
-            while (iterator.hasNext()) {
+            while (iterator.hasNext() && !engineListener.isEvaluationTerminated()) {
                 evaluate(runtimeRules, result, iterator.next());
             }
         }
@@ -129,8 +134,10 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     }
 
     private void evaluateSequentially(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
-        for (RuntimeRules.ExecutableRule executableRule : runtimeRules.getExecutableRules()) {
-            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes());
+        List<RuntimeRules.ExecutableRule> executableRules = runtimeRules.getExecutableRules();
+        for (int i = 0; i < executableRules.size() && !engineListener.isEvaluationTerminated(); ++i) {
+            RuntimeRules.ExecutableRule executableRule = executableRules.get(i);
+            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes(), engineController);
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
             if (Boolean.TRUE.equals(evaluationResult)) {
                 executableRule.getConsequence().proceed(context);
@@ -141,14 +148,15 @@ public class DefaultRulesExecutor implements RulesExecutor, Wrapper, EvictableCa
     private void evaluate(RuntimeRules runtimeRules, Object result, Map<String, Object> factMap) {
         List<Pair<Invocation<ProcessingContext, Void>, PredicateContext>> consequences = new LinkedList<>();
         for (RuntimeRules.ExecutableRule executableRule : runtimeRules.getExecutableRules()) {
-            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes());
+            PredicateContext context = new PredicateContext(executableRule.getRuleId(), result, factMap, executableRule.getAttributes(), engineController);
             Boolean evaluationResult = executableRule.getPredicate().evaluate(context);
             if (Boolean.TRUE.equals(evaluationResult)) {
                 consequences.add(Pair.of(executableRule.getConsequence(), context));
             }
         }
 
-        for (Pair<Invocation<ProcessingContext, Void>, PredicateContext> consequence : consequences) {
+        for (int i = 0; i < consequences.size() && !engineListener.isEvaluationTerminated(); ++i) {
+            Pair<Invocation<ProcessingContext, Void>, PredicateContext> consequence = consequences.get(i);
             consequence.getKey().proceed(consequence.getValue());
         }
     }

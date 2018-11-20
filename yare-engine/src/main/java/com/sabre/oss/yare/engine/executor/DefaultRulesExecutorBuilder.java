@@ -24,15 +24,13 @@
 
 package com.sabre.oss.yare.engine.executor;
 
-import com.sabre.oss.yare.core.ErrorHandler;
-import com.sabre.oss.yare.core.RulesExecutor;
-import com.sabre.oss.yare.core.RulesExecutorBuilder;
-import com.sabre.oss.yare.core.RulesRepository;
+import com.sabre.oss.yare.core.*;
 import com.sabre.oss.yare.core.call.CallMetadata;
 import com.sabre.oss.yare.core.call.ConsequenceFactory;
 import com.sabre.oss.yare.core.call.FunctionFactory;
 import com.sabre.oss.yare.core.call.ProcessingInvocationFactory;
 import com.sabre.oss.yare.core.feature.FeaturedObject;
+import com.sabre.oss.yare.core.internal.EngineControllerFactory;
 import com.sabre.oss.yare.engine.*;
 import com.sabre.oss.yare.engine.feature.DefaultEngineFeature;
 import org.apache.commons.lang3.ArrayUtils;
@@ -203,6 +201,8 @@ public class DefaultRulesExecutorBuilder implements RulesExecutorBuilder {
         ConsequenceFactory consequenceFactory = new ConsequenceFactory(actionInvocationFactory, errorHandler);
         RuntimeRulesBuilder runtimeRulesBuilder = new RuntimeRulesBuilder(new DefaultPredicateFactory(), functionFactory, consequenceFactory);
 
-        return new DefaultRulesExecutor(rulesRepository, runtimeRulesBuilder, configuration);
+        EngineListener engineListener = new EngineListener();
+        EngineController engineController = EngineControllerFactory.createDefaultFrom(engineListener);
+        return new DefaultRulesExecutor(rulesRepository, runtimeRulesBuilder, configuration, engineController, engineListener);
     }
 }

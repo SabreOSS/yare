@@ -24,25 +24,44 @@
 
 package com.sabre.oss.yare.engine.executor.runtime.predicate;
 
+import com.sabre.oss.yare.core.EngineController;
 import com.sabre.oss.yare.core.call.ProcessingContext;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Predicate evaluation context.
  */
 public class PredicateContext implements ProcessingContext {
+    static final String CTX = "ctx";
+    static final String RULE_NAME = "ruleName";
+    static final String ENGINE_CONTROLLER = "engineController";
+
     private final String ruleId;
     private final Object result;
     private final Map<String, Object> facts;
     private final Map<String, Object> attributes;
+    private final EngineController engineController;
+    private final Map<String, Object> reservedIdentifiers;
 
     // Do not pass merged maps due to performance implications.
-    public PredicateContext(String ruleId, Object result, Map<String, Object> facts, Map<String, Object> attributes) {
+    public PredicateContext(String ruleId, Object result, Map<String, Object> facts, Map<String, Object> attributes, EngineController engineController) {
         this.ruleId = ruleId;
         this.result = result;
         this.facts = facts;
         this.attributes = attributes;
+        this.engineController = engineController;
+        this.reservedIdentifiers = createResolveIdentifiers();
+    }
+
+    private Map<String, Object> createResolveIdentifiers() {
+        Map<String, Object> reservedIdentifiers = new HashMap<>();
+        reservedIdentifiers.put(CTX, result);
+        reservedIdentifiers.put(RULE_NAME, ruleId);
+        reservedIdentifiers.put(ENGINE_CONTROLLER, engineController);
+
+        return reservedIdentifiers;
     }
 
     @Override
@@ -57,13 +76,7 @@ public class PredicateContext implements ProcessingContext {
 
     @Override
     public Object resolve(String identifier) {
-        if ("ctx".equals(identifier)) {
-            return result;
-        }
-        if ("ruleName".equals(identifier)) {
-            return ruleId;
-        }
-        return attributes.getOrDefault(identifier, facts.get(identifier));
+        return reservedIdentifiers.getOrDefault(identifier, attributes.getOrDefault(identifier, facts.get(identifier)));
     }
 
     @SuppressWarnings("unchecked")
@@ -73,6 +86,6 @@ public class PredicateContext implements ProcessingContext {
     }
 
     public PredicateContext copy(String ruleId) {
-        return new PredicateContext(ruleId, result, facts, attributes);
+        return new PredicateContext(ruleId, result, facts, attributes, engineController);
     }
 }
