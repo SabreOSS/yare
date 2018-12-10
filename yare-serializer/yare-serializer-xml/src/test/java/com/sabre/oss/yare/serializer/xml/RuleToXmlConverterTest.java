@@ -224,7 +224,7 @@ class RuleToXmlConverterTest {
     }
 
     @Test
-    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10})
+    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10, JRE.JAVA_11})
     void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchemaOnJdk9And10() {
         // given
         String invalidXmlRule = "" +

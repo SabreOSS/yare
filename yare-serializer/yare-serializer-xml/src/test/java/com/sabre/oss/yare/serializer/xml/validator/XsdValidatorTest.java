@@ -122,7 +122,7 @@ class XsdValidatorTest {
     }
 
     @Nested
-    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10})
+    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10, JRE.JAVA_11})
     class ValidationMessagesOnJdk9And10Test {
         @Test
         void shouldReturnErrorResultsForInvalidXmlRuleWithSingleViolation() {
