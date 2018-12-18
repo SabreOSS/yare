@@ -34,6 +34,7 @@ import com.sabre.oss.yare.serializer.xml.mapper.converter.rule.ToRuleConverter;
 import com.sabre.oss.yare.serializer.xml.mapper.converter.xml.ToXmlConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnJre;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
 import org.xml.sax.ErrorHandler;
@@ -224,8 +225,8 @@ class RuleToXmlConverterTest {
     }
 
     @Test
-    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10})
-    void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchemaOnJdk9And10() {
+    @DisabledOnJre(JRE.JAVA_8)
+    void shouldThrowExceptionWhenXmlRuleDoesNotSatisfySchemaOnJdkDifferentThan8() {
         // given
         String invalidXmlRule = "" +
                 "<yare:Rule xmlns:yare=\"http://www.sabre.com/schema/oss/yare/rules/v1\">\n" +
