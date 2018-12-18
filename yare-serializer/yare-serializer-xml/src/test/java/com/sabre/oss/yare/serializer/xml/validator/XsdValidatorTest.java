@@ -30,6 +30,7 @@ import com.sabre.oss.yare.serializer.xml.utils.ResourceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnJre;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
 
@@ -122,8 +123,8 @@ class XsdValidatorTest {
     }
 
     @Nested
-    @EnabledOnJre({JRE.JAVA_9, JRE.JAVA_10, JRE.JAVA_11})
-    class ValidationMessagesOnJdk9And10Test {
+    @DisabledOnJre(JRE.JAVA_8)
+    class ValidationMessagesOnJdkDifferentThan8Test {
         @Test
         void shouldReturnErrorResultsForInvalidXmlRuleWithSingleViolation() {
             // given
