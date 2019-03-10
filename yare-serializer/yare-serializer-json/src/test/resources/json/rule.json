@@ -78,7 +78,7 @@
                       "name": "param-1",
                       "function": {
                         "name": "function-2",
-                        "returnType": "com.sabre.oss.yare.core.model.Expression.Undefined",
+                        "returnType": "Undefined",
                         "parameters": []
                       }
                     }
@@ -125,7 +125,7 @@
             "is-null": [
               {
                 "value": null,
-                "type": "com.sabre.oss.yare.core.model.Expression.Undefined"
+                "type": "Undefined"
               }
             ]
           }
@@ -155,7 +155,7 @@
           "name": "param-3",
           "function": {
             "name": "function-4",
-            "returnType": "com.sabre.oss.yare.core.model.Expression.Undefined",
+            "returnType": "Undefined",
             "parameters": []
           }
         }

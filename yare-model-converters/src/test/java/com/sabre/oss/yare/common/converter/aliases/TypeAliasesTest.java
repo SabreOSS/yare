@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.common.converter.aliases;
 
+import com.sabre.oss.yare.core.model.Expression;
 import org.assertj.core.data.MapEntry;
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +70,8 @@ class TypeAliasesTest {
                         getEntryWithNameKey("BigDecimal", BigDecimal.class),
                         getEntryWithNameKey("List", List.class),
                         getEntryWithNameKey("Map", Map.class),
-                        getEntryWithNameKey("Set", Set.class));
+                        getEntryWithNameKey("Set", Set.class),
+                        getEntryWithNameKey("Undefined", Expression.UNDEFINED));
     }
 
     @Test
@@ -101,7 +103,8 @@ class TypeAliasesTest {
                         getEntryWithTypeKey("BigDecimal", BigDecimal.class),
                         getEntryWithTypeKey("List", List.class),
                         getEntryWithTypeKey("Map", Map.class),
-                        getEntryWithTypeKey("Set", Set.class));
+                        getEntryWithTypeKey("Set", Set.class),
+                        getEntryWithTypeKey("Undefined", Expression.UNDEFINED));
     }
 
     private MapEntry<String, TypeAlias> getEntryWithNameKey(String typeName, Class<?> type) {
