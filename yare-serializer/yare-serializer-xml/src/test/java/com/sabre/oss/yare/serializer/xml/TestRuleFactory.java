@@ -207,6 +207,20 @@ final class TestRuleFactory {
                         .withParameter(operands));
     }
 
+    static RuleSer constructValidRuleWithNullUndefinedValue() {
+        return new RuleSer()
+                .withPredicate(new PredicateSer()
+                        .withValue(new ValueSer().withType("Undefined").withValue("@null"))
+                );
+    }
+
+    static RuleSer constructValidRuleWithNullStringValue() {
+        return new RuleSer()
+                .withPredicate(new PredicateSer()
+                        .withValue(new ValueSer().withValue("@null"))
+                );
+    }
+
     @XmlRootElement(namespace = "http://example.sabre.com/custom/schema", name = "Isbn")
     static class Isbn {
         private String code;

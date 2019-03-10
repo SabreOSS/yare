@@ -24,38 +24,38 @@
 
 package com.sabre.oss.yare.common.converter;
 
-import static java.util.Arrays.asList;
+import com.sabre.oss.yare.core.model.Expression;
+import org.junit.jupiter.api.Test;
 
-/**
- * A utility class which configures {@link TypeConverter} with the default set of type converters.
- */
-public abstract class DefaultTypeConverters {
-    private static final TypeConverter DEFAULT_AGGREGATE_TYPE_CONVERTER = prepareDefaultTypeConverter();
+import static org.assertj.core.api.Assertions.assertThat;
 
-    /**
-     * Returns pre-configured aggregate {@link TypeConverter}.
-     *
-     * @return {@link TypeConverter}
-     */
-    public static TypeConverter getDefaultTypeConverter() {
-        return DEFAULT_AGGREGATE_TYPE_CONVERTER;
+class UndefinedTypeConverterTest {
+    private final UndefinedTypeConverter converter = new UndefinedTypeConverter();
+
+    @Test
+    void shouldBeApplicableForUndefinedType() {
+        // when
+        boolean applicable = converter.isApplicable(Expression.UNDEFINED);
+
+        // then
+        assertThat(applicable).isTrue();
     }
 
-    /**
-     * Prepares default aggregate type converter that is able to handle simple types.
-     *
-     * @return aggregated {@link TypeConverter}
-     */
-    private static TypeConverter prepareDefaultTypeConverter() {
-        return new ChainedTypeConverter(asList(
-                new TypeTypeConverter(),
-                new StringTypeConverter(),
-                new BooleanTypeConverter(),
-                new IntegerTypeConverter(),
-                new LongTypeConverter(),
-                new BigDecimalTypeConverter(),
-                new ZonedDateTimeConverter(),
-                new UndefinedTypeConverter()
-        ));
+    @Test
+    void shouldReturnNullWhenFromStringConversion() {
+        // when
+        Object converted = converter.fromString(null, null);
+
+        // then
+        assertThat(converted).isNull();
+    }
+
+    @Test
+    void shouldReturnNullLiteralWhenToStringConversion() {
+        // when
+        String converted = converter.toString(null, null);
+
+        // then
+        assertThat(converted).isEqualTo(StringTypeConverter.NULL_LITERAL);
     }
 }

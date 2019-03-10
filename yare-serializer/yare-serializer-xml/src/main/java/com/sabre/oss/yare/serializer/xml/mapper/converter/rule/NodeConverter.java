@@ -77,12 +77,8 @@ class NodeConverter {
         return (name, input) -> {
             String typeName = input.getType();
             String value = input.getValue();
-            if (typeName != null) {
-                Type type = typeConverter.fromString(Type.class, typeName);
-                return valueOf(name, type, typeConverter.fromString(type, value));
-            } else {
-                return valueOf(name, String.class, value);
-            }
+            Type type = typeName != null ? typeConverter.fromString(Type.class, typeName) : String.class;
+            return valueOf(name, type, typeConverter.fromString(type, value));
         };
     }
 

@@ -75,12 +75,10 @@ class ExpressionConverter {
         Expression.Value value = expression.as(Expression.Value.class);
         if (value != null) {
             String type = typeConverter.toString(Type.class, value.getType());
-            if (value.getValue() != null) {
-                if (typeConverter.isApplicable(value.getType())) {
-                    return new ValueSer()
-                            .withType(String.class.equals(value.getType()) ? null : type)
-                            .withValue(typeConverter.toString(value.getType(), value.getValue()));
-                }
+            if (typeConverter.isApplicable(value.getType())) {
+                return new ValueSer()
+                        .withType(String.class.equals(value.getType()) ? null : type)
+                        .withValue(typeConverter.toString(value.getType(), value.getValue()));
             }
             return new CustomValueSer()
                     .withType(type)
