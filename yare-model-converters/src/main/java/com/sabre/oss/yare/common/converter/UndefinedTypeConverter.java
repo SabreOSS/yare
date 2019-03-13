@@ -24,38 +24,23 @@
 
 package com.sabre.oss.yare.common.converter;
 
-import static java.util.Arrays.asList;
+import com.sabre.oss.yare.core.model.Expression;
 
-/**
- * A utility class which configures {@link TypeConverter} with the default set of type converters.
- */
-public abstract class DefaultTypeConverters {
-    private static final TypeConverter DEFAULT_AGGREGATE_TYPE_CONVERTER = prepareDefaultTypeConverter();
+import java.lang.reflect.Type;
 
-    /**
-     * Returns pre-configured aggregate {@link TypeConverter}.
-     *
-     * @return {@link TypeConverter}
-     */
-    public static TypeConverter getDefaultTypeConverter() {
-        return DEFAULT_AGGREGATE_TYPE_CONVERTER;
+public class UndefinedTypeConverter implements TypeConverter {
+    @Override
+    public boolean isApplicable(Type type) {
+        return Expression.UNDEFINED.equals(type);
     }
 
-    /**
-     * Prepares default aggregate type converter that is able to handle simple types.
-     *
-     * @return aggregated {@link TypeConverter}
-     */
-    private static TypeConverter prepareDefaultTypeConverter() {
-        return new ChainedTypeConverter(asList(
-                new TypeTypeConverter(),
-                new StringTypeConverter(),
-                new BooleanTypeConverter(),
-                new IntegerTypeConverter(),
-                new LongTypeConverter(),
-                new BigDecimalTypeConverter(),
-                new ZonedDateTimeConverter(),
-                new UndefinedTypeConverter()
-        ));
+    @Override
+    public Object fromString(Type type, String value) {
+        return null;
+    }
+
+    @Override
+    public String toString(Type type, Object value) {
+        return StringTypeConverter.NULL_LITERAL;
     }
 }

@@ -60,6 +60,8 @@ class RuleToXmlConverterTest {
     private static final ObjectFactory objectFactory = new ObjectFactory();
     private static final String validXmlRuleWithBuildInObjectTypes = substringAfterLast(getResourceAsString("/serializer/validXmlRuleWithBuildInObjectTypes.xml"), "-->");
     private static final String validXmlRuleWithCustomObjectTypes = substringAfterLast(getResourceAsString("/serializer/validXmlRuleWithCustomObjectTypes.xml"), "-->");
+    private static final String validXmlRuleWithNullUndefinedValue = substringAfterLast(getResourceAsString("/serializer/validXmlRuleWithNullUndefinedValue.xml"), "-->");
+    private static final String validXmlRuleWithNullStringValue = substringAfterLast(getResourceAsString("/serializer/validXmlRuleWithNullStringValue.xml"), "-->");
 
     private final ToRuleConverter toRuleConverter = new ToRuleConverter(DefaultTypeConverters.getDefaultTypeConverter());
     private final ToXmlConverter toXmlConverter = new ToXmlConverter(DefaultTypeConverters.getDefaultTypeConverter());
@@ -96,6 +98,30 @@ class RuleToXmlConverterTest {
     }
 
     @Test
+    void shouldMarshallValidRuleWithNullUndefinedValue() {
+        // given
+        Rule ruleObject = toRuleConverter.map(TestRuleFactory.constructValidRuleWithNullUndefinedValue());
+
+        // when
+        String ruleAsString = converter.marshal(ruleObject);
+
+        // then
+        assertThat(ruleAsString).isXmlEqualTo(validXmlRuleWithNullUndefinedValue);
+    }
+
+    @Test
+    void shouldMarshallValidRuleWithNullStringValue() {
+        // given
+        Rule ruleObject = toRuleConverter.map(TestRuleFactory.constructValidRuleWithNullStringValue());
+
+        // when
+        String ruleAsString = converter.marshal(ruleObject);
+
+        // then
+        assertThat(ruleAsString).isXmlEqualTo(validXmlRuleWithNullStringValue);
+    }
+
+    @Test
     void shouldUnmarshalValidRuleWithBuildInObjectTypes() {
         // given
         Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithBuildInObjectTypes());
@@ -118,6 +144,30 @@ class RuleToXmlConverterTest {
 
         // then
         assertThat(ruleObject.getAttributes()).containsAll(validRule.getAttributes());
+        assertThat(ruleObject).isEqualTo(validRule);
+    }
+
+    @Test
+    void shouldUnmarshalValidRuleWithNullUndefinedValue() {
+        // given
+        Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithNullUndefinedValue());
+
+        // when
+        Rule ruleObject = converter.unmarshal(validXmlRuleWithNullUndefinedValue);
+
+        // then
+        assertThat(ruleObject).isEqualTo(validRule);
+    }
+
+    @Test
+    void shouldUnmarshalValidRuleWithNullStringValue() {
+        // given
+        Rule validRule = toRuleConverter.map(TestRuleFactory.constructValidRuleWithNullStringValue());
+
+        // when
+        Rule ruleObject = converter.unmarshal(validXmlRuleWithNullStringValue);
+
+        // then
         assertThat(ruleObject).isEqualTo(validRule);
     }
 

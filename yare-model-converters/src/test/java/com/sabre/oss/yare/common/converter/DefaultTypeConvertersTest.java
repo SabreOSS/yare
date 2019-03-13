@@ -24,6 +24,7 @@
 
 package com.sabre.oss.yare.common.converter;
 
+import com.sabre.oss.yare.core.model.Expression;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -62,7 +63,8 @@ class DefaultTypeConvertersTest {
                 Long.class,
                 String.class,
                 Type.class,
-                ZonedDateTime.class
+                ZonedDateTime.class,
+                Expression.UNDEFINED
         );
     }
 
@@ -90,7 +92,8 @@ class DefaultTypeConvertersTest {
                 Arguments.of(Long.class, "123", 123L),
                 Arguments.of(String.class, "test", "test"),
                 Arguments.of(Type.class, "Object", Object.class),
-                Arguments.of(ZonedDateTime.class, "2014-12-02T10:45:30+02:00", ZonedDateTime.parse("2014-12-02T10:45:30+02:00"))
+                Arguments.of(ZonedDateTime.class, "2014-12-02T10:45:30+02:00", ZonedDateTime.parse("2014-12-02T10:45:30+02:00")),
+                Arguments.of(Expression.UNDEFINED, "@null", null)
         );
     }
 }

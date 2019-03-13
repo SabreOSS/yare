@@ -27,10 +27,10 @@ package com.sabre.oss.yare.serializer.json.mapper.json;
 import com.sabre.oss.yare.common.converter.DefaultTypeConverters;
 import com.sabre.oss.yare.core.model.Expression;
 import com.sabre.oss.yare.serializer.json.model.Function;
-import com.sabre.oss.yare.serializer.json.model.*;
 import com.sabre.oss.yare.serializer.json.model.Operator;
 import com.sabre.oss.yare.serializer.json.model.Value;
 import com.sabre.oss.yare.serializer.json.model.Values;
+import com.sabre.oss.yare.serializer.json.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -73,7 +73,7 @@ class PredicateConverterTest {
 
             Value expected = new Value()
                     .withValue(100)
-                    .withType(Expression.Undefined.class.getCanonicalName());
+                    .withType("Expression.Undefined");
             assertThat(operand).isEqualTo(expected);
         }
     }
@@ -144,7 +144,7 @@ class PredicateConverterTest {
             Operand operand = predicateConverter.convert(toConvert);
 
             Values expected = new Values()
-                    .withType(Expression.Undefined.class.getCanonicalName())
+                    .withType("Expression.Undefined")
                     .withValues();
             assertThat(operand).isEqualTo(expected);
         }

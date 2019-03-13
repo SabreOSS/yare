@@ -45,7 +45,8 @@ final class ClassUtils {
                 }
             };
 
-    private ClassUtils() { }
+    private ClassUtils() {
+    }
 
     static Class<?> forName(String name) {
         return Stream.of(
