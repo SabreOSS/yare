@@ -210,7 +210,7 @@ final class TestRuleFactory {
     static RuleSer constructValidRuleWithNullUndefinedValue() {
         return new RuleSer()
                 .withPredicate(new PredicateSer()
-                        .withValue(new ValueSer().withType("Undefined").withValue("@null"))
+                        .withValue(new ValueSer().withType("Expression.Undefined").withValue("@null"))
                 );
     }
 

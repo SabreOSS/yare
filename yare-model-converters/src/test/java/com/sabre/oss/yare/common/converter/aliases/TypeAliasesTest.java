@@ -71,7 +71,7 @@ class TypeAliasesTest {
                         getEntryWithNameKey("List", List.class),
                         getEntryWithNameKey("Map", Map.class),
                         getEntryWithNameKey("Set", Set.class),
-                        getEntryWithNameKey("Undefined", Expression.UNDEFINED));
+                        getEntryWithNameKey("Expression.Undefined", Expression.UNDEFINED));
     }
 
     @Test
@@ -104,7 +104,7 @@ class TypeAliasesTest {
                         getEntryWithTypeKey("List", List.class),
                         getEntryWithTypeKey("Map", Map.class),
                         getEntryWithTypeKey("Set", Set.class),
-                        getEntryWithTypeKey("Undefined", Expression.UNDEFINED));
+                        getEntryWithTypeKey("Expression.Undefined", Expression.UNDEFINED));
     }
 
     private MapEntry<String, TypeAlias> getEntryWithNameKey(String typeName, Class<?> type) {

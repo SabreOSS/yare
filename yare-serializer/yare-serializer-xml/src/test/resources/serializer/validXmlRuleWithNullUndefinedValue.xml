@@ -27,6 +27,6 @@
 <yare:Rule xmlns:custom="http://example.sabre.com/custom/schema"
            xmlns:yare="http://www.sabre.com/schema/oss/yare/rules/v1">
     <yare:Predicate>
-        <yare:Value type="Undefined">@null</yare:Value>
+        <yare:Value type="Expression.Undefined">@null</yare:Value>
     </yare:Predicate>
 </yare:Rule>

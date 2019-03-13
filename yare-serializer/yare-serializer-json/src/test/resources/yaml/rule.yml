@@ -52,7 +52,7 @@ predicate:
           - name: "param-1"
             function:
               name: "function-2"
-              returnType: "Undefined"
+              returnType: "Expression.Undefined"
               parameters: []
   - function:
       name: "function-3"
@@ -72,7 +72,7 @@ predicate:
   - not:
     - is-null:
       - value: null
-        type: "Undefined"
+        type: "Expression.Undefined"
 actions:
 - name: "action-name"
   parameters:
@@ -86,5 +86,5 @@ actions:
   - name: "param-3"
     function:
       name: "function-4"
-      returnType: "Undefined"
+      returnType: "Expression.Undefined"
       parameters: []

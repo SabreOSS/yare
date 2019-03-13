@@ -73,7 +73,7 @@ class PredicateConverterTest {
 
             Value expected = new Value()
                     .withValue(100)
-                    .withType("Undefined");
+                    .withType("Expression.Undefined");
             assertThat(operand).isEqualTo(expected);
         }
     }
@@ -144,7 +144,7 @@ class PredicateConverterTest {
             Operand operand = predicateConverter.convert(toConvert);
 
             Values expected = new Values()
-                    .withType("Undefined")
+                    .withType("Expression.Undefined")
                     .withValues();
             assertThat(operand).isEqualTo(expected);
         }
