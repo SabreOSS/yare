@@ -80,6 +80,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.cxf.xjc-utils</groupId>
+            <artifactId>cxf-xjc-runtime</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <scope>runtime</scope>
@@ -172,6 +177,7 @@
                     <extensions>
                         <extension>org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0</extension>
                         <extension>org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.3</extension>
+                        <extension>org.apache.cxf.xjcplugins:cxf-xjc-ts:3.3.0</extension>
                     </extensions>
                 </configuration>
                 <executions>
@@ -191,6 +197,7 @@
                                     <extensionArgs>
                                         <extensionArg>-Xnamespace-prefix</extensionArg>
                                         <extensionArg>-Xfluent-api</extensionArg>
+                                        <extensionArg>-Xts:style:multiline</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
