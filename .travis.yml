@@ -32,3 +32,4 @@ jdk:
   - oraclejdk9
   - openjdk10
   - openjdk11
+  - openjdk12
