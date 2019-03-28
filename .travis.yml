@@ -24,12 +24,10 @@
 language: java
 sudo: false
 before_install:
-- chmod +x mvnw
+  - chmod +x mvnw
 script: chmod +x ./.travis/build.sh && ./.travis/build.sh
 
 jdk:
   - oraclejdk8
-  - oraclejdk9
-  - openjdk10
   - openjdk11
   - openjdk12
