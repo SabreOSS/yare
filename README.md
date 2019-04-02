@@ -209,6 +209,18 @@ We accept pull request via _GitHub_. Here are some guidelines which will make ap
 
 See [CONTRIBUTING](CONTRIBUTING.md) document for more details.
 
+## JDK support policy
+YARE supports each LTS (Long Term Support) version of the Java platform starting from the version 1.8. Moreover, it is
+compatible with every non-LTS version released after the latest LTS.
+
+Each JDK has separate _Travis_ pipeline to ensure proper compatibility. Please make sure your changes don't break
+any supported version.
+
+Currently YARE supports following JDK versions:
+* JDK 8
+* JDK 11
+* JDK 12
+
 ## License
 
 Copyright 2018 Sabre GLBL Inc.
