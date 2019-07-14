@@ -28,6 +28,6 @@ before_install:
 script: chmod +x ./.travis/build.sh && ./.travis/build.sh
 
 jdk:
-  - oraclejdk8
+  - openjdk8
   - openjdk11
   - openjdk12
