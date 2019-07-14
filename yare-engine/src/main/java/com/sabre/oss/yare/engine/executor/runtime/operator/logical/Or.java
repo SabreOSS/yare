@@ -30,7 +30,6 @@ import com.sabre.oss.yare.engine.executor.runtime.predicate.Predicate;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateContext;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateFactory;
 import com.sabre.oss.yare.engine.executor.runtime.predicate.PredicateFactoryContext;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
@@ -76,20 +75,21 @@ public final class Or extends Predicate {
         return anyUnknownResult ? null : false;
     }
 
+    @Override
     public int hashCode() {
         return Objects.hashCode(predicates);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(obj instanceof Or)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Or other = (Or) obj;
-        return CollectionUtils.isEqualCollection(other.predicates, this.predicates);
+        Or or = (Or) o;
+        return Objects.equals(predicates, or.predicates);
     }
 
     public static class Factory implements PredicateFactory {
