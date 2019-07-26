@@ -32,19 +32,20 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sabre.oss.yare.engine.executor.runtime.value.TypeUtils.getRawType;
 import static com.sabre.oss.yare.engine.executor.runtime.value.TypeUtils.isCollection;
 
 public abstract class FieldReferringClassFactory {
     private static final Logger log = LoggerFactory.getLogger(FieldReferringClassFactory.class);
-    private static final Map<String, ValueProvider> valueProviders = new HashMap<>();
+    private static final Map<String, ValueProvider> valueProviders = new ConcurrentHashMap<>();
     private static final ClassPool classPool = createClassPool();
 
     private FieldReferringClassFactory() {
     }
 
-    public static synchronized ValueProvider create(Class<?> targetClass, String identifier, String propertyName) {
+    public static ValueProvider create(Class<?> targetClass, String identifier, String propertyName) {
         String key = nameForType(targetClass, propertyName) + '$' + identifier;
         return valueProviders.computeIfAbsent(key, k -> createFieldReferringInstance(targetClass, identifier, propertyName));
     }
