@@ -84,7 +84,7 @@ public class MultithreadedTest {
 
     @State(Scope.Thread)
     public static class FactsState {
-        public static int NUMBER_OF_FACTS = 1000;
+        public static final int NUMBER_OF_FACTS = 1000;
         private List<SimpleFact> facts;
 
         @Setup(Level.Invocation)
@@ -98,7 +98,7 @@ public class MultithreadedTest {
 
     @State(Scope.Thread)
     public static class EngineState {
-        public static int NUMBER_OF_RULES = 500;
+        public static final int NUMBER_OF_RULES = 500;
         private RulesEngine engine;
 
         @Setup(Level.Invocation)
