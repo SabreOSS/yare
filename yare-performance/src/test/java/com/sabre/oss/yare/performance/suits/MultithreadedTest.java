@@ -71,26 +71,28 @@ public class MultithreadedTest {
     }
 
     @Benchmark
-    public void benchmark(EngineState state, FactsState threadState) {
+    public void benchmark(EngineState engineState, FactsState factsState) {
         //given
         String uri = UUID.randomUUID().toString();
-        RuleSession session = state.engine.createSession(uri);
+        RuleSession session = engineState.engine.createSession(uri);
         //when
-        ArrayList<Object> result = session.execute(new ArrayList<>(), threadState.facts);
+        ArrayList<Object> result = session.execute(new ArrayList<>(), factsState.facts);
         //then
-        int expectedResultSize = EngineState.NUMBER_OF_RULES * FactsState.NUMBER_OF_FACTS;
+        int expectedResultSize = engineState.numberOfRules * factsState.numberOfFacts;
         assertThat(result.size()).isEqualTo(expectedResultSize);
     }
 
     @State(Scope.Thread)
     public static class FactsState {
-        public static final int NUMBER_OF_FACTS = 1000;
+
+        @Param({"50","100"})
+        public int numberOfFacts;
         private List<SimpleFact> facts;
 
         @Setup(Level.Invocation)
         public void init() {
             facts = IntStream
-                    .range(0, NUMBER_OF_FACTS)
+                    .range(0, numberOfFacts)
                     .mapToObj(i -> new SimpleFact("1"))
                     .collect(Collectors.toList());
         }
@@ -98,40 +100,43 @@ public class MultithreadedTest {
 
     @State(Scope.Thread)
     public static class EngineState {
-        public static final int NUMBER_OF_RULES = 500;
+        @Param({"50","100"})
+        public int numberOfRules;
+        @Param({"5", "50", "500"})
+        public int ruleComplexity;
         private RulesEngine engine;
 
         @Setup(Level.Invocation)
         public void init() {
             engine = new RulesEngineBuilder()
-                    .withRulesRepository(initializeRuleRepository(NUMBER_OF_RULES))
+                    .withRulesRepository(initializeRuleRepository(numberOfRules, ruleComplexity))
                     .withRulesExecutorBuilder(new DefaultRulesExecutorBuilder())
                     .withActionMapping("collectValueAction",
                             method(new CollectValueAction(), (action) -> action.execute(null, null)))
                     .build();
         }
 
-        static RulesRepository initializeRuleRepository(int testRuleCount) {
+        static RulesRepository initializeRuleRepository(int testRuleCount, int ruleComplexity) {
             RulesRepository rulesRepository = mock(RulesRepository.class);
-            when(rulesRepository.get(anyString())).thenReturn(createTestRules(testRuleCount));
+            when(rulesRepository.get(anyString())).thenReturn(createTestRules(testRuleCount, ruleComplexity));
             return rulesRepository;
         }
 
-        static List<Rule> createTestRules(final int testRuleCount) {
+        static List<Rule> createTestRules(int testRuleCount, int ruleComplexity) {
             return IntStream
                     .range(0, testRuleCount)
-                    .mapToObj(EngineState::createRule)
+                    .mapToObj(id -> createRule(id, ruleComplexity))
                     .collect(Collectors.toList());
         }
 
-        static Rule createRule(int index) {
+        static Rule createRule(int index, int ruleComplexity) {
             return RuleDsl.ruleBuilder()
                     .name(String.valueOf(index))
                     .fact("simpleStringValueFact", SimpleFact.class)
                     .priority(0L)
                     .predicate(
                             RuleDsl.and(
-                                    IntStream.range(0, 500).mapToObj(x -> RuleDsl.equal(
+                                    IntStream.range(0, ruleComplexity).mapToObj(x -> RuleDsl.equal(
                                             RuleDsl.value("${simpleStringValueFact.value}"),
                                             RuleDsl.value("1")
                                     )).toArray(Expression[]::new)
