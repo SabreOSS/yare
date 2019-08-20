@@ -85,7 +85,7 @@ public class MultithreadedTest {
     @State(Scope.Thread)
     public static class FactsState {
 
-        @Param({"50","100"})
+        @Param({"50", "100"})
         public int numberOfFacts;
         private List<SimpleFact> facts;
 
@@ -100,7 +100,7 @@ public class MultithreadedTest {
 
     @State(Scope.Thread)
     public static class EngineState {
-        @Param({"50","100"})
+        @Param({"50", "100"})
         public int numberOfRules;
         @Param({"5", "50", "500"})
         public int ruleComplexity;
