@@ -147,10 +147,10 @@ function build() {
     echo "Travis jdk version: ${TRAVIS_JDK_VERSION}"
     local release_commit_message_pattern="^Release ${releaseVersion}$"
     if [[ "${TRAVIS_COMMIT_MESSAGE}" =~ ${release_commit_message_pattern} ]]; then
-        if [[ "${TRAVIS_JDK_VERSION}" == "oraclejdk8" ]]; then
+        if [[ "${TRAVIS_JDK_VERSION}" == "openjdk8" ]]; then
             perform_release_build
         else
-            echo "Skipping release build for Travis jdk version '${TRAVIS_JDK_VERSION}', only 'oraclejdk8' is supported."
+            echo "Skipping release build for Travis jdk version '${TRAVIS_JDK_VERSION}', only 'openjdk8' is supported."
         fi
     else
         perform_regular_build
