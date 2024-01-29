@@ -104,7 +104,7 @@
     </issueManagement>
     <ciManagement>
         <system>Travis CI</system>
-        <url>https://travis-ci.org/SabreOSS/yare</url>
+        <url>https://github.com/SabreOSS/yare/actions</url>
     </ciManagement>
     <distributionManagement>
         <repository>
