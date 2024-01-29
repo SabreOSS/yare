@@ -125,12 +125,6 @@
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
 
-        <!-- Size Violations -->
-        <module name="LineLength">
-            <!-- reduce it to 120 -->
-            <property name="max" value="200"/>
-        </module>
-
         <!-- Whitespace -->
         <module name="EmptyForInitializerPad"/>
         <module name="EmptyForIteratorPad"/>
