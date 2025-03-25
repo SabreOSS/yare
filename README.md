@@ -26,6 +26,7 @@
 
 [![Build Status](https://travis-ci.org/SabreOSS/yare.svg?branch=master)](https://travis-ci.org/SabreOSS/yare)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.sabre.oss.yare/yare/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.sabre.oss.yare/yare)
+[![libs.tech recommends](https://libs.tech/project/132126497/badge.svg)](https://libs.tech/project/132126497/yare)
 
 **YARE** (**Y**et **A**nother **R**ules **E**ngine) is a rule engine written in Java.
 It is an approach to implement an Expert System which is reliable, fast and full of capabilities.
